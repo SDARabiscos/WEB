@@ -25,13 +25,13 @@
   </script>
   <style>
     body { background-color: theme('colors.sda-bg'); color: #f8fafc; }
-   .glass-card {
+  .glass-card {
       background: theme('colors.sda-surface');
       border: 1px solid theme('colors.sda-border');
       box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.5);
       transition: transform 0.2s ease, box-shadow 0.2s ease;
     }
-   .glass-card:hover { transform: translateY(-2px); box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5); }
+  .glass-card:hover { transform: translateY(-2px); box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5); }
     #progress-bar { transition: transform 0.1s linear; transform-origin: left; }
   </style>
 </head>
@@ -103,7 +103,7 @@
 
       if (remainingMs === 0) {
         targetTime = Date.now() + REFRESH_INTERVAL_MS;
-        carregarDados(); // Carrega os dados silenciosamente via fetch sem dar F5 na página [5]
+        carregarDados(); // Carrega os dados silenciosamente via fetch sem dar F5 na página
       }
       requestAnimationFrame(updateTimer);
     }
@@ -116,8 +116,6 @@
         const response = await fetch(API_URL);
         const data = await response.json();
         
-        // Exemplo: populando as métricas caso seu JSON tenha esses atributos.
-        // Se o JSON gerado pelo seu script tiver propriedades diferentes, ajuste os nomes abaixo.
         document.getElementById('metric-sessoes').textContent = data.sessoes |
 
 | "0";
