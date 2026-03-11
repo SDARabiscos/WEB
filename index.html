@@ -1,425 +1,197 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-BR" class="dark">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Dashboard LP — SDA Ao Vivo 2026</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-<style>
-:root{--bg:#060612;--card:#0e0e1f;--card2:#141428;--border:#1a1a32;--green:#00ff88;--green2:#00cc6a;--blue:#4dabf7;--purple:#c084fc;--red:#ff6b6b;--yellow:#ffd93d;--text:#e2e2f0;--text2:#888898;--text3:#44445a}
-*{margin:0;padding:0;box-sizing:border-box}
-body{background:var(--bg);font-family:'Inter',sans-serif;color:var(--text);min-height:100vh;-webkit-font-smoothing:antialiased}
-::selection{background:#00ff8833;color:#fff}
-
-/* HEADER */
-.header{background:linear-gradient(180deg,#00ff8808 0%,var(--bg) 100%);padding:20px 24px 16px;position:sticky;top:0;z-index:100;backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-bottom:1px solid var(--border)}
-.header-grid{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
-.header-brand{color:var(--green);font-size:10px;letter-spacing:4px;text-transform:uppercase;font-weight:700;opacity:.6}
-.header h1{color:#fff;font-size:18px;font-weight:800;margin-top:4px}
-.status-pill{display:inline-flex;align-items:center;gap:6px;padding:5px 12px;border-radius:20px;font-size:10px;font-weight:700;letter-spacing:.5px}
-.status-pill .dot{width:6px;height:6px;border-radius:50%;animation:pulse 2s infinite}
-@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
-.header-actions{display:flex;gap:8px;margin-top:12px;align-items:center;flex-wrap:wrap}
-.header-info{color:var(--text3);font-size:11px}
-.btn{display:inline-flex;align-items:center;gap:6px;background:var(--card2);border:1px solid var(--border);border-radius:10px;padding:8px 16px;color:var(--green);cursor:pointer;font-size:11px;font-weight:600;font-family:inherit;transition:all .2s}
-.btn:hover{background:var(--border);transform:translateY(-1px)}
-.btn:active{transform:translateY(0)}
-.btn:disabled{opacity:.4;cursor:default;transform:none}
-.btn-email{color:var(--yellow);border-color:#ffd93d22}
-.btn-email:hover{background:#ffd93d11}
-
-/* COUNTDOWN */
-.countdown-bar{height:2px;background:var(--border);position:relative;overflow:hidden}
-.countdown-fill{height:100%;background:var(--green);transition:width 1s linear;border-radius:2px}
-
-/* TABS */
-.tabs{display:flex;gap:4px;padding:16px 24px 8px;overflow-x:auto;-webkit-overflow-scrolling:touch}
-.tabs::-webkit-scrollbar{display:none}
-.tab{background:var(--card);border:1px solid transparent;border-radius:12px;padding:10px 18px;color:var(--text3);cursor:pointer;font-size:12px;font-weight:600;white-space:nowrap;font-family:inherit;transition:all .2s}
-.tab:hover{color:var(--text2)}
-.tab.active{background:#00ff8815;border-color:#00ff8830;color:var(--green)}
-
-/* CONTENT */
-.content{padding:8px 24px 40px;max-width:800px;margin:0 auto}
-
-/* CARDS */
-.card-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:8px}
-@media(max-width:500px){.card-grid{grid-template-columns:repeat(2,1fr)}}
-.m-card{background:var(--card);border-radius:16px;padding:20px 16px;text-align:center;position:relative;overflow:hidden;transition:transform .2s}
-.m-card:hover{transform:translateY(-2px)}
-.m-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px}
-.m-card .label{color:var(--text3);font-size:9px;text-transform:uppercase;letter-spacing:2px;font-weight:700}
-.m-card .val{font-size:28px;font-weight:900;margin:10px 0 4px;line-height:1}
-.m-card .sub{color:var(--text3);font-size:10px;font-weight:500}
-
-/* NOTA */
-.nota-wrap{text-align:center;padding:20px 0}
-.nota-card{display:inline-flex;flex-direction:column;align-items:center;background:var(--card);border-radius:24px;padding:28px 52px;position:relative;overflow:hidden}
-.nota-card::after{content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);width:60%;height:3px;border-radius:0 0 4px 4px}
-.nota-num{font-size:56px;font-weight:900;line-height:1;margin:10px 0 6px}
-.nota-num span{font-size:22px;opacity:.3}
-.nota-label{font-size:11px;font-weight:800;letter-spacing:2px}
-
-/* RESUMO / ALERTA */
-.resumo{background:var(--card);border-radius:14px;padding:18px 22px;margin-bottom:14px;font-size:13px;line-height:1.75;color:var(--text2);position:relative;overflow:hidden}
-.resumo::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--green);border-radius:0 3px 3px 0}
-.alerta{background:#ff6b6b08;border:1px solid #ff6b6b22;border-radius:14px;padding:16px 20px;margin-bottom:14px;color:var(--red);font-size:13px;display:flex;gap:10px;align-items:flex-start}
-
-/* TENDÊNCIA */
-.trend-box{background:var(--card);border-radius:16px;padding:22px;margin-bottom:16px}
-.trend-header{display:flex;align-items:center;gap:14px;margin-bottom:20px}
-.trend-icon{font-size:30px;line-height:1}
-.trend-label{font-weight:800;font-size:16px;text-transform:uppercase;letter-spacing:.5px}
-.trend-sub{color:var(--text3);font-size:12px;margin-top:3px;font-weight:500}
-.chart{display:flex;align-items:flex-end;gap:8px;height:130px}
-.chart-col{flex:1;display:flex;flex-direction:column;align-items:center}
-.chart-bar{width:100%;max-width:44px;border-radius:8px 8px 4px 4px;background:linear-gradient(180deg,var(--green),#00ff8822);transition:height .6s cubic-bezier(.4,0,.2,1)}
-.chart-val{color:var(--green);font-size:12px;font-weight:700;margin-top:8px}
-.chart-day{color:var(--text3);font-size:10px;margin-top:2px;font-weight:500}
-
-/* VARIANTES */
-.var-row{display:flex;align-items:center;padding:16px 20px;gap:16px;border-bottom:1px solid var(--border);transition:background .2s}
-.var-row:hover{background:#ffffff03}
-.var-row:last-child{border:none}
-.var-letter{color:var(--purple);font-weight:900;font-size:22px;min-width:32px}
-.progress-bg{background:var(--bg);border-radius:8px;height:8px;width:100%;overflow:hidden}
-.progress-fill{height:100%;border-radius:8px;transition:width .6s cubic-bezier(.4,0,.2,1)}
-
-/* DEVICE CARDS */
-.dev-card{background:var(--card);border-radius:16px;padding:22px;margin-bottom:10px;transition:transform .2s}
-.dev-card:hover{transform:translateY(-2px)}
-.dev-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
-.dev-name{font-size:16px;font-weight:700}
-.dev-badge{padding:5px 14px;border-radius:20px;font-size:11px;font-weight:700}
-.dev-metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
-@media(max-width:400px){.dev-metrics{grid-template-columns:repeat(2,1fr)}}
-.dev-m{background:var(--bg);border-radius:12px;padding:16px 12px;text-align:center}
-.dev-m .dm-l{color:var(--text3);font-size:9px;text-transform:uppercase;letter-spacing:1px;font-weight:600}
-.dev-m .dm-v{font-size:22px;font-weight:800;margin-top:6px}
-.traffic-bar{display:flex;border-radius:10px;overflow:hidden;height:32px;margin-top:12px}
-.traffic-seg{display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:var(--bg);transition:width .6s}
-
-/* UX / CRO CARDS */
-.ux-card{background:var(--card);border-radius:16px;padding:22px;margin-bottom:10px;transition:transform .2s}
-.ux-card:hover{transform:translateY(-2px)}
-.ux-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
-.ux-area{color:#fff;font-weight:700;font-size:14px}
-.badge{padding:4px 12px;border-radius:20px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px}
-.ux-prob{color:var(--text2);font-size:13px;line-height:1.6;margin-bottom:12px}
-.ux-tip{background:#00ff8808;border:1px solid #00ff8815;border-radius:10px;padding:12px 16px;color:var(--green);font-size:12px;line-height:1.6;font-weight:500}
-.cro-card{background:var(--card);border-radius:16px;padding:22px;margin-bottom:10px;display:flex;gap:18px;align-items:flex-start;transition:transform .2s}
-.cro-card:hover{transform:translateY(-2px)}
-.cro-num{background:#00ff8815;color:var(--green);min-width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:17px;flex-shrink:0}
-.cro-impact{background:#00ff8810;display:inline-block;padding:5px 14px;border-radius:20px;color:var(--green);font-size:11px;font-weight:700;margin-top:6px}
-
-/* MODAL */
-.modal-overlay{position:fixed;inset:0;background:#000000cc;z-index:200;display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;pointer-events:none;transition:opacity .3s}
-.modal-overlay.show{opacity:1;pointer-events:all}
-.modal{background:var(--card);border-radius:20px;padding:32px;max-width:440px;width:100%;transform:scale(.95);transition:transform .3s}
-.modal-overlay.show .modal{transform:scale(1)}
-.modal h2{color:#fff;font-size:18px;margin-bottom:6px}
-.modal p{color:var(--text2);font-size:13px;margin-bottom:16px;line-height:1.5}
-.modal input{width:100%;background:var(--bg);border:1px solid var(--border);border-radius:12px;padding:14px 16px;color:#fff;font-size:14px;font-family:inherit;outline:none;transition:border .2s}
-.modal input:focus{border-color:var(--green)}
-.modal-btns{display:flex;gap:10px;margin-top:16px}
-.modal-btns button{flex:1;padding:14px;border-radius:12px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;border:none}
-.btn-confirm{background:var(--green);color:var(--bg)}
-.btn-cancel{background:var(--card2);color:var(--text2);border:1px solid var(--border)}
-
-/* FOOTER */
-.footer{text-align:center;padding:20px 0 40px;border-top:1px solid var(--border)}
-.footer div{color:var(--text3);font-size:10px;letter-spacing:2px;opacity:.4}
-
-/* LOADING */
-.loading{display:flex;align-items:center;justify-content:center;flex-direction:column;gap:20px;min-height:100vh;background:var(--bg)}
-.spinner{width:44px;height:44px;border:3px solid #00ff8822;border-top:3px solid var(--green);border-radius:50%;animation:spin .8s linear infinite}
-@keyframes spin{to{transform:rotate(360deg)}}
-.hidden{display:none!important}
-
-/* SECTION */
-.sec-title{color:#fff;font-size:15px;font-weight:700;margin:20px 0 12px;display:flex;align-items:center;gap:8px}
-.sec-sub{color:var(--text3);font-size:12px;margin-bottom:16px;font-weight:500}
-</style>
-</head>
-<body>
-
-<div id="loading-screen" class="loading">
-  <div class="spinner"></div>
-  <div style="color:var(--green);font-size:14px;font-weight:600" id="load-msg">Conectando...</div>
-  <div style="color:var(--text3);font-size:11px">Buscando dados da Web App</div>
-</div>
-
-<div id="error-screen" class="loading hidden">
-  <div style="font-size:52px">⚠️</div>
-  <div style="color:var(--red);font-size:18px;font-weight:700;margin-top:8px">Falha ao carregar</div>
-  <div style="color:var(--text3);font-size:13px;text-align:center;max-width:360px;line-height:1.6;margin-top:4px">
-    Verifique se <code style="color:var(--green)">executarAnalise</code> já rodou e se a Web App está implantada.
-  </div>
-  <button class="btn" style="margin-top:16px;background:var(--green);color:var(--bg);padding:14px 32px;font-size:14px;font-weight:800;border:none" onclick="fetchData()">🔄 Tentar Novamente</button>
-</div>
-
-<div id="dashboard" class="hidden">
-  <div class="header">
-    <div class="header-grid">
-      <div>
-        <div class="header-brand">Performance Dashboard</div>
-        <h1>LP — SDA Ao Vivo 2026</h1>
-      </div>
-      <div style="text-align:right">
-        <div class="status-pill" id="status-pill">
-          <span class="dot" id="status-dot"></span>
-          <span id="status-text"></span>
-        </div>
-        <div id="last-update" style="font-size:10px;color:var(--text3);margin-top:6px"></div>
-        <div id="next-refresh" style="font-size:10px;color:var(--text3);margin-top:2px"></div>
-      </div>
-    </div>
-    <div class="header-actions">
-      <div class="header-info">Últimos 7 dias • Conversão & UI/UX</div>
-      <div style="flex:1"></div>
-      <button class="btn btn-email" onclick="showEmailModal()">📧 Enviar Relatório</button>
-      <button class="btn" id="refresh-btn" onclick="fetchData()">🔄 Atualizar</button>
-    </div>
-  </div>
-  <div class="countdown-bar"><div class="countdown-fill" id="countdown-fill"></div></div>
-  <div id="banner-area"></div>
-
-  <div class="tabs">
-    <button class="tab active" onclick="switchTab('overview',this)">📊 Visão Geral</button>
-    <button class="tab" onclick="switchTab('devices',this)">📱 Dispositivos</button>
-    <button class="tab" onclick="switchTab('ux',this)">🔍 UX</button>
-    <button class="tab" onclick="switchTab('cro',this)">🎯 CRO</button>
-  </div>
-
-  <div class="content">
-    <div id="tab-overview"></div>
-    <div id="tab-devices" class="hidden"></div>
-    <div id="tab-ux" class="hidden"></div>
-    <div id="tab-cro" class="hidden"></div>
-  </div>
-
-  <div class="footer"><div>SDA AO VIVO 2026 • DASHBOARD AUTOMÁTICO • CLAUDE AI</div></div>
-</div>
-
-<!-- EMAIL MODAL -->
-<div class="modal-overlay" id="email-modal">
-  <div class="modal">
-    <h2>📧 Enviar Relatório</h2>
-    <p>O relatório completo será enviado para o e-mail abaixo.</p>
-    <input type="email" id="email-input" placeholder="seuemail@exemplo.com" value="">
-    <div id="email-msg" style="font-size:12px;margin-top:8px;min-height:18px"></div>
-    <div class="modal-btns">
-      <button class="btn-cancel" onclick="closeEmailModal()">Cancelar</button>
-      <button class="btn-confirm" onclick="sendEmail()">Enviar Agora</button>
-    </div>
-  </div>
-</div>
-
-<script>
-var WEB_APP="https://script.google.com/macros/s/AKfycbz5NEXfcvzY-VrhQp02JfbGKc6tFcp-wkxE4CmtSQbaVpNt_K-WmWQZEpWFofORVJqXDA/exec";
-var CACHE_KEY="sda_dash_v3";
-var REFRESH_MS=30*60*1000;
-var D=null,lastFetch=null,refreshTimer=null,countdownTimer=null;
-
-function switchTab(id,el){
-  document.querySelectorAll('.tab').forEach(function(t){t.classList.remove('active')});
-  el.classList.add('active');
-  ['overview','devices','ux','cro'].forEach(function(t){document.getElementById('tab-'+t).classList.toggle('hidden',t!==id)});
-}
-
-function setStatus(s){
-  var colors={online:"#00ff88",cache:"#ffd93d",loading:"#4dabf7",error:"#ff6b6b"};
-  var labels={online:"AO VIVO",cache:"CACHE",loading:"ATUALIZANDO",error:"OFFLINE"};
-  var pill=document.getElementById('status-pill');
-  var dot=document.getElementById('status-dot');
-  var txt=document.getElementById('status-text');
-  pill.style.background=(colors[s]||"#555")+"15";
-  pill.style.color=colors[s]||"#555";
-  dot.style.background=colors[s]||"#555";
-  txt.textContent=labels[s]||"";
-}
-
-function setLastUpdate(date){
-  var el=document.getElementById('last-update');
-  if(el&&date) el.textContent="Atualizado: "+date.toLocaleString("pt-BR");
-  lastFetch=date;
-  startCountdown();
-}
-
-function startCountdown(){
-  if(countdownTimer) clearInterval(countdownTimer);
-  countdownTimer=setInterval(function(){
-    if(!lastFetch) return;
-    var next=new Date(lastFetch.getTime()+REFRESH_MS);
-    var diff=next-new Date();
-    var el=document.getElementById('next-refresh');
-    var bar=document.getElementById('countdown-fill');
-    if(diff<=0){
-      if(el) el.textContent="Atualizando...";
-      if(bar) bar.style.width="100%";
-      return;
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard Analítico — SDA Ao Vivo 2026</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: { sans: ['Inter', 'sans-serif'] },
+          colors: {
+            'sda-bg': 'hsl(224, 71%, 4%)',
+            'sda-surface': 'hsl(215, 28%, 17%)',
+            'sda-brand': 'hsl(24, 100%, 50%)',
+            'sda-brand-hover': 'hsl(24, 100%, 45%)',
+            'sda-border': 'hsl(217, 33%, 25%)',
+          }
+        }
+      }
     }
-    var m=Math.floor(diff/60000);
-    var s=Math.floor((diff%60000)/1000);
-    if(el) el.textContent="Próximo refresh: "+m+"m "+s+"s";
-    var pct=100-((diff/REFRESH_MS)*100);
-    if(bar) bar.style.width=pct+"%";
-  },1000);
-}
+  </script>
+  <style>
+    body { background-color: theme('colors.sda-bg'); color: #f8fafc; }
+   .glass-card {
+      background: theme('colors.sda-surface');
+      border: 1px solid theme('colors.sda-border');
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.5);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+   .glass-card:hover { transform: translateY(-2px); box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5); }
+    #progress-bar { transition: transform 0.1s linear; transform-origin: left; }
+  </style>
+</head>
+<body class="min-h-screen p-6 md:p-10 antialiased">
+  <div class="max-w-6xl mx-auto">
+    
+    <header class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 glass-card p-6 rounded-2xl gap-6">
+      <div>
+        <h1 class="text-2xl font-bold tracking-tight">Performance LP <span class="text-sda-brand">SDA Ao Vivo</span></h1>
+        <p class="text-sm text-slate-400 mt-1">Análise de tráfego e conversão em tempo real</p>
+      </div>
+      <div class="flex items-center gap-5 w-full md:w-auto">
+        <div class="text-right flex-1 md:flex-none">
+          <p class="text-xs font-medium text-slate-400 uppercase tracking-wider">Próximo refresh</p>
+          <p id="countdown-text" class="text-xl font-mono font-semibold text-white">30:00</p>
+        </div>
+        <button onclick="enviarEmail()" id="btn-email" class="bg-sda-brand hover:bg-sda-brand-hover text-white px-5 py-2.5 rounded-lg font-semibold transition-colors flex items-center gap-2 shadow-lg shadow-orange-900/20 whitespace-nowrap">
+          <span id="btn-email-text">📧 Enviar Relatório</span>
+        </button>
+      </div>
+    </header>
 
-function saveCache(data){try{localStorage.setItem(CACHE_KEY,JSON.stringify({data:data,at:new Date().toISOString()}))}catch(e){}}
-function loadCache(){try{var c=localStorage.getItem(CACHE_KEY);if(c)return JSON.parse(c)}catch(e){}return null}
+    <div class="w-full bg-sda-surface rounded-full h-1 mb-8 overflow-hidden border border-sda-border">
+      <div id="progress-bar" class="bg-sda-brand h-1 rounded-full w-full"></div>
+    </div>
 
-function fetchData(){
-  setStatus("loading");
-  var btn=document.getElementById('refresh-btn');
-  btn.disabled=true;btn.textContent="⏳ ...";
-  document.getElementById('load-msg').textContent="Buscando dados...";
+    <div id="status-message" class="hidden p-4 rounded-xl mb-6 text-center font-medium shadow-md"></div>
 
-  fetch(WEB_APP,{redirect:"follow"})
-  .then(function(r){return r.text()})
-  .then(function(text){
-    var clean=text.trim();
-    var s=clean.indexOf("{"),e=clean.lastIndexOf("}");
-    if(s>=0&&e>s) clean=clean.substring(s,e+1);
-    var json=JSON.parse(clean);
-    D=json;
-    setStatus("online");
-    setLastUpdate(new Date());
-    saveCache(json);
-    render();
-    show("dashboard");
-    document.getElementById('banner-area').innerHTML='';
-  })
-  .catch(function(){
-    var c=loadCache();
-    if(c&&c.data){
-      D=c.data;setStatus("cache");setLastUpdate(new Date(c.at));render();show("dashboard");
-      document.getElementById('banner-area').innerHTML='<div style="background:#ffd93d08;border-bottom:1px solid #ffd93d15;padding:10px 24px;color:var(--yellow);font-size:11px;text-align:center">📦 Exibindo cache — clique Atualizar para dados frescos</div>';
-    } else { show("error-screen"); }
-  })
-  .finally(function(){btn.disabled=false;btn.textContent="🔄 Atualizar"});
-}
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+      <div class="glass-card p-6 rounded-2xl">
+        <h3 class="text-slate-400 text-sm font-semibold mb-2 uppercase tracking-wider">Sessões Totais</h3>
+        <p class="text-4xl font-bold" id="metric-sessoes">--</p>
+      </div>
+      <div class="glass-card p-6 rounded-2xl">
+        <h3 class="text-slate-400 text-sm font-semibold mb-2 uppercase tracking-wider">Leads da Página</h3>
+        <p class="text-4xl font-bold" id="metric-leads">--</p>
+      </div>
+      <div class="glass-card p-6 rounded-2xl border-t-4 border-t-sda-brand">
+        <h3 class="text-slate-400 text-sm font-semibold mb-2 uppercase tracking-wider">Taxa de Conversão</h3>
+        <p class="text-4xl font-bold text-sda-brand" id="metric-conversao">--</p>
+      </div>
+    </div>
 
-function show(id){['loading-screen','error-screen','dashboard'].forEach(function(s){document.getElementById(s).classList.toggle('hidden',s!==id)})}
+    <div class="glass-card p-6 rounded-2xl">
+      <h3 class="text-slate-200 text-sm font-semibold mb-4 border-b border-sda-border pb-2">Log de Dados Brutos</h3>
+      <pre id="json-container" class="text-xs text-slate-400 overflow-x-auto whitespace-pre-wrap font-mono">Aguardando sincronização com o Google Apps Script...</pre>
+    </div>
+  </div>
 
-function showEmailModal(){
-  document.getElementById('email-modal').classList.add('show');
-  document.getElementById('email-msg').textContent='';
-  document.getElementById('email-input').focus();
-}
-function closeEmailModal(){document.getElementById('email-modal').classList.remove('show')}
+  <script>
+    // IMPORTANTE: Cole abaixo a URL PÚBLICA do seu Google Apps Script (Terminada em /exec)
+    const API_URL = "SUA_URL_DO_WEB_APP_AQUI_TERMINADA_EM_/EXEC";
 
-function sendEmail(){
-  var email=document.getElementById('email-input').value.trim();
-  var msg=document.getElementById('email-msg');
-  if(!email||!email.includes('@')){msg.style.color='var(--red)';msg.textContent='Digite um e-mail válido';return}
-  msg.style.color='var(--yellow)';msg.textContent='Enviando...';
-  fetch(WEB_APP+"?action=email&to="+encodeURIComponent(email),{redirect:"follow"})
-  .then(function(r){return r.text()})
-  .then(function(){
-    msg.style.color='var(--green)';msg.textContent='✅ Relatório enviado para '+email;
-    setTimeout(closeEmailModal,2500);
-  })
-  .catch(function(){msg.style.color='var(--red)';msg.textContent='Erro ao enviar. Tente novamente.'});
-}
+    // 1. Lógica Absoluta de Contagem e Refresh (Evita throttling em abas inativas)
+    const REFRESH_INTERVAL_MS = 30 * 60 * 1000; // 30 minutos
+    let targetTime = Date.now() + REFRESH_INTERVAL_MS;
 
-function progress(pct,color){return '<div class="progress-bg"><div class="progress-fill" style="background:'+color+';width:'+Math.min(parseFloat(pct)||0,100)+'%"></div></div>'}
-function badge(level){var c={alto:"var(--red)","médio":"var(--yellow)",baixo:"var(--green)"}[level]||"#888";return '<span class="badge" style="background:'+c+'15;color:'+c+'">'+level+'</span>'}
-function num(v){return typeof v==='number'?v.toLocaleString('pt-BR'):v}
+    function updateTimer() {
+      const now = Date.now();
+      const remainingMs = Math.max(0, targetTime - now);
 
-function render(){
-  if(!D) return;
-  var d=D;
-  var nota=parseFloat(d.nota_performance)||0;
-  var nC=nota>=7?"var(--green)":nota>=4?"var(--yellow)":"var(--red)";
-  var nL=nota>=7?"SAUDÁVEL":nota>=4?"ATENÇÃO":"CRÍTICO";
-  var tI=d.tendencia==="crescendo"?"📈":d.tendencia==="caindo"?"📉":"➡️";
-  var tC=d.tendencia==="crescendo"?"var(--green)":d.tendencia==="caindo"?"var(--red)":"var(--yellow)";
+      const minutes = Math.floor(remainingMs / 60000);
+      const seconds = Math.floor((remainingMs % 60000) / 1000);
+      document.getElementById('countdown-text').textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
 
-  // CHART
-  var chartHTML="";
-  if(d.leads_por_dia&&typeof d.leads_por_dia==="object"){
-    var entries=Object.entries(d.leads_por_dia).sort(function(a,b){return a[0].localeCompare(b[0])});
-    var max=Math.max.apply(null,entries.map(function(e){return e[1]}))||1;
-    chartHTML='<div class="chart">'+entries.map(function(e){
-      var h=Math.max((e[1]/max)*110,8);
-      var label=e[0].substring(8,10)+"/"+e[0].substring(5,7);
-      return '<div class="chart-col"><div class="chart-bar" style="height:'+h+'px"></div><div class="chart-val">'+e[1]+'</div><div class="chart-day">'+label+'</div></div>';
-    }).join("")+'</div>';
-  }
+      // Usa transform scaleX para alto desempenho (GPU) sem acionar repaint na renderização
+      const progressPercentage = remainingMs / REFRESH_INTERVAL_MS;
+      document.getElementById('progress-bar').style.transform = `scaleX(${progressPercentage})`;
 
-  // VARIANTES
-  var varHTML="";
-  if(d.variantes&&d.variantes.length){
-    varHTML='<div class="sec-title">🔀 Variantes da LP</div><div style="background:var(--card);border-radius:16px;overflow:hidden">'+
-    d.variantes.map(function(v){
-      return '<div class="var-row"><div class="var-letter">'+v.variante+'</div><div style="flex:1">'+progress(parseFloat(v.pct),"var(--purple)")+'</div><div style="color:var(--purple);font-weight:800;font-size:18px;min-width:40px;text-align:right">'+v.leads+'</div><div style="color:var(--text3);font-size:12px;min-width:50px;text-align:right">'+v.pct+'</div></div>';
-    }).join("")+'</div>';
-  }
+      if (remainingMs === 0) {
+        targetTime = Date.now() + REFRESH_INTERVAL_MS;
+        carregarDados(); // Carrega os dados silenciosamente via fetch sem dar F5 na página [5]
+      }
+      requestAnimationFrame(updateTimer);
+    }
+    requestAnimationFrame(updateTimer);
 
-  // OVERVIEW
-  document.getElementById('tab-overview').innerHTML=
-    '<div class="nota-wrap"><div class="nota-card" style="border:1px solid '+nC+'22"><div style="position:absolute;top:0;left:50%;transform:translateX(-50%);width:60%;height:3px;background:'+nC+';border-radius:0 0 4px 4px"></div><div style="color:var(--text3);font-size:10px;text-transform:uppercase;letter-spacing:2px;font-weight:700">Nota da LP</div><div class="nota-num" style="color:'+nC+'">'+d.nota_performance+'<span>/10</span></div><div class="nota-label" style="color:'+nC+'">'+nL+'</div></div></div>'+
-    '<div class="resumo">'+((d.resumo||""))+'</div>'+
-    (d.alerta&&d.alerta!=="null"&&d.alerta!==null?'<div class="alerta"><span>🚨</span><div><strong>ALERTA:</strong> '+d.alerta+'</div></div>':"")+
-    '<div class="card-grid">'+
-    mCard("Sessões",d.sessoes||0,"7 dias","var(--blue)")+
-    mCard("Visitantes",d.visitantes||0,"únicos","var(--purple)")+
-    mCard("Leads LP",d.leads_7d||0,"variante","var(--green)")+
-    '</div><div class="card-grid" style="margin-bottom:20px">'+
-    mCard("Convert Rate",d.taxa_conversao||"0%","leads/sessões","var(--red)")+
-    mCard("Média/Dia",d.media_leads_dia||0,"leads","var(--yellow)")+
-    mCard("Pág/Sessão",d.paginas_por_sessao||0,"engajamento","var(--blue)")+
-    '</div>'+
-    '<div class="trend-box"><div class="trend-header"><span class="trend-icon">'+tI+'</span><div><div class="trend-label" style="color:'+tC+'">'+
-    (d.tendencia||"")+'</div><div class="trend-sub">'+(d.tendencia_detalhe||"")+'</div></div></div>'+chartHTML+'</div>'+varHTML;
+    // 2. Fetch dos dados do Google Sheets
+    async function carregarDados() {
+      if(API_URL.includes("SUA_URL_DO_WEB_APP_AQUI")) return; // Ignora se a URL não foi inserida
+      try {
+        const response = await fetch(API_URL);
+        const data = await response.json();
+        
+        // Exemplo: populando as métricas caso seu JSON tenha esses atributos.
+        // Se o JSON gerado pelo seu script tiver propriedades diferentes, ajuste os nomes abaixo.
+        document.getElementById('metric-sessoes').textContent = data.sessoes |
 
-  // DEVICES
-  var devC={Mobile:"var(--green)",mobile:"var(--green)",Desktop:"var(--blue)",desktop:"var(--blue)",Tablet:"var(--yellow)",tablet:"var(--yellow)"};
-  var devI={Mobile:"📱",mobile:"📱",Desktop:"🖥️",desktop:"🖥️",Tablet:"📟",tablet:"📟"};
-  var devHTML='<div class="sec-title">📱 Performance por Dispositivo</div>';
-  (d.dispositivos||[]).forEach(function(dv){
-    var cor=devC[dv.tipo]||"#888";
-    devHTML+='<div class="dev-card" style="border-left:3px solid '+cor+'"><div class="dev-header"><span class="dev-name">'+(devI[dv.tipo]||"📟")+' '+dv.tipo+'</span><span class="dev-badge" style="background:'+cor+'15;color:'+cor+'">'+dv.pct+' tráfego</span></div><div class="dev-metrics">'+
-    '<div class="dev-m"><div class="dm-l">Sessões</div><div class="dm-v" style="color:'+cor+'">'+(typeof dv.sessoes==="number"?num(dv.sessoes):dv.sessoes)+'</div></div>'+
-    '<div class="dev-m"><div class="dm-l">Visitantes</div><div class="dm-v" style="color:var(--text)">'+(typeof dv.visitantes==="number"?num(dv.visitantes):dv.visitantes)+'</div></div>'+
-    '<div class="dev-m"><div class="dm-l">Conv. Rate</div><div class="dm-v" style="color:var(--green)">'+(dv.convert_rate||"—")+'</div></div></div></div>';
-  });
-  if(d.dispositivos&&d.dispositivos.length){
-    devHTML+='<div style="background:var(--card);border-radius:14px;padding:18px;margin-top:8px"><div style="color:var(--text3);font-size:10px;margin-bottom:10px;text-transform:uppercase;letter-spacing:2px;font-weight:600">Distribuição</div><div class="traffic-bar">'+
-    d.dispositivos.map(function(dv){return '<div class="traffic-seg" style="width:'+(parseFloat(dv.pct)||0)+'%;background:'+(devC[dv.tipo]||"#888")+'">'+dv.tipo+' '+dv.pct+'</div>'}).join("")+'</div></div>';
-  }
-  document.getElementById('tab-devices').innerHTML=devHTML;
+| "0";
+        document.getElementById('metric-leads').textContent = data.leads_totais |
 
-  // UX
-  var uxHTML='<div class="sec-title">🔍 Diagnóstico UI/UX</div><div class="sec-sub">Problemas por área da LP, ordenados por impacto na conversão</div>';
-  (d.diagnostico_ux||[]).forEach(function(ux){
-    var corI=ux.impacto==="alto"?"var(--red)":ux.impacto==="médio"?"var(--yellow)":"var(--green)";
-    var ic=ux.impacto==="alto"?"🔴":ux.impacto==="médio"?"🟡":"🟢";
-    uxHTML+='<div class="ux-card" style="border-left:3px solid '+corI+'"><div class="ux-head"><span class="ux-area">'+ic+' '+ux.area+'</span>'+badge(ux.impacto)+'</div><div class="ux-prob">'+ux.problema+'</div><div class="ux-tip">💡 '+ux.sugestao+'</div></div>';
-  });
-  document.getElementById('tab-ux').innerHTML=uxHTML;
+| "0";
+        document.getElementById('metric-conversao').textContent = data.taxa_conversao |
 
-  // CRO
-  var croHTML='<div class="sec-title">🎯 Ações de CRO</div><div class="sec-sub">Otimizações por prioridade de impacto na conversão</div>';
-  (d.acoes_cro||[]).forEach(function(a){
-    croHTML+='<div class="cro-card"><div class="cro-num">'+a.prioridade+'</div><div style="flex:1"><div style="color:#fff;font-size:14px;font-weight:600;margin-bottom:2px">'+a.acao+'</div><div class="cro-impact">'+(a.impacto_esperado||"")+'</div></div></div>';
-  });
-  document.getElementById('tab-cro').innerHTML=croHTML;
-}
+| "0%";
+        
+        document.getElementById('json-container').textContent = JSON.stringify(data, null, 2);
+      } catch (error) {
+        console.error("Erro ao puxar dados:", error);
+        document.getElementById('json-container').textContent = "Falha na conexão com o banco de dados.";
+      }
+    }
+    carregarDados(); // Início imediato
 
-function mCard(title,value,sub,color){
-  return '<div class="m-card"><div style="position:absolute;top:0;left:0;right:0;height:3px;background:'+color+'"></div><div class="label">'+title+'</div><div class="val" style="color:'+color+'">'+(typeof value==="number"?num(value):value)+'</div><div class="sub">'+sub+'</div></div>';
-}
+    // 3. Função de Disparo de E-mail Bypassing CORS
+    async function enviarEmail() {
+      const btn = document.getElementById('btn-email');
+      const btnText = document.getElementById('btn-email-text');
+      const statusBox = document.getElementById('status-message');
+      
+      if(API_URL.includes("SUA_URL_DO_WEB_APP_AQUI")) {
+          alert("Por favor, configure sua API_URL no código fonte primeiro.");
+          return;
+      }
 
-// INIT
-(function(){
-  var c=loadCache();
-  if(c&&c.data){D=c.data;setLastUpdate(new Date(c.at));render();show("dashboard");setStatus("cache")}
-  fetchData();
-  refreshTimer=setInterval(fetchData,REFRESH_MS);
-})();
-</script>
+      const emailDestino = prompt("Digite o e-mail de destino do relatório:");
+      if (!emailDestino) return;
+
+      btn.disabled = true;
+      btn.classList.add('opacity-50', 'cursor-not-allowed');
+      btnText.textContent = "⏳ Processando...";
+      statusBox.className = "hidden";
+
+      try {
+        const payload = {
+          action: "email",
+          to: emailDestino,
+          conversao: document.getElementById('metric-conversao').textContent
+        };
+
+        // O SEGREDO DO CORS: redirect 'follow' obriga o front a seguir o redirecionamento 302
+        // O Content-Type 'text/plain' engana o preflight OPTIONS para requisições simples
+        const response = await fetch(API_URL, {
+          method: "POST",
+          redirect: "follow", 
+          headers: {
+            "Content-Type": "text/plain;charset=utf-8", 
+          },
+          body: JSON.stringify(payload)
+        });
+
+        const result = await response.json();
+
+        if (result.status === "success") {
+          statusBox.textContent = "✅ " + result.message;
+          statusBox.className = "p-4 rounded-xl mb-6 text-center font-medium bg-green-950 text-green-400 border border-green-800 block";
+        } else {
+          throw new Error(result.message);
+        }
+
+      } catch (error) {
+        console.error("Falha na negociação de tráfego:", error);
+        statusBox.textContent = "⚠️ Erro ao enviar relatório. Possível falha na rede.";
+        statusBox.className = "p-4 rounded-xl mb-6 text-center font-medium bg-red-950 text-red-400 border border-red-800 block";
+      } finally {
+        btn.disabled = false;
+        btn.classList.remove('opacity-50', 'cursor-not-allowed');
+        btnText.textContent = "📧 Enviar Relatório";
+      }
+    }
+  </script>
 </body>
 </html>
