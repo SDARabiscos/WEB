@@ -193,9 +193,28 @@ function sendEmail(){
   var msg=document.getElementById('email-msg');
   if(!email||!email.includes('@')){msg.style.color='#ff6b6b';msg.textContent='Digite um e-mail válido';return}
   msg.style.color='#ffd93d';msg.textContent='Enviando...';
-  fetch(WEB_APP,{method:'POST',redirect:'follow',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action:'email',to:email})})
-  .then(function(){msg.style.color='#00ff88';msg.textContent='✅ Enviado para '+email;setTimeout(closeEmailModal,2000)})
-  .catch(function(){msg.style.color='#ff6b6b';msg.textContent='Erro ao enviar. Tente novamente.'});
+  
+  var conversao=D&&D.taxa_conversao?D.taxa_conversao:'N/A';
+  
+  fetch(WEB_APP,{
+    method:'POST',
+    redirect:'follow',
+    headers:{'Content-Type':'text/plain;charset=utf-8'},
+    body:JSON.stringify({action:'email',to:email,conversao:conversao})
+  })
+  .then(function(r){return r.json()})
+  .then(function(result){
+    if(result.status==='success'){
+      msg.style.color='#00ff88';msg.textContent='✅ '+result.message;
+      setTimeout(closeEmailModal,2500);
+    }else{
+      throw new Error(result.message||'Erro desconhecido');
+    }
+  })
+  .catch(function(err){
+    msg.style.color='#ff6b6b';msg.textContent='⚠️ Erro ao enviar. Tente novamente.';
+    console.error('Email error:',err);
+  });
 }
 
 // --- HELPERS ---
