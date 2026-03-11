@@ -61,7 +61,6 @@ body{background:#060612;color:#f0f0f8}
           <p id="last-update" class="text-[10px] text-slate-600 mt-0.5"></p>
         </div>
         <div class="flex flex-col gap-2">
-          <button onclick="showEmailModal()" class="bg-sda-brand hover:bg-sda-brand-hover text-white px-4 py-2 rounded-lg font-semibold text-xs transition-colors flex items-center gap-2 shadow-lg shadow-orange-900/20 whitespace-nowrap">📧 Enviar Relatório</button>
           <button onclick="fetchData()" id="refresh-btn" class="bg-sda-surface hover:bg-sda-card text-sda-green border border-sda-border px-4 py-2 rounded-lg font-semibold text-xs transition-colors flex items-center gap-2 whitespace-nowrap">🔄 Atualizar</button>
         </div>
       </div>
@@ -96,19 +95,7 @@ body{background:#060612;color:#f0f0f8}
   </div>
 </div>
 
-<!-- EMAIL MODAL -->
-<div id="email-modal" class="fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-5 opacity-0 pointer-events-none transition-opacity duration-300">
-  <div class="bg-sda-surface border border-sda-border rounded-2xl p-7 max-w-md w-full transform scale-95 transition-transform duration-300" id="email-modal-inner">
-    <h2 class="text-lg font-bold text-white mb-1">📧 Enviar Relatório</h2>
-    <p class="text-slate-400 text-sm mb-5">O dashboard completo será enviado por e-mail.</p>
-    <input type="email" id="email-input" placeholder="seuemail@exemplo.com" class="w-full bg-sda-bg border border-sda-border rounded-xl px-4 py-3 text-white text-sm outline-none focus:border-sda-green transition-colors">
-    <p id="email-msg" class="text-xs mt-2 min-h-[18px]"></p>
-    <div class="flex gap-3 mt-4">
-      <button onclick="closeEmailModal()" class="flex-1 bg-sda-card text-slate-400 border border-sda-border rounded-xl py-3 font-semibold text-sm">Cancelar</button>
-      <button onclick="sendEmail()" class="flex-1 bg-sda-green text-sda-bg rounded-xl py-3 font-bold text-sm">Enviar Agora</button>
-    </div>
-  </div>
-</div>
+<!-- FIM DO BODY -->
 
 <script>
 var WEB_APP="https://script.google.com/macros/s/AKfycbz5NEXfcvzY-VrhQp02JfbGKc6tFcp-wkxE4CmtSQbaVpNt_K-WmWQZEpWFofORVJqXDA/exec";
