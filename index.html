@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard LP — SDA Ao Vivo 2026</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#080816;font-family:'Segoe UI',Arial,sans-serif;color:#eee;min-height:100vh}
+.header{background:linear-gradient(135deg,#00ff8810,#080816 70%);padding:24px 20px 16px;border-bottom:1px solid #00ff8822}
+.header-top{display:flex;justify-content:space-between;align-items:center}
+.header-brand{color:#00ff8888;font-size:10px;letter-spacing:3px;text-transform:uppercase;font-weight:600}
+.header h1{color:#fff;margin:4px 0;font-size:20px;font-weight:800}
+.header-status{text-align:right}
+.status-dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px}
+.header-bottom{display:flex;justify-content:space-between;align-items:center;margin-top:12px}
+.btn{background:#12122a;border:1px solid #1a1a2e;border-radius:8px;padding:6px 14px;color:#00ff88;cursor:pointer;font-size:11px;font-weight:600}
+.btn:hover{background:#1a1a2e}
+.btn:disabled{color:#333;cursor:default}
+.banner{padding:8px 20px;font-size:11px;text-align:center;border-bottom:1px solid}
+.banner-cache{background:#ffd93d12;color:#ffd93d;border-color:#ffd93d22}
+.banner-error{background:#ff6b6b12;color:#ff6b6b;border-color:#ff6b6b22}
+.tabs{display:flex;gap:4px;padding:14px 20px 6px;overflow-x:auto}
+.tab{background:#12122a;border:1px solid transparent;border-radius:10px;padding:10px 16px;color:#555;cursor:pointer;font-size:12px;font-weight:600;white-space:nowrap}
+.tab.active{background:#00ff8822;border-color:#00ff8844;color:#00ff88}
+.content{padding:8px 20px 32px}
+.card-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px}
+.metric-card{background:#12122a;border-radius:14px;padding:20px 14px;text-align:center;flex:1;min-width:100px}
+.metric-card .label{color:#666;font-size:10px;text-transform:uppercase;letter-spacing:1.5px;font-weight:600}
+.metric-card .value{font-size:26px;font-weight:800;margin:8px 0 4px;line-height:1}
+.metric-card .sub{color:#444;font-size:11px}
+.nota-box{display:inline-block;background:#12122a;border-radius:18px;padding:24px 44px}
+.nota-value{font-size:52px;font-weight:900;line-height:1;margin:8px 0}
+.nota-value span{font-size:20px;color:#444}
+.resumo{background:#12122a;border-radius:12px;padding:16px 20px;border-left:3px solid #00ff88;margin-bottom:14px;color:#999;font-size:13px;line-height:1.7}
+.alerta{background:#ff6b6b10;border:1px solid #ff6b6b33;border-radius:12px;padding:14px 18px;margin-bottom:14px;color:#ff6b6b;font-size:13px}
+.tendencia-box{background:#12122a;border-radius:14px;padding:20px;margin-bottom:16px}
+.tendencia-header{display:flex;align-items:center;gap:12px;margin-bottom:16px}
+.tendencia-icon{font-size:28px}
+.tendencia-label{font-weight:800;font-size:16px;text-transform:uppercase}
+.chart{display:flex;align-items:flex-end;gap:6px;height:120px;padding:0 4px}
+.chart-bar-wrap{flex:1;text-align:center}
+.chart-bar{background:linear-gradient(180deg,#00ff88,#00ff8833);border-radius:6px 6px 0 0;margin:0 auto;max-width:48px}
+.chart-val{color:#00ff88;font-size:13px;font-weight:700;margin-top:6px}
+.chart-label{color:#444;font-size:10px}
+.section-title{color:#eee;font-size:14px;font-weight:700;margin:0 0 10px}
+.variante-row{display:flex;align-items:center;padding:14px 18px;gap:16px;border-bottom:1px solid #1a1a2e}
+.variante-row:last-child{border:none}
+.progress-bg{background:#0a0a1a;border-radius:6px;height:10px;width:100%;overflow:hidden}
+.progress-fill{height:100%;border-radius:6px}
+.device-card{background:#12122a;border-radius:14px;padding:20px;margin-bottom:10px}
+.device-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
+.device-metrics{display:flex;gap:10px;flex-wrap:wrap}
+.device-metric{flex:1;background:#0a0a1a;border-radius:10px;padding:14px;text-align:center;min-width:80px}
+.device-metric .dm-label{color:#555;font-size:10px;text-transform:uppercase}
+.device-metric .dm-value{font-size:20px;font-weight:800}
+.traffic-bar{display:flex;border-radius:8px;overflow:hidden;height:28px}
+.ux-card{background:#12122a;border-radius:14px;padding:20px;margin-bottom:10px}
+.ux-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.ux-problem{color:#999;font-size:13px;margin-bottom:10px;line-height:1.5}
+.ux-tip{background:#00ff8810;border-radius:8px;padding:10px 14px;color:#00ff88;font-size:12px;line-height:1.5}
+.impact-badge{padding:3px 12px;border-radius:20px;font-size:10px;font-weight:700;text-transform:uppercase}
+.cro-card{background:#12122a;border-radius:14px;padding:20px;margin-bottom:10px;display:flex;align-items:flex-start;gap:16px}
+.cro-num{background:#00ff8822;color:#00ff88;min-width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:16px;flex-shrink:0}
+.cro-impact{background:#00ff8815;display:inline-block;padding:4px 12px;border-radius:20px;color:#00ff88;font-size:12px;font-weight:700}
+.footer{text-align:center;padding:16px 0 32px;border-top:1px solid #1a1a2e}
+.footer div{color:#1a1a2e;font-size:10px;letter-spacing:1px}
+.loading{display:flex;align-items:center;justify-content:center;flex-direction:column;gap:16px;min-height:100vh}
+.spinner{width:48px;height:48px;border:3px solid #00ff8833;border-top:3px solid #00ff88;border-radius:50%;animation:spin 1s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.hidden{display:none}
+</style>
+</head>
+<body>
+
+<!-- LOADING -->
+<div id="loading-screen" class="loading">
+  <div class="spinner"></div>
+  <div style="color:#00ff88;font-size:14px;font-weight:600" id="load-msg">Conectando à Web App...</div>
+  <div style="color:#333;font-size:11px">Pode levar alguns segundos</div>
+</div>
+
+<!-- ERROR -->
+<div id="error-screen" class="loading hidden">
+  <div style="font-size:48px">⚠️</div>
+  <div style="color:#ff6b6b;font-size:16px;font-weight:700">Não foi possível carregar</div>
+  <div style="color:#555;font-size:13px;text-align:center;max-width:400px;line-height:1.6">
+    Verifique se o <code style="color:#00ff88">executarAnalise</code> já rodou e se a Web App está implantada.
+  </div>
+  <button class="btn" style="margin-top:8px;background:#00ff88;color:#080816;padding:12px 28px;font-size:14px;font-weight:800" onclick="fetchData()">🔄 TENTAR NOVAMENTE</button>
+</div>
+
+<!-- MAIN DASHBOARD -->
+<div id="dashboard" class="hidden">
+  <!-- HEADER -->
+  <div class="header">
+    <div class="header-top">
+      <div>
+        <div class="header-brand">Performance Dashboard</div>
+        <h1>LP — SDA Ao Vivo 2026</h1>
+      </div>
+      <div class="header-status">
+        <div id="status-line" style="font-size:11px"><span class="status-dot" id="status-dot"></span><span id="status-text"></span></div>
+        <div id="last-update" style="font-size:10px;color:#333;margin-top:4px"></div>
+      </div>
+    </div>
+    <div class="header-bottom">
+      <div style="color:#444;font-size:11px">Últimos 7 dias • Conversão & UI/UX</div>
+      <button class="btn" id="refresh-btn" onclick="fetchData()">🔄 Atualizar ao Vivo</button>
+    </div>
+  </div>
+
+  <div id="banner-area"></div>
+
+  <!-- TABS -->
+  <div class="tabs">
+    <button class="tab active" data-tab="overview" onclick="switchTab('overview',this)">📊 Visão Geral</button>
+    <button class="tab" data-tab="devices" onclick="switchTab('devices',this)">📱 Dispositivos</button>
+    <button class="tab" data-tab="ux" onclick="switchTab('ux',this)">🔍 Diagnóstico UX</button>
+    <button class="tab" data-tab="cro" onclick="switchTab('cro',this)">🎯 Ações CRO</button>
+  </div>
+
+  <div class="content">
+    <!-- OVERVIEW -->
+    <div id="tab-overview"></div>
+    <!-- DEVICES -->
+    <div id="tab-devices" class="hidden"></div>
+    <!-- UX -->
+    <div id="tab-ux" class="hidden"></div>
+    <!-- CRO -->
+    <div id="tab-cro" class="hidden"></div>
+  </div>
+
+  <div class="footer"><div>DASHBOARD AUTOMÁTICO • GOOGLE APPS SCRIPT + CLAUDE AI</div></div>
+</div>
+
+<script>
+const WEB_APP = "https://script.google.com/macros/s/AKfycbz5NEXfcvzY-VrhQp02JfbGKc6tFcp-wkxE4CmtSQbaVpNt_K-WmWQZEpWFofORVJqXDA/exec";
+const CACHE_KEY = "sda_dash_cache";
+let D = null;
+let currentStatus = "loading";
+
+function switchTab(id, el) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  ['overview','devices','ux','cro'].forEach(t => {
+    document.getElementById('tab-'+t).classList.toggle('hidden', t !== id);
+  });
+}
+
+function setStatus(s) {
+  currentStatus = s;
+  const colors = {online:"#00ff88",cache:"#ffd93d",loading:"#4dabf7",error:"#ff6b6b"};
+  const labels = {online:"AO VIVO",cache:"CACHE",loading:"ATUALIZANDO",error:"OFFLINE"};
+  const dot = document.getElementById('status-dot');
+  const txt = document.getElementById('status-text');
+  if(dot) dot.style.background = colors[s]||"#555";
+  if(txt) { txt.textContent = labels[s]||""; txt.style.color = colors[s]||"#555"; }
+}
+
+function setLastUpdate(date) {
+  const el = document.getElementById('last-update');
+  if(el && date) el.textContent = "Atualizado: " + date.toLocaleString("pt-BR");
+}
+
+function saveCache(data) {
+  try { localStorage.setItem(CACHE_KEY, JSON.stringify({data, at: new Date().toISOString()})); } catch(e){}
+}
+
+function loadCache() {
+  try {
+    const c = localStorage.getItem(CACHE_KEY);
+    if(c) { const p = JSON.parse(c); return p; }
+  } catch(e){}
+  return null;
+}
+
+function fetchData() {
+  setStatus("loading");
+  document.getElementById('refresh-btn').disabled = true;
+  document.getElementById('refresh-btn').textContent = "⏳ Carregando...";
+  document.getElementById('load-msg').textContent = "Buscando dados da Web App...";
+
+  fetch(WEB_APP)
+    .then(r => r.json())
+    .then(json => {
+      D = json;
+      setStatus("online");
+      setLastUpdate(new Date());
+      saveCache(json);
+      render();
+      show("dashboard");
+    })
+    .catch(() => {
+      // Tenta cache
+      const c = loadCache();
+      if(c && c.data) {
+        D = c.data;
+        setStatus("cache");
+        setLastUpdate(new Date(c.at));
+        render();
+        show("dashboard");
+        document.getElementById('banner-area').innerHTML = '<div class="banner banner-cache">📦 Exibindo dados em cache — clique em "Atualizar ao Vivo" para dados frescos</div>';
+      } else {
+        show("error-screen");
+      }
+    })
+    .finally(() => {
+      document.getElementById('refresh-btn').disabled = false;
+      document.getElementById('refresh-btn').textContent = "🔄 Atualizar ao Vivo";
+    });
+}
+
+function show(id) {
+  ['loading-screen','error-screen','dashboard'].forEach(s => {
+    document.getElementById(s).classList.toggle('hidden', s !== id);
+  });
+}
+
+function progressBar(pct, color) {
+  const p = Math.min(parseFloat(pct)||0, 100);
+  return `<div class="progress-bg"><div class="progress-fill" style="background:${color};width:${p}%"></div></div>`;
+}
+
+function impactBadge(level) {
+  const c = {alto:"#ff6b6b","médio":"#ffd93d",baixo:"#00ff88"}[level]||"#888";
+  return `<span class="impact-badge" style="background:${c}22;color:${c}">${level}</span>`;
+}
+
+function render() {
+  if(!D) return;
+  const d = D;
+  const nota = parseFloat(d.nota_performance)||0;
+  const nCor = nota>=7?"#00ff88":nota>=4?"#ffd93d":"#ff6b6b";
+  const nLabel = nota>=7?"SAUDÁVEL":nota>=4?"ATENÇÃO":"CRÍTICO";
+  const tIcon = d.tendencia==="crescendo"?"📈":d.tendencia==="caindo"?"📉":"➡️";
+  const tCor = d.tendencia==="crescendo"?"#00ff88":d.tendencia==="caindo"?"#ff6b6b":"#ffd93d";
+
+  // --- OVERVIEW ---
+  let chartHTML = "";
+  if(d.leads_por_dia && typeof d.leads_por_dia === "object") {
+    const entries = Object.entries(d.leads_por_dia).sort((a,b)=>a[0].localeCompare(b[0]));
+    const max = Math.max(...entries.map(e=>e[1]))||1;
+    chartHTML = '<div class="chart">' + entries.map(([k,v])=>{
+      const h = Math.max((v/max)*100,6);
+      const label = k.substring(8,10)+"/"+k.substring(5,7);
+      return `<div class="chart-bar-wrap"><div class="chart-bar" style="height:${h}px"></div><div class="chart-val">${v}</div><div class="chart-label">${label}</div></div>`;
+    }).join("") + '</div>';
+  }
+
+  let varHTML = "";
+  if(d.variantes && d.variantes.length) {
+    varHTML = '<h3 class="section-title" style="margin-top:16px">🔀 Variantes da LP</h3><div style="background:#12122a;border-radius:12px;overflow:hidden">' +
+      d.variantes.map((v,i)=>`<div class="variante-row"><div style="color:#c084fc;font-weight:800;font-size:20px;min-width:30px">${v.variante}</div><div style="flex:1">${progressBar(parseFloat(v.pct),"#c084fc")}</div><div style="color:#c084fc;font-weight:700;font-size:16px;min-width:40px;text-align:right">${v.leads}</div><div style="color:#555;font-size:12px;min-width:50px;text-align:right">${v.pct}</div></div>`).join("") + '</div>';
+  }
+
+  document.getElementById('tab-overview').innerHTML = `
+    <div style="text-align:center;padding:16px 0"><div class="nota-box" style="border:2px solid ${nCor}33">
+      <div style="color:#666;font-size:10px;text-transform:uppercase;letter-spacing:2px">Nota da LP</div>
+      <div class="nota-value" style="color:${nCor}">${d.nota_performance}<span>/10</span></div>
+      <div style="color:${nCor};font-size:11px;font-weight:700;letter-spacing:1px">${nLabel}</div>
+    </div></div>
+    <div class="resumo">${d.resumo||""}</div>
+    ${d.alerta && d.alerta!=="null" && d.alerta!==null ? `<div class="alerta">🚨 <strong>ALERTA:</strong> ${d.alerta}</div>` : ""}
+    <div class="card-row">
+      <div class="metric-card" style="border-top:3px solid #4dabf7"><div class="label">Sessões</div><div class="value" style="color:#4dabf7">${(d.sessoes||0).toLocaleString("pt-BR")}</div><div class="sub">7 dias</div></div>
+      <div class="metric-card" style="border-top:3px solid #c084fc"><div class="label">Visitantes</div><div class="value" style="color:#c084fc">${(d.visitantes||0).toLocaleString("pt-BR")}</div><div class="sub">únicos</div></div>
+      <div class="metric-card" style="border-top:3px solid #00ff88"><div class="label">Leads LP</div><div class="value" style="color:#00ff88">${d.leads_7d||0}</div><div class="sub">variante preenchida</div></div>
+    </div>
+    <div class="card-row" style="margin-bottom:20px">
+      <div class="metric-card" style="border-top:3px solid #ff6b6b"><div class="label">Convert Rate</div><div class="value" style="color:#ff6b6b">${d.taxa_conversao||"0%"}</div><div class="sub">leads / sessões</div></div>
+      <div class="metric-card" style="border-top:3px solid #ffd93d"><div class="label">Média/Dia</div><div class="value" style="color:#ffd93d">${d.media_leads_dia||0}</div><div class="sub">leads</div></div>
+      <div class="metric-card" style="border-top:3px solid #4dabf7"><div class="label">Pág/Sessão</div><div class="value" style="color:#4dabf7">${d.paginas_por_sessao||0}</div><div class="sub">engajamento</div></div>
+    </div>
+    <div class="tendencia-box">
+      <div class="tendencia-header"><span class="tendencia-icon">${tIcon}</span><div><span class="tendencia-label" style="color:${tCor}">${d.tendencia||""}</span><div style="color:#666;font-size:12px;margin-top:2px">${d.tendencia_detalhe||""}</div></div></div>
+      ${chartHTML}
+    </div>
+    ${varHTML}`;
+
+  // --- DEVICES ---
+  const devCores = {Mobile:"#00ff88",mobile:"#00ff88",Desktop:"#4dabf7",desktop:"#4dabf7",Tablet:"#ffd93d",tablet:"#ffd93d"};
+  const devIcons = {Mobile:"📱",mobile:"📱",Desktop:"🖥️",desktop:"🖥️",Tablet:"📟",tablet:"📟"};
+  let devHTML = '<h3 class="section-title" style="margin:16px 0 12px">📱 Performance por Dispositivo</h3>';
+  (d.dispositivos||[]).forEach(dv => {
+    const cor = devCores[dv.tipo]||"#888";
+    devHTML += `<div class="device-card" style="border-left:4px solid ${cor}">
+      <div class="device-header"><span style="font-size:16px;font-weight:700">${devIcons[dv.tipo]||"📟"} ${dv.tipo}</span>
+      <span style="background:${cor}22;color:${cor};padding:4px 14px;border-radius:20px;font-size:12px;font-weight:700">${dv.pct} tráfego</span></div>
+      <div class="device-metrics">
+        <div class="device-metric"><div class="dm-label">Sessões</div><div class="dm-value" style="color:${cor}">${typeof dv.sessoes==="number"?dv.sessoes.toLocaleString("pt-BR"):dv.sessoes}</div></div>
+        <div class="device-metric"><div class="dm-label">Visitantes</div><div class="dm-value" style="color:#ccc">${typeof dv.visitantes==="number"?dv.visitantes.toLocaleString("pt-BR"):dv.visitantes}</div></div>
+        <div class="device-metric"><div class="dm-label">Conv. Rate</div><div class="dm-value" style="color:#00ff88">${dv.convert_rate||"—"}</div></div>
+      </div></div>`;
+  });
+  if(d.dispositivos && d.dispositivos.length) {
+    devHTML += '<div style="background:#12122a;border-radius:12px;padding:16px;margin-top:8px"><div style="color:#555;font-size:11px;margin-bottom:10px;text-transform:uppercase;letter-spacing:1px">Distribuição de Tráfego</div><div class="traffic-bar">' +
+      d.dispositivos.map(dv => `<div style="width:${parseFloat(dv.pct)||0}%;background:${devCores[dv.tipo]||"#888"};display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#080816">${dv.tipo} ${dv.pct}</div>`).join("") +
+      '</div></div>';
+  }
+  document.getElementById('tab-devices').innerHTML = devHTML;
+
+  // --- UX ---
+  let uxHTML = '<h3 class="section-title" style="margin:16px 0 8px">🔍 Diagnóstico UI/UX</h3><div style="color:#444;font-size:12px;margin-bottom:16px">Problemas por área da LP, por impacto na conversão</div>';
+  (d.diagnostico_ux||[]).forEach(ux => {
+    const corI = ux.impacto==="alto"?"#ff6b6b":ux.impacto==="médio"?"#ffd93d":"#00ff88";
+    const iconI = ux.impacto==="alto"?"🔴":ux.impacto==="médio"?"🟡":"🟢";
+    uxHTML += `<div class="ux-card" style="border-left:4px solid ${corI}">
+      <div class="ux-header"><span style="color:#eee;font-weight:700;font-size:14px">${iconI} ${ux.area}</span>${impactBadge(ux.impacto)}</div>
+      <div class="ux-problem">${ux.problema}</div>
+      <div class="ux-tip">💡 ${ux.sugestao}</div></div>`;
+  });
+  document.getElementById('tab-ux').innerHTML = uxHTML;
+
+  // --- CRO ---
+  let croHTML = '<h3 class="section-title" style="margin:16px 0 8px">🎯 Ações de CRO — Por Prioridade</h3><div style="color:#444;font-size:12px;margin-bottom:16px">Otimizações por impacto na conversão</div>';
+  (d.acoes_cro||[]).forEach(a => {
+    croHTML += `<div class="cro-card"><div class="cro-num">${a.prioridade}</div><div style="flex:1">
+      <div style="color:#eee;font-size:14px;font-weight:600;margin-bottom:6px">${a.acao}</div>
+      <div class="cro-impact">${a.impacto_esperado}</div></div></div>`;
+  });
+  document.getElementById('tab-cro').innerHTML = croHTML;
+}
+
+// --- INIT ---
+(function(){
+  // Tenta cache primeiro
+  const c = loadCache();
+  if(c && c.data) {
+    D = c.data;
+    setLastUpdate(new Date(c.at));
+    render();
+    show("dashboard");
+    setStatus("cache");
+    document.getElementById('banner-area').innerHTML = '<div class="banner banner-cache">📦 Cache carregado — buscando dados frescos...</div>';
+  }
+  fetchData();
+})();
+
+// Auto-refresh 6h
+setInterval(fetchData, 6*60*60*1000);
+</script>
+</body>
+</html>
