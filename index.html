@@ -1,195 +1,320 @@
 <!DOCTYPE html>
 <html lang="pt-BR" class="dark">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dashboard Analítico — SDA Ao Vivo 2026</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <script>
-    tailwind.config = {
-      darkMode: 'class',
-      theme: {
-        extend: {
-          fontFamily: { sans: ['Inter', 'sans-serif'] },
-          colors: {
-            'sda-bg': 'hsl(224, 71%, 4%)',
-            'sda-surface': 'hsl(215, 28%, 17%)',
-            'sda-brand': 'hsl(24, 100%, 50%)',
-            'sda-brand-hover': 'hsl(24, 100%, 45%)',
-            'sda-border': 'hsl(217, 33%, 25%)',
-          }
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard Analítico — SDA Ao Vivo 2026</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<script>
+tailwind.config = {
+  darkMode: 'class',
+  theme: {
+    extend: {
+      fontFamily: { sans: ['Inter', 'sans-serif'] },
+      colors: {
+        'sda-bg': '#060612',
+        'sda-surface': '#0e0e1f',
+        'sda-card': '#141428',
+        'sda-brand': '#ff6a00',
+        'sda-brand-hover': '#e55d00',
+        'sda-green': '#00ff88',
+        'sda-blue': '#4dabf7',
+        'sda-purple': '#c084fc',
+        'sda-red': '#ff6b6b',
+        'sda-yellow': '#ffd93d',
+        'sda-border': '#1a1a32',
       }
     }
-  </script>
-  <style>
-    body { background-color: theme('colors.sda-bg'); color: #f8fafc; }
-  .glass-card {
-      background: theme('colors.sda-surface');
-      border: 1px solid theme('colors.sda-border');
-      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.5);
-      transition: transform 0.2s ease, box-shadow 0.2s ease;
-    }
-  .glass-card:hover { transform: translateY(-2px); box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5); }
-    #progress-bar { transition: transform 0.1s linear; transform-origin: left; }
-  </style>
+  }
+}
+</script>
+<style>
+body{background:#060612;color:#f0f0f8}
+.glass{background:#0e0e1f;border:1px solid #1a1a32;transition:transform .2s,box-shadow .2s}
+.glass:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,.4)}
+.tab-btn{transition:all .2s}
+.tab-btn.active{background:rgba(0,255,136,.1);border-color:rgba(0,255,136,.25);color:#00ff88}
+#progress-bar{transition:transform .1s linear;transform-origin:left}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.fade-in{animation:fadeIn .4s ease-out}
+</style>
 </head>
-<body class="min-h-screen p-6 md:p-10 antialiased">
-  <div class="max-w-6xl mx-auto">
-    
-    <header class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 glass-card p-6 rounded-2xl gap-6">
+<body class="min-h-screen antialiased">
+<div class="max-w-5xl mx-auto px-4 py-6 md:px-8 md:py-8">
+
+  <!-- HEADER -->
+  <header class="glass rounded-2xl p-5 md:p-6 mb-2">
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
       <div>
-        <h1 class="text-2xl font-bold tracking-tight">Performance LP <span class="text-sda-brand">SDA Ao Vivo</span></h1>
-        <p class="text-sm text-slate-400 mt-1">Análise de tráfego e conversão em tempo real</p>
+        <p class="text-[10px] tracking-[4px] uppercase font-bold text-sda-green/50">Performance Dashboard</p>
+        <h1 class="text-xl md:text-2xl font-bold tracking-tight mt-1">LP — <span class="text-sda-brand">SDA Ao Vivo 2026</span></h1>
+        <p class="text-xs text-slate-500 mt-1">Conversão • UI/UX • Últimos 7 dias</p>
       </div>
-      <div class="flex items-center gap-5 w-full md:w-auto">
+      <div class="flex items-center gap-4 w-full md:w-auto">
         <div class="text-right flex-1 md:flex-none">
-          <p class="text-xs font-medium text-slate-400 uppercase tracking-wider">Próximo refresh</p>
-          <p id="countdown-text" class="text-xl font-mono font-semibold text-white">30:00</p>
+          <div class="flex items-center justify-end gap-2 mb-1">
+            <span id="status-dot" class="w-2 h-2 rounded-full bg-slate-600 animate-pulse"></span>
+            <span id="status-label" class="text-[10px] font-bold tracking-wider uppercase text-slate-500">Offline</span>
+          </div>
+          <p id="countdown-text" class="text-lg font-mono font-bold text-white">30:00</p>
+          <p id="last-update" class="text-[10px] text-slate-600 mt-0.5"></p>
         </div>
-        <button onclick="enviarEmail()" id="btn-email" class="bg-sda-brand hover:bg-sda-brand-hover text-white px-5 py-2.5 rounded-lg font-semibold transition-colors flex items-center gap-2 shadow-lg shadow-orange-900/20 whitespace-nowrap">
-          <span id="btn-email-text">📧 Enviar Relatório</span>
-        </button>
-      </div>
-    </header>
-
-    <div class="w-full bg-sda-surface rounded-full h-1 mb-8 overflow-hidden border border-sda-border">
-      <div id="progress-bar" class="bg-sda-brand h-1 rounded-full w-full"></div>
-    </div>
-
-    <div id="status-message" class="hidden p-4 rounded-xl mb-6 text-center font-medium shadow-md"></div>
-
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-      <div class="glass-card p-6 rounded-2xl">
-        <h3 class="text-slate-400 text-sm font-semibold mb-2 uppercase tracking-wider">Sessões Totais</h3>
-        <p class="text-4xl font-bold" id="metric-sessoes">--</p>
-      </div>
-      <div class="glass-card p-6 rounded-2xl">
-        <h3 class="text-slate-400 text-sm font-semibold mb-2 uppercase tracking-wider">Leads da Página</h3>
-        <p class="text-4xl font-bold" id="metric-leads">--</p>
-      </div>
-      <div class="glass-card p-6 rounded-2xl border-t-4 border-t-sda-brand">
-        <h3 class="text-slate-400 text-sm font-semibold mb-2 uppercase tracking-wider">Taxa de Conversão</h3>
-        <p class="text-4xl font-bold text-sda-brand" id="metric-conversao">--</p>
+        <div class="flex flex-col gap-2">
+          <button onclick="showEmailModal()" class="bg-sda-brand hover:bg-sda-brand-hover text-white px-4 py-2 rounded-lg font-semibold text-xs transition-colors flex items-center gap-2 shadow-lg shadow-orange-900/20 whitespace-nowrap">📧 Enviar Relatório</button>
+          <button onclick="fetchData()" id="refresh-btn" class="bg-sda-surface hover:bg-sda-card text-sda-green border border-sda-border px-4 py-2 rounded-lg font-semibold text-xs transition-colors flex items-center gap-2 whitespace-nowrap">🔄 Atualizar</button>
+        </div>
       </div>
     </div>
+  </header>
 
-    <div class="glass-card p-6 rounded-2xl">
-      <h3 class="text-slate-200 text-sm font-semibold mb-4 border-b border-sda-border pb-2">Log de Dados Brutos</h3>
-      <pre id="json-container" class="text-xs text-slate-400 overflow-x-auto whitespace-pre-wrap font-mono">Aguardando sincronização com o Google Apps Script...</pre>
-    </div>
+  <!-- PROGRESS BAR -->
+  <div class="w-full bg-sda-surface rounded-full h-1 mb-6 overflow-hidden border border-sda-border">
+    <div id="progress-bar" class="bg-sda-brand h-1 rounded-full w-full"></div>
   </div>
 
-  <script>
-    // IMPORTANTE: Cole abaixo a URL PÚBLICA do seu Google Apps Script (Terminada em /exec)
-    const API_URL = "https://script.google.com/macros/s/AKfycbz5NEXfcvzY-VrhQp02JfbGKc6tFcp-wkxE4CmtSQbaVpNt_K-WmWQZEpWFofORVJqXDA/exec";
+  <!-- STATUS MESSAGE -->
+  <div id="status-message" class="hidden p-3 rounded-xl mb-4 text-center text-sm font-medium"></div>
 
-    // 1. Lógica Absoluta de Contagem e Refresh (Evita throttling em abas inativas)
-    const REFRESH_INTERVAL_MS = 30 * 60 * 1000; // 30 minutos
-    let targetTime = Date.now() + REFRESH_INTERVAL_MS;
+  <!-- TABS -->
+  <div class="flex gap-2 mb-6 overflow-x-auto pb-1" id="tabs-container">
+    <button class="tab-btn active border border-transparent rounded-xl px-4 py-2.5 text-xs font-semibold text-slate-500 bg-sda-surface whitespace-nowrap" onclick="switchTab('overview',this)">📊 Visão Geral</button>
+    <button class="tab-btn border border-transparent rounded-xl px-4 py-2.5 text-xs font-semibold text-slate-500 bg-sda-surface whitespace-nowrap" onclick="switchTab('devices',this)">📱 Dispositivos</button>
+    <button class="tab-btn border border-transparent rounded-xl px-4 py-2.5 text-xs font-semibold text-slate-500 bg-sda-surface whitespace-nowrap" onclick="switchTab('ux',this)">🔍 UX</button>
+    <button class="tab-btn border border-transparent rounded-xl px-4 py-2.5 text-xs font-semibold text-slate-500 bg-sda-surface whitespace-nowrap" onclick="switchTab('cro',this)">🎯 CRO</button>
+  </div>
 
-    function updateTimer() {
-      const now = Date.now();
-      const remainingMs = Math.max(0, targetTime - now);
+  <!-- TAB CONTENT -->
+  <div id="tab-overview" class="fade-in"></div>
+  <div id="tab-devices" class="fade-in hidden"></div>
+  <div id="tab-ux" class="fade-in hidden"></div>
+  <div id="tab-cro" class="fade-in hidden"></div>
 
-      const minutes = Math.floor(remainingMs / 60000);
-      const seconds = Math.floor((remainingMs % 60000) / 1000);
-      document.getElementById('countdown-text').textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+  <!-- FOOTER -->
+  <div class="text-center pt-8 pb-4 border-t border-sda-border mt-8">
+    <p class="text-[10px] tracking-[2px] text-slate-700 uppercase">SDA Ao Vivo 2026 • Dashboard Automático • Claude AI</p>
+  </div>
+</div>
 
-      // Usa transform scaleX para alto desempenho (GPU) sem acionar repaint na renderização
-      const progressPercentage = remainingMs / REFRESH_INTERVAL_MS;
-      document.getElementById('progress-bar').style.transform = `scaleX(${progressPercentage})`;
+<!-- EMAIL MODAL -->
+<div id="email-modal" class="fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-5 opacity-0 pointer-events-none transition-opacity duration-300">
+  <div class="bg-sda-surface border border-sda-border rounded-2xl p-7 max-w-md w-full transform scale-95 transition-transform duration-300" id="email-modal-inner">
+    <h2 class="text-lg font-bold text-white mb-1">📧 Enviar Relatório</h2>
+    <p class="text-slate-400 text-sm mb-5">O dashboard completo será enviado por e-mail.</p>
+    <input type="email" id="email-input" placeholder="seuemail@exemplo.com" class="w-full bg-sda-bg border border-sda-border rounded-xl px-4 py-3 text-white text-sm outline-none focus:border-sda-green transition-colors">
+    <p id="email-msg" class="text-xs mt-2 min-h-[18px]"></p>
+    <div class="flex gap-3 mt-4">
+      <button onclick="closeEmailModal()" class="flex-1 bg-sda-card text-slate-400 border border-sda-border rounded-xl py-3 font-semibold text-sm">Cancelar</button>
+      <button onclick="sendEmail()" class="flex-1 bg-sda-green text-sda-bg rounded-xl py-3 font-bold text-sm">Enviar Agora</button>
+    </div>
+  </div>
+</div>
 
-      if (remainingMs === 0) {
-        targetTime = Date.now() + REFRESH_INTERVAL_MS;
-        carregarDados(); // Carrega os dados silenciosamente via fetch sem dar F5 na página
-      }
-      requestAnimationFrame(updateTimer);
-    }
-    requestAnimationFrame(updateTimer);
+<script>
+var WEB_APP="https://script.google.com/macros/s/AKfycbz5NEXfcvzY-VrhQp02JfbGKc6tFcp-wkxE4CmtSQbaVpNt_K-WmWQZEpWFofORVJqXDA/exec";
+var CACHE_KEY="sda_dash_v4";
+var REFRESH_MS=30*60*1000;
+var D=null;
+var targetTime=Date.now()+REFRESH_MS;
 
-    // 2. Fetch dos dados do Google Sheets
-    async function carregarDados() {
-      if(API_URL.includes("SUA_URL_DO_WEB_APP_AQUI")) return; // Ignora se a URL não foi inserida
-      try {
-        const response = await fetch(API_URL);
-        const data = await response.json();
-        
-        document.getElementById('metric-sessoes').textContent = data.sessoes |
+// --- TABS ---
+function switchTab(id,el){
+  document.querySelectorAll('.tab-btn').forEach(function(t){t.classList.remove('active')});
+  el.classList.add('active');
+  ['overview','devices','ux','cro'].forEach(function(t){
+    var tab=document.getElementById('tab-'+t);
+    tab.classList.toggle('hidden',t!==id);
+  });
+}
 
-| "0";
-        document.getElementById('metric-leads').textContent = data.leads_totais |
+// --- STATUS ---
+function setStatus(s){
+  var dot=document.getElementById('status-dot');
+  var label=document.getElementById('status-label');
+  var map={online:{c:'bg-sda-green',t:'Ao Vivo'},cache:{c:'bg-sda-yellow',t:'Cache'},loading:{c:'bg-sda-blue',t:'Carregando'},error:{c:'bg-sda-red',t:'Offline'}};
+  var m=map[s]||map.error;
+  dot.className='w-2 h-2 rounded-full animate-pulse '+m.c;
+  label.textContent=m.t;
+  label.style.color=s==='online'?'#00ff88':s==='cache'?'#ffd93d':s==='loading'?'#4dabf7':'#ff6b6b';
+}
 
-| "0";
-        document.getElementById('metric-conversao').textContent = data.taxa_conversao |
+// --- TIMER ---
+function updateTimer(){
+  var remaining=Math.max(0,targetTime-Date.now());
+  var m=Math.floor(remaining/60000),s=Math.floor((remaining%60000)/1000);
+  document.getElementById('countdown-text').textContent=String(m).padStart(2,'0')+':'+String(s).padStart(2,'0');
+  document.getElementById('progress-bar').style.transform='scaleX('+(remaining/REFRESH_MS)+')';
+  if(remaining===0){targetTime=Date.now()+REFRESH_MS;fetchData()}
+  requestAnimationFrame(updateTimer);
+}
+requestAnimationFrame(updateTimer);
 
-| "0%";
-        
-        document.getElementById('json-container').textContent = JSON.stringify(data, null, 2);
-      } catch (error) {
-        console.error("Erro ao puxar dados:", error);
-        document.getElementById('json-container').textContent = "Falha na conexão com o banco de dados.";
-      }
-    }
-    carregarDados(); // Início imediato
+// --- CACHE ---
+function saveCache(data){try{localStorage.setItem(CACHE_KEY,JSON.stringify({data:data,at:new Date().toISOString()}))}catch(e){}}
+function loadCache(){try{var c=localStorage.getItem(CACHE_KEY);if(c)return JSON.parse(c)}catch(e){}return null}
 
-    // 3. Função de Disparo de E-mail Bypassing CORS
-    async function enviarEmail() {
-      const btn = document.getElementById('btn-email');
-      const btnText = document.getElementById('btn-email-text');
-      const statusBox = document.getElementById('status-message');
-      
-      if(API_URL.includes("SUA_URL_DO_WEB_APP_AQUI")) {
-          alert("Por favor, configure sua API_URL no código fonte primeiro.");
-          return;
-      }
+// --- FETCH ---
+function fetchData(){
+  setStatus('loading');
+  var btn=document.getElementById('refresh-btn');
+  btn.disabled=true;btn.innerHTML='⏳ ...';
 
-      const emailDestino = prompt("Digite o e-mail de destino do relatório:");
-      if (!emailDestino) return;
+  fetch(WEB_APP,{redirect:'follow'})
+  .then(function(r){return r.text()})
+  .then(function(text){
+    var clean=text.trim();
+    var s=clean.indexOf('{'),e=clean.lastIndexOf('}');
+    if(s>=0&&e>s) clean=clean.substring(s,e+1);
+    D=JSON.parse(clean);
+    setStatus('online');
+    saveCache(D);
+    targetTime=Date.now()+REFRESH_MS;
+    document.getElementById('last-update').textContent='Atualizado: '+new Date().toLocaleString('pt-BR');
+    document.getElementById('status-message').className='hidden';
+    render();
+  })
+  .catch(function(){
+    var c=loadCache();
+    if(c&&c.data){D=c.data;setStatus('cache');document.getElementById('last-update').textContent='Cache: '+new Date(c.at).toLocaleString('pt-BR');render();
+      showMsg('📦 Exibindo dados em cache. Clique Atualizar para dados frescos.','bg-yellow-950 text-yellow-400 border border-yellow-800');
+    }else{setStatus('error');showMsg('⚠️ Não foi possível carregar. Verifique a Web App.','bg-red-950 text-red-400 border border-red-800')}
+  })
+  .finally(function(){btn.disabled=false;btn.innerHTML='🔄 Atualizar'});
+}
 
-      btn.disabled = true;
-      btn.classList.add('opacity-50', 'cursor-not-allowed');
-      btnText.textContent = "⏳ Processando...";
-      statusBox.className = "hidden";
+function showMsg(text,cls){var el=document.getElementById('status-message');el.textContent=text;el.className='p-3 rounded-xl mb-4 text-center text-sm font-medium '+cls}
 
-      try {
-        const payload = {
-          action: "email",
-          to: emailDestino,
-          conversao: document.getElementById('metric-conversao').textContent
-        };
+// --- EMAIL ---
+function showEmailModal(){var m=document.getElementById('email-modal');m.classList.remove('opacity-0','pointer-events-none');document.getElementById('email-modal-inner').classList.remove('scale-95');document.getElementById('email-msg').textContent='';document.getElementById('email-input').focus()}
+function closeEmailModal(){var m=document.getElementById('email-modal');m.classList.add('opacity-0','pointer-events-none');document.getElementById('email-modal-inner').classList.add('scale-95')}
 
-        // O SEGREDO DO CORS: redirect 'follow' obriga o front a seguir o redirecionamento 302
-        // O Content-Type 'text/plain' engana o preflight OPTIONS para requisições simples
-        const response = await fetch(API_URL, {
-          method: "POST",
-          redirect: "follow", 
-          headers: {
-            "Content-Type": "text/plain;charset=utf-8", 
-          },
-          body: JSON.stringify(payload)
-        });
+function sendEmail(){
+  var email=document.getElementById('email-input').value.trim();
+  var msg=document.getElementById('email-msg');
+  if(!email||!email.includes('@')){msg.style.color='#ff6b6b';msg.textContent='Digite um e-mail válido';return}
+  msg.style.color='#ffd93d';msg.textContent='Enviando...';
+  fetch(WEB_APP,{method:'POST',redirect:'follow',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action:'email',to:email})})
+  .then(function(){msg.style.color='#00ff88';msg.textContent='✅ Enviado para '+email;setTimeout(closeEmailModal,2000)})
+  .catch(function(){msg.style.color='#ff6b6b';msg.textContent='Erro ao enviar. Tente novamente.'});
+}
 
-        const result = await response.json();
+// --- HELPERS ---
+function num(v){return typeof v==='number'?v.toLocaleString('pt-BR'):v}
+function progress(pct,color){return '<div class="w-full bg-sda-bg rounded-full h-2 overflow-hidden"><div class="h-2 rounded-full transition-all duration-500" style="background:'+color+';width:'+Math.min(parseFloat(pct)||0,100)+'%"></div></div>'}
+function badge(level){var c={alto:'#ff6b6b','médio':'#ffd93d',baixo:'#00ff88'}[level]||'#888';return '<span class="px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider" style="background:'+c+'15;color:'+c+'">'+level+'</span>'}
 
-        if (result.status === "success") {
-          statusBox.textContent = "✅ " + result.message;
-          statusBox.className = "p-4 rounded-xl mb-6 text-center font-medium bg-green-950 text-green-400 border border-green-800 block";
-        } else {
-          throw new Error(result.message);
-        }
+function metricCard(title,value,sub,color){
+  return '<div class="glass rounded-2xl p-5 relative overflow-hidden"><div class="absolute top-0 left-0 right-0 h-[3px]" style="background:'+color+'"></div>'+
+  '<p class="text-[10px] tracking-[2px] uppercase font-bold text-slate-500">'+title+'</p>'+
+  '<p class="text-3xl font-black mt-2 mb-1" style="color:'+color+'">'+(typeof value==='number'?num(value):value)+'</p>'+
+  (sub?'<p class="text-[11px] text-slate-600">'+sub+'</p>':'')+'</div>';
+}
 
-      } catch (error) {
-        console.error("Falha na negociação de tráfego:", error);
-        statusBox.textContent = "⚠️ Erro ao enviar relatório. Possível falha na rede.";
-        statusBox.className = "p-4 rounded-xl mb-6 text-center font-medium bg-red-950 text-red-400 border border-red-800 block";
-      } finally {
-        btn.disabled = false;
-        btn.classList.remove('opacity-50', 'cursor-not-allowed');
-        btnText.textContent = "📧 Enviar Relatório";
-      }
-    }
-  </script>
+// --- RENDER ---
+function render(){
+  if(!D) return;
+  var d=D;
+  var nota=parseFloat(d.nota_performance)||0;
+  var nC=nota>=7?'#00ff88':nota>=4?'#ffd93d':'#ff6b6b';
+  var nL=nota>=7?'SAUDÁVEL':nota>=4?'ATENÇÃO':'CRÍTICO';
+  var tI=d.tendencia==='crescendo'?'📈':d.tendencia==='caindo'?'📉':'➡️';
+  var tC=d.tendencia==='crescendo'?'#00ff88':d.tendencia==='caindo'?'#ff6b6b':'#ffd93d';
+
+  // CHART
+  var chartHTML='';
+  if(d.leads_por_dia&&typeof d.leads_por_dia==='object'){
+    var entries=Object.entries(d.leads_por_dia).sort(function(a,b){return a[0].localeCompare(b[0])});
+    var max=Math.max.apply(null,entries.map(function(e){return e[1]}))||1;
+    chartHTML='<div class="flex items-end gap-2 h-32 mt-4">';
+    entries.forEach(function(e){
+      var h=Math.max((e[1]/max)*110,8);
+      var label=e[0].substring(8,10)+'/'+e[0].substring(5,7);
+      chartHTML+='<div class="flex-1 flex flex-col items-center"><div class="w-full max-w-[40px] rounded-t-lg" style="height:'+h+'px;background:linear-gradient(180deg,#00ff88,#00ff8830)"></div><p class="text-xs font-bold text-sda-green mt-2">'+e[1]+'</p><p class="text-[10px] text-slate-600">'+label+'</p></div>';
+    });
+    chartHTML+='</div>';
+  }
+
+  // VARIANTES
+  var varHTML='';
+  if(d.variantes&&d.variantes.length){
+    varHTML='<h3 class="text-sm font-bold text-white mt-6 mb-3">🔀 Variantes da LP</h3><div class="glass rounded-2xl overflow-hidden">';
+    d.variantes.forEach(function(v,i){
+      varHTML+='<div class="flex items-center gap-4 px-5 py-4'+(i<d.variantes.length-1?' border-b border-sda-border':'')+'"><span class="text-xl font-black text-sda-purple min-w-[30px]">'+v.variante+'</span><div class="flex-1">'+progress(parseFloat(v.pct),'#c084fc')+'</div><span class="text-lg font-bold text-sda-purple min-w-[40px] text-right">'+v.leads+'</span><span class="text-xs text-slate-500 min-w-[50px] text-right">'+v.pct+'</span></div>';
+    });
+    varHTML+='</div>';
+  }
+
+  // OVERVIEW
+  document.getElementById('tab-overview').innerHTML=
+    // NOTA
+    '<div class="text-center py-5"><div class="inline-block glass rounded-3xl px-12 py-7 relative overflow-hidden" style="border-color:'+nC+'33"><div class="absolute top-0 left-1/2 -translate-x-1/2 w-3/5 h-[3px] rounded-b" style="background:'+nC+'"></div>'+
+    '<p class="text-[10px] tracking-[2px] uppercase font-bold text-slate-500">Nota da LP</p>'+
+    '<p class="text-5xl font-black mt-2 mb-1" style="color:'+nC+'">'+d.nota_performance+'<span class="text-xl text-slate-600">/10</span></p>'+
+    '<p class="text-[11px] font-bold tracking-wider" style="color:'+nC+'">'+nL+'</p></div></div>'+
+
+    // RESUMO
+    '<div class="glass rounded-2xl p-5 mb-4 relative overflow-hidden"><div class="absolute left-0 top-0 bottom-0 w-[3px] bg-sda-green rounded-r"></div><p class="text-sm text-slate-400 leading-relaxed pl-3">'+(d.resumo||'')+'</p></div>'+
+
+    // ALERTA
+    (d.alerta&&d.alerta!=='null'&&d.alerta!==null?'<div class="bg-red-950/30 border border-red-900/30 rounded-2xl p-4 mb-4 flex gap-3 items-start"><span class="text-lg">🚨</span><p class="text-sm text-sda-red"><strong>ALERTA:</strong> '+d.alerta+'</p></div>':'')+
+
+    // MÉTRICAS
+    '<div class="grid grid-cols-2 md:grid-cols-3 gap-3 mb-3">'+
+    metricCard('Sessões',d.sessoes||0,'7 dias','#4dabf7')+
+    metricCard('Visitantes',d.visitantes||0,'únicos','#c084fc')+
+    metricCard('Leads LP',d.leads_7d||0,'variante preenchida','#00ff88')+
+    '</div><div class="grid grid-cols-2 md:grid-cols-3 gap-3 mb-6">'+
+    metricCard('Convert Rate',d.taxa_conversao||'0%','leads / sessões','#ff6b6b')+
+    metricCard('Média/Dia',d.media_leads_dia||0,'leads','#ffd93d')+
+    metricCard('Pág/Sessão',d.paginas_por_sessao||0,'engajamento','#4dabf7')+
+    '</div>'+
+
+    // TENDÊNCIA
+    '<div class="glass rounded-2xl p-5 mb-4"><div class="flex items-center gap-3 mb-2"><span class="text-2xl">'+tI+'</span><div><p class="font-bold text-base uppercase tracking-wider" style="color:'+tC+'">'+(d.tendencia||'')+'</p><p class="text-xs text-slate-500 mt-0.5">'+(d.tendencia_detalhe||'')+'</p></div></div>'+chartHTML+'</div>'+
+    varHTML;
+
+  // DEVICES
+  var devC={Mobile:'#00ff88',mobile:'#00ff88',Desktop:'#4dabf7',desktop:'#4dabf7',Tablet:'#ffd93d',tablet:'#ffd93d'};
+  var devI={Mobile:'📱',mobile:'📱',Desktop:'🖥️',desktop:'🖥️',Tablet:'📟',tablet:'📟'};
+  var devHTML='<h3 class="text-sm font-bold text-white mb-4">📱 Performance por Dispositivo</h3>';
+  (d.dispositivos||[]).forEach(function(dv){
+    var cor=devC[dv.tipo]||'#888';
+    devHTML+='<div class="glass rounded-2xl p-5 mb-3" style="border-left:3px solid '+cor+'"><div class="flex justify-between items-center mb-4"><span class="font-bold text-base">'+(devI[dv.tipo]||'📟')+' '+dv.tipo+'</span><span class="px-3 py-1 rounded-full text-xs font-bold" style="background:'+cor+'15;color:'+cor+'">'+dv.pct+' tráfego</span></div>'+
+    '<div class="grid grid-cols-3 gap-3">'+
+    '<div class="bg-sda-bg rounded-xl p-3 text-center"><p class="text-[9px] uppercase tracking-wider text-slate-500 font-semibold">Sessões</p><p class="text-xl font-extrabold mt-1" style="color:'+cor+'">'+(typeof dv.sessoes==='number'?num(dv.sessoes):dv.sessoes)+'</p></div>'+
+    '<div class="bg-sda-bg rounded-xl p-3 text-center"><p class="text-[9px] uppercase tracking-wider text-slate-500 font-semibold">Visitantes</p><p class="text-xl font-extrabold mt-1 text-slate-200">'+(typeof dv.visitantes==='number'?num(dv.visitantes):dv.visitantes)+'</p></div>'+
+    '<div class="bg-sda-bg rounded-xl p-3 text-center"><p class="text-[9px] uppercase tracking-wider text-slate-500 font-semibold">Conv. Rate</p><p class="text-xl font-extrabold mt-1 text-sda-green">'+(dv.convert_rate||'—')+'</p></div></div></div>';
+  });
+  if(d.dispositivos&&d.dispositivos.length){
+    devHTML+='<div class="glass rounded-2xl p-5 mt-2"><p class="text-[10px] uppercase tracking-[2px] text-slate-500 font-semibold mb-3">Distribuição de Tráfego</p><div class="flex rounded-xl overflow-hidden h-8">';
+    d.dispositivos.forEach(function(dv){devHTML+='<div class="flex items-center justify-center text-[10px] font-bold text-sda-bg" style="width:'+(parseFloat(dv.pct)||0)+'%;background:'+(devC[dv.tipo]||'#888')+'">'+dv.tipo+' '+dv.pct+'</div>'});
+    devHTML+='</div></div>';
+  }
+  document.getElementById('tab-devices').innerHTML=devHTML;
+
+  // UX
+  var uxHTML='<h3 class="text-sm font-bold text-white mb-2">🔍 Diagnóstico UI/UX</h3><p class="text-xs text-slate-500 mb-4">Problemas por área da LP, ordenados por impacto na conversão</p>';
+  (d.diagnostico_ux||[]).forEach(function(ux){
+    var corI=ux.impacto==='alto'?'#ff6b6b':ux.impacto==='médio'?'#ffd93d':'#00ff88';
+    var ic=ux.impacto==='alto'?'🔴':ux.impacto==='médio'?'🟡':'🟢';
+    uxHTML+='<div class="glass rounded-2xl p-5 mb-3" style="border-left:3px solid '+corI+'"><div class="flex justify-between items-center mb-3"><span class="font-bold text-sm text-white">'+ic+' '+ux.area+'</span>'+badge(ux.impacto)+'</div><p class="text-sm text-slate-400 leading-relaxed mb-3">'+ux.problema+'</p><div class="bg-sda-green/5 border border-sda-green/10 rounded-xl p-3"><p class="text-xs text-sda-green leading-relaxed">💡 '+ux.sugestao+'</p></div></div>';
+  });
+  document.getElementById('tab-ux').innerHTML=uxHTML;
+
+  // CRO
+  var croHTML='<h3 class="text-sm font-bold text-white mb-2">🎯 Ações de CRO</h3><p class="text-xs text-slate-500 mb-4">Otimizações por prioridade de impacto na conversão</p>';
+  (d.acoes_cro||[]).forEach(function(a){
+    croHTML+='<div class="glass rounded-2xl p-5 mb-3 flex gap-4 items-start"><div class="bg-sda-green/10 text-sda-green min-w-[44px] h-[44px] rounded-full flex items-center justify-center font-black text-base flex-shrink-0">'+a.prioridade+'</div><div><p class="text-sm font-semibold text-white mb-1">'+a.acao+'</p><span class="inline-block bg-sda-green/10 px-3 py-1 rounded-full text-xs font-bold text-sda-green">'+(a.impacto_esperado||'')+'</span></div></div>';
+  });
+  document.getElementById('tab-cro').innerHTML=croHTML;
+}
+
+// INIT
+(function(){
+  var c=loadCache();
+  if(c&&c.data){D=c.data;setStatus('cache');document.getElementById('last-update').textContent='Cache: '+new Date(c.at).toLocaleString('pt-BR');render()}
+  fetchData();
+})();
+</script>
 </body>
 </html>
