@@ -1,324 +1,1109 @@
 <!DOCTYPE html>
-<html lang="pt-BR" class="dark">
+<html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Dashboard Analítico — SDA Ao Vivo 2026</title>
-<script src="https://cdn.tailwindcss.com"></script>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-<script>
-tailwind.config = {
-  darkMode: 'class',
-  theme: {
-    extend: {
-      fontFamily: { sans: ['Inter', 'sans-serif'] },
-      colors: {
-        'sda-bg': '#060612',
-        'sda-surface': '#0e0e1f',
-        'sda-card': '#141428',
-        'sda-brand': '#ff6a00',
-        'sda-brand-hover': '#e55d00',
-        'sda-green': '#00ff88',
-        'sda-blue': '#4dabf7',
-        'sda-purple': '#c084fc',
-        'sda-red': '#ff6b6b',
-        'sda-yellow': '#ffd93d',
-        'sda-border': '#1a1a32',
-      }
-    }
-  }
-}
-</script>
+<title>SDA 2026 — Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
-body{background:#060612;color:#f0f0f8}
-.glass{background:#0e0e1f;border:1px solid #1a1a32;transition:transform .2s,box-shadow .2s}
-.glass:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,.4)}
-.tab-btn{transition:all .2s}
-.tab-btn.active{background:rgba(0,255,136,.1);border-color:rgba(0,255,136,.25);color:#00ff88}
-#progress-bar{transition:transform .1s linear;transform-origin:left}
-@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
-.fade-in{animation:fadeIn .4s ease-out}
+/* ── RESET & BASE ─────────────────────────────── */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#07070f;
+  --s1:#0d0d1a;
+  --s2:#12121f;
+  --s3:#18182a;
+  --border:rgba(255,255,255,0.06);
+  --border2:rgba(255,255,255,0.1);
+  --text:#e8e8f2;
+  --muted:#5a5a7a;
+  --muted2:#3a3a5a;
+  --orange:#ff6b00;
+  --orange2:#ff8c3a;
+  --green:#00e87a;
+  --green2:#00c265;
+  --blue:#4da6ff;
+  --red:#ff4d6d;
+  --yellow:#ffd93d;
+  --purple:#b06bff;
+  --r:14px;
+  --nav-h:64px;
+}
+html{scroll-behavior:smooth;scroll-padding-top:calc(var(--nav-h) + 16px)}
+body{
+  background:var(--bg);
+  color:var(--text);
+  font-family:'DM Sans',sans-serif;
+  font-size:14px;
+  line-height:1.6;
+  min-height:100vh;
+  overflow-x:hidden;
+}
+
+/* ── NOISE OVERLAY ─────────────────────────────── */
+body::before{
+  content:'';
+  position:fixed;inset:0;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.025'/%3E%3C/svg%3E");
+  pointer-events:none;z-index:0;opacity:.5;
+}
+
+/* ── NAV ─────────────────────────────────────── */
+nav{
+  position:fixed;top:0;left:0;right:0;
+  height:var(--nav-h);
+  background:rgba(7,7,15,0.85);
+  backdrop-filter:blur(20px);
+  border-bottom:1px solid var(--border);
+  z-index:100;
+  display:flex;align-items:center;
+  padding:0 24px;gap:0;
+}
+.nav-logo{
+  font-family:'Syne',sans-serif;
+  font-weight:800;font-size:15px;
+  color:#fff;letter-spacing:-.02em;
+  margin-right:auto;
+  display:flex;align-items:center;gap:10px;
+}
+.nav-logo-dot{
+  width:8px;height:8px;border-radius:50%;
+  background:var(--orange);
+  box-shadow:0 0 12px var(--orange);
+  animation:pulse 2s infinite;
+}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.6;transform:scale(.8)}}
+
+.nav-links{display:flex;gap:2px}
+.nav-link{
+  font-family:'DM Mono',monospace;
+  font-size:11px;font-weight:500;
+  color:var(--muted);
+  text-decoration:none;
+  padding:6px 14px;
+  border-radius:8px;
+  letter-spacing:.05em;
+  text-transform:uppercase;
+  transition:all .2s;
+  border:1px solid transparent;
+}
+.nav-link:hover{color:var(--text);background:var(--s2)}
+.nav-link.active{color:var(--orange);background:rgba(255,107,0,.08);border-color:rgba(255,107,0,.2)}
+
+.nav-status{
+  display:flex;align-items:center;gap:8px;
+  margin-left:20px;
+  padding:6px 14px;
+  border-radius:8px;
+  background:var(--s2);
+  border:1px solid var(--border);
+}
+.status-dot{
+  width:6px;height:6px;border-radius:50%;
+  background:var(--muted2);
+  transition:background .3s;
+}
+.status-dot.online{background:var(--green);box-shadow:0 0 8px var(--green)}
+.status-dot.cache{background:var(--yellow);box-shadow:0 0 8px var(--yellow)}
+.status-dot.loading{background:var(--blue);box-shadow:0 0 8px var(--blue);animation:pulse 1s infinite}
+.status-dot.error{background:var(--red)}
+.status-text{font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);letter-spacing:.06em;text-transform:uppercase}
+
+.nav-refresh{
+  margin-left:8px;
+  background:transparent;
+  border:1px solid var(--border);
+  color:var(--muted);
+  padding:5px 10px;border-radius:7px;
+  font-size:11px;cursor:pointer;
+  transition:all .2s;
+  font-family:'DM Mono',monospace;
+}
+.nav-refresh:hover{color:var(--green);border-color:rgba(0,232,122,.3)}
+
+/* ── LAYOUT ─────────────────────────────────── */
+.page{padding-top:calc(var(--nav-h) + 32px);padding-bottom:80px;max-width:1100px;margin:0 auto;padding-left:24px;padding-right:24px;position:relative;z-index:1}
+
+/* ── SECTIONS ─────────────────────────────── */
+.section{margin-bottom:80px;scroll-margin-top:calc(var(--nav-h) + 24px)}
+.section-label{
+  font-family:'DM Mono',monospace;
+  font-size:10px;font-weight:500;
+  letter-spacing:.15em;text-transform:uppercase;
+  color:var(--muted);
+  margin-bottom:6px;
+  display:flex;align-items:center;gap:8px;
+}
+.section-label::before{content:'';display:block;width:16px;height:1px;background:var(--orange)}
+.section-title{
+  font-family:'Syne',sans-serif;
+  font-size:22px;font-weight:700;
+  color:#fff;margin-bottom:24px;
+  letter-spacing:-.03em;
+}
+
+/* ── HERO SCORE ─────────────────────────────── */
+.hero-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:12px}
+.hero-grid-bottom{display:grid;grid-template-columns:2fr 1fr;gap:12px}
+
+@media(max-width:700px){
+  .hero-grid{grid-template-columns:1fr 1fr}
+  .hero-grid-bottom{grid-template-columns:1fr}
+  .nav-links{display:none}
+}
+
+.card{
+  background:var(--s1);
+  border:1px solid var(--border);
+  border-radius:var(--r);
+  padding:20px;
+  position:relative;overflow:hidden;
+  transition:border-color .2s;
+}
+.card:hover{border-color:var(--border2)}
+.card-accent{
+  position:absolute;top:0;left:0;right:0;
+  height:2px;border-radius:var(--r) var(--r) 0 0;
+}
+.card-label{
+  font-family:'DM Mono',monospace;
+  font-size:9px;font-weight:500;
+  letter-spacing:.12em;text-transform:uppercase;
+  color:var(--muted);margin-bottom:8px;
+}
+.card-value{
+  font-family:'Syne',sans-serif;
+  font-size:36px;font-weight:800;
+  line-height:1;margin-bottom:4px;
+  letter-spacing:-.03em;
+}
+.card-sub{font-size:11px;color:var(--muted)}
+
+/* NOTA CARD */
+.nota-card{
+  background:var(--s1);
+  border:1px solid var(--border);
+  border-radius:var(--r);
+  padding:24px;
+  display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  text-align:center;
+  position:relative;overflow:hidden;
+}
+.nota-ring{
+  width:100px;height:100px;
+  border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  flex-direction:column;
+  position:relative;
+  margin-bottom:12px;
+}
+.nota-ring svg{position:absolute;top:0;left:0;transform:rotate(-90deg)}
+.nota-num{
+  font-family:'Syne',sans-serif;
+  font-size:32px;font-weight:800;
+  line-height:1;letter-spacing:-.04em;
+}
+.nota-denom{font-size:13px;color:var(--muted)}
+.nota-status{
+  font-family:'DM Mono',monospace;
+  font-size:10px;font-weight:500;
+  letter-spacing:.12em;text-transform:uppercase;
+}
+
+/* ── CONVERT RATE HERO ─────────────────────── */
+.convert-hero{
+  background:var(--s1);
+  border:1px solid var(--border);
+  border-radius:var(--r);
+  padding:24px;
+  position:relative;overflow:hidden;
+}
+.convert-hero::after{
+  content:'';
+  position:absolute;
+  right:-40px;bottom:-40px;
+  width:180px;height:180px;
+  border-radius:50%;
+  background:radial-gradient(circle, rgba(255,107,0,.08) 0%, transparent 70%);
+  pointer-events:none;
+}
+.convert-big{
+  font-family:'Syne',sans-serif;
+  font-size:56px;font-weight:800;
+  line-height:1;letter-spacing:-.04em;
+  color:var(--orange);
+  margin:8px 0 4px;
+}
+.convert-bar-wrap{
+  height:6px;
+  background:rgba(255,255,255,0.05);
+  border-radius:99px;overflow:hidden;
+  margin-top:14px;
+}
+.convert-bar{
+  height:100%;border-radius:99px;
+  background:linear-gradient(90deg,var(--orange),var(--orange2));
+  transition:width 1s cubic-bezier(.4,0,.2,1);
+}
+
+/* ── TIMELINE ─────────────────────────────── */
+.timeline-card{
+  background:var(--s1);
+  border:1px solid var(--border);
+  border-radius:var(--r);
+  padding:24px;
+  grid-column:1/-1;
+}
+.timeline-header{
+  display:flex;justify-content:space-between;align-items:flex-end;
+  margin-bottom:20px;flex-wrap:wrap;gap:12px;
+}
+.timeline-title{
+  font-family:'Syne',sans-serif;
+  font-size:16px;font-weight:700;color:#fff;
+}
+.timeline-legend{
+  display:flex;gap:16px;
+}
+.legend-item{
+  display:flex;align-items:center;gap:6px;
+  font-size:11px;color:var(--muted);
+}
+.legend-dot{width:8px;height:8px;border-radius:2px}
+
+.chart-area{
+  position:relative;
+  height:160px;
+  display:flex;align-items:flex-end;
+  gap:3px;
+  padding-bottom:28px;
+}
+.chart-grid{
+  position:absolute;top:0;left:0;right:0;
+  height:calc(100% - 28px);
+  display:flex;flex-direction:column;justify-content:space-between;
+  pointer-events:none;
+}
+.chart-grid-line{
+  border-top:1px dashed rgba(255,255,255,0.04);
+  width:100%;position:relative;
+}
+.chart-grid-line span{
+  position:absolute;right:calc(100% + 8px);
+  top:-7px;
+  font-family:'DM Mono',monospace;
+  font-size:9px;color:var(--muted2);
+  white-space:nowrap;
+}
+
+.bar-group{
+  flex:1;display:flex;flex-direction:column;
+  align-items:center;gap:2px;
+  position:relative;
+}
+.bar-wrap{
+  width:100%;display:flex;
+  align-items:flex-end;justify-content:center;
+  flex:1;gap:2px;
+  position:relative;
+}
+.bar{
+  flex:1;border-radius:3px 3px 0 0;
+  transition:height .8s cubic-bezier(.4,0,.2,1),opacity .2s;
+  cursor:pointer;position:relative;
+  max-width:22px;
+}
+.bar:hover{filter:brightness(1.3)}
+.bar-tooltip{
+  position:absolute;
+  bottom:calc(100% + 6px);
+  left:50%;transform:translateX(-50%);
+  background:var(--s3);
+  border:1px solid var(--border2);
+  border-radius:6px;
+  padding:5px 10px;
+  font-family:'DM Mono',monospace;
+  font-size:10px;color:var(--text);
+  white-space:nowrap;
+  pointer-events:none;
+  opacity:0;transition:opacity .15s;
+  z-index:10;
+}
+.bar:hover .bar-tooltip{opacity:1}
+.bar-label{
+  font-family:'DM Mono',monospace;
+  font-size:9px;color:var(--muted2);
+  text-align:center;
+  position:absolute;bottom:0;
+  white-space:nowrap;
+}
+
+.timeline-stats{
+  display:grid;grid-template-columns:repeat(4,1fr);
+  gap:10px;margin-top:16px;
+}
+@media(max-width:600px){.timeline-stats{grid-template-columns:repeat(2,1fr)}}
+
+.tstat{
+  background:var(--s2);
+  border:1px solid var(--border);
+  border-radius:10px;
+  padding:12px 14px;
+}
+.tstat-label{font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);letter-spacing:.1em;text-transform:uppercase;margin-bottom:4px}
+.tstat-value{font-family:'Syne',sans-serif;font-size:20px;font-weight:700;line-height:1}
+
+/* ── TENDÊNCIA ─────────────────────────────── */
+.trend-pill{
+  display:inline-flex;align-items:center;gap:6px;
+  padding:4px 12px;border-radius:99px;
+  font-family:'DM Mono',monospace;
+  font-size:10px;font-weight:500;
+  text-transform:uppercase;letter-spacing:.06em;
+}
+
+/* ── DEVICES ─────────────────────────────── */
+.devices-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+@media(max-width:650px){.devices-grid{grid-template-columns:1fr}}
+
+.device-card{
+  background:var(--s1);
+  border:1px solid var(--border);
+  border-radius:var(--r);
+  padding:20px;
+  position:relative;overflow:hidden;
+}
+.device-icon{font-size:28px;margin-bottom:12px}
+.device-name{font-family:'Syne',sans-serif;font-weight:700;font-size:16px;margin-bottom:4px}
+.device-pct{
+  font-family:'Syne',sans-serif;
+  font-size:32px;font-weight:800;
+  line-height:1;letter-spacing:-.04em;
+  margin:8px 0;
+}
+.device-row{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:6px 0;
+  border-top:1px solid var(--border);
+  font-size:12px;
+}
+.device-row-label{color:var(--muted)}
+.device-row-val{font-family:'DM Mono',monospace;font-weight:500}
+.device-bar{
+  height:3px;background:rgba(255,255,255,.04);
+  border-radius:99px;overflow:hidden;margin:12px 0 8px;
+}
+.device-bar-fill{height:100%;border-radius:99px;transition:width 1s}
+
+/* ── UX ISSUES ─────────────────────────────── */
+.ux-grid{display:flex;flex-direction:column;gap:10px}
+.ux-card{
+  background:var(--s1);
+  border:1px solid var(--border);
+  border-radius:var(--r);
+  padding:20px 24px;
+  display:grid;
+  grid-template-columns:auto 1fr auto;
+  gap:16px;align-items:start;
+}
+.ux-num{
+  font-family:'Syne',sans-serif;
+  font-size:28px;font-weight:800;
+  line-height:1;color:var(--muted2);
+  min-width:30px;
+}
+.ux-area{font-weight:600;font-size:14px;color:#fff;margin-bottom:4px}
+.ux-problem{font-size:13px;color:var(--muted);line-height:1.5;margin-bottom:10px}
+.ux-fix{
+  background:rgba(0,232,122,.05);
+  border:1px solid rgba(0,232,122,.1);
+  border-radius:8px;
+  padding:10px 14px;
+  font-size:12px;color:var(--green);
+  line-height:1.5;
+}
+.ux-fix::before{content:'→ ';font-weight:700}
+.impact-badge{
+  font-family:'DM Mono',monospace;
+  font-size:9px;font-weight:500;
+  padding:3px 10px;border-radius:99px;
+  text-transform:uppercase;letter-spacing:.08em;
+  white-space:nowrap;
+  align-self:flex-start;
+}
+
+/* ── CRO ACTIONS ─────────────────────────────── */
+.cro-grid{display:flex;flex-direction:column;gap:10px}
+.cro-card{
+  background:var(--s1);
+  border:1px solid var(--border);
+  border-radius:var(--r);
+  padding:20px 24px;
+  display:flex;gap:16px;align-items:flex-start;
+  transition:border-color .2s;
+}
+.cro-card:hover{border-color:var(--border2)}
+.cro-priority{
+  font-family:'Syne',sans-serif;
+  font-size:32px;font-weight:800;
+  line-height:1;
+  min-width:40px;
+  letter-spacing:-.04em;
+}
+.cro-action{font-weight:600;font-size:14px;color:#fff;margin-bottom:6px}
+.cro-impact{
+  display:inline-block;
+  font-family:'DM Mono',monospace;
+  font-size:10px;
+  padding:2px 10px;border-radius:99px;
+  background:rgba(0,232,122,.08);
+  border:1px solid rgba(0,232,122,.15);
+  color:var(--green);
+  margin-top:2px;
+}
+
+/* ── VARIANTES AB ─────────────────────────────── */
+.ab-card{
+  background:var(--s1);
+  border:1px solid var(--border);
+  border-radius:var(--r);
+  padding:20px 24px;
+}
+.ab-row{
+  display:flex;align-items:center;gap:14px;
+  padding:10px 0;
+  border-bottom:1px solid var(--border);
+}
+.ab-row:last-child{border-bottom:none}
+.ab-label{
+  font-family:'Syne',sans-serif;
+  font-weight:700;font-size:18px;
+  min-width:32px;
+}
+.ab-bar-outer{flex:1;height:8px;background:rgba(255,255,255,.04);border-radius:99px;overflow:hidden}
+.ab-bar-inner{height:100%;border-radius:99px;transition:width 1s cubic-bezier(.4,0,.2,1)}
+.ab-leads{
+  font-family:'DM Mono',monospace;
+  font-size:12px;font-weight:500;
+  min-width:40px;text-align:right;
+}
+.ab-pct{
+  font-family:'DM Mono',monospace;
+  font-size:11px;color:var(--muted);
+  min-width:44px;text-align:right;
+}
+
+/* ── ALERTA ─────────────────────────────── */
+.alert-box{
+  background:rgba(255,77,109,.06);
+  border:1px solid rgba(255,77,109,.2);
+  border-radius:var(--r);
+  padding:16px 20px;
+  display:flex;gap:12px;
+  align-items:flex-start;
+  margin-bottom:24px;
+}
+.alert-icon{font-size:18px}
+.alert-text{font-size:13px;color:#ffb3c1;line-height:1.5}
+
+/* ── RESUMO BOX ─────────────────────────────── */
+.resumo-box{
+  background:var(--s1);
+  border:1px solid var(--border);
+  border-left:3px solid var(--orange);
+  border-radius:var(--r);
+  padding:16px 20px;
+  font-size:13px;color:#b0b0c8;
+  line-height:1.6;
+  margin-bottom:24px;
+}
+
+/* ── FOOTER ─────────────────────────────── */
+footer{
+  text-align:center;
+  padding:32px 24px;
+  border-top:1px solid var(--border);
+  font-family:'DM Mono',monospace;
+  font-size:10px;
+  color:var(--muted2);
+  letter-spacing:.1em;
+  text-transform:uppercase;
+}
+
+/* ── LOADING SKELETON ─────────────────────── */
+.skeleton{
+  background:linear-gradient(90deg,var(--s2) 25%,var(--s3) 50%,var(--s2) 75%);
+  background-size:200% 100%;
+  animation:shimmer 1.5s infinite;
+  border-radius:6px;
+}
+@keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+
+/* ── SCROLL REVEAL ─────────────────────────── */
+.reveal{opacity:0;transform:translateY(16px);transition:opacity .5s,transform .5s}
+.reveal.visible{opacity:1;transform:translateY(0)}
+
+/* ── PROGRESS BAR TOP ─────────────────────── */
+.refresh-bar{
+  position:fixed;top:var(--nav-h);left:0;right:0;
+  height:2px;z-index:99;
+  background:rgba(255,255,255,.04);
+}
+.refresh-bar-fill{
+  height:100%;
+  background:linear-gradient(90deg,var(--orange),var(--orange2));
+  transform-origin:left;
+  transition:transform .1s linear;
+}
+
+/* ── MSG ─────────────────────────────────── */
+#msg-bar{
+  position:fixed;bottom:24px;left:50%;transform:translateX(-50%);
+  z-index:200;
+  padding:10px 20px;
+  border-radius:10px;
+  font-size:12px;font-family:'DM Mono',monospace;
+  backdrop-filter:blur(12px);
+  opacity:0;transition:opacity .3s;
+  pointer-events:none;white-space:nowrap;
+}
+#msg-bar.show{opacity:1}
+
 </style>
 </head>
-<body class="min-h-screen antialiased">
-<div class="max-w-5xl mx-auto px-4 py-6 md:px-8 md:py-8">
+<body>
 
-  <!-- HEADER -->
-  <header class="glass rounded-2xl p-5 md:p-6 mb-2">
-    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-      <div>
-        <p class="text-[10px] tracking-[4px] uppercase font-bold text-sda-green/50">Performance Dashboard</p>
-        <h1 class="text-xl md:text-2xl font-bold tracking-tight mt-1">LP — <span class="text-sda-brand">SDA Ao Vivo 2026</span></h1>
-        <p class="text-xs text-slate-500 mt-1">Conversão • UI/UX • Últimos 7 dias</p>
-      </div>
-      <div class="flex items-center gap-4 w-full md:w-auto">
-        <div class="text-right flex-1 md:flex-none">
-          <div class="flex items-center justify-end gap-2 mb-1">
-            <span id="status-dot" class="w-2 h-2 rounded-full bg-slate-600 animate-pulse"></span>
-            <span id="status-label" class="text-[10px] font-bold tracking-wider uppercase text-slate-500">Offline</span>
-          </div>
-          <p id="countdown-text" class="text-lg font-mono font-bold text-white">30:00</p>
-          <p id="last-update" class="text-[10px] text-slate-600 mt-0.5"></p>
-        </div>
-        <div class="flex flex-col gap-2">
-          <button onclick="fetchData()" id="refresh-btn" class="bg-sda-surface hover:bg-sda-card text-sda-green border border-sda-border px-4 py-2 rounded-lg font-semibold text-xs transition-colors flex items-center gap-2 whitespace-nowrap">🔄 Atualizar</button>
-        </div>
-      </div>
-    </div>
-  </header>
-
-  <!-- PROGRESS BAR -->
-  <div class="w-full bg-sda-surface rounded-full h-1 mb-6 overflow-hidden border border-sda-border">
-    <div id="progress-bar" class="bg-sda-brand h-1 rounded-full w-full"></div>
+<!-- NAV FIXA -->
+<nav>
+  <div class="nav-logo">
+    <div class="nav-logo-dot"></div>
+    SDA <span style="color:var(--orange)">2026</span>
   </div>
-
-  <!-- STATUS MESSAGE -->
-  <div id="status-message" class="hidden p-3 rounded-xl mb-4 text-center text-sm font-medium"></div>
-
-  <!-- TABS -->
-  <div class="flex gap-2 mb-6 overflow-x-auto pb-1" id="tabs-container">
-    <button class="tab-btn active border border-transparent rounded-xl px-4 py-2.5 text-xs font-semibold text-slate-500 bg-sda-surface whitespace-nowrap" onclick="switchTab('overview',this)">📊 Visão Geral</button>
-    <button class="tab-btn border border-transparent rounded-xl px-4 py-2.5 text-xs font-semibold text-slate-500 bg-sda-surface whitespace-nowrap" onclick="switchTab('devices',this)">📱 Dispositivos</button>
-    <button class="tab-btn border border-transparent rounded-xl px-4 py-2.5 text-xs font-semibold text-slate-500 bg-sda-surface whitespace-nowrap" onclick="switchTab('ux',this)">🔍 UX</button>
-    <button class="tab-btn border border-transparent rounded-xl px-4 py-2.5 text-xs font-semibold text-slate-500 bg-sda-surface whitespace-nowrap" onclick="switchTab('cro',this)">🎯 CRO</button>
+  <div class="nav-links">
+    <a class="nav-link active" href="#overview">Visão Geral</a>
+    <a class="nav-link" href="#dispositivos">Dispositivos</a>
+    <a class="nav-link" href="#ux">UX</a>
+    <a class="nav-link" href="#cro">CRO</a>
   </div>
-
-  <!-- TAB CONTENT -->
-  <div id="tab-overview" class="fade-in"></div>
-  <div id="tab-devices" class="fade-in hidden"></div>
-  <div id="tab-ux" class="fade-in hidden"></div>
-  <div id="tab-cro" class="fade-in hidden"></div>
-
-  <!-- FOOTER -->
-  <div class="text-center pt-8 pb-4 border-t border-sda-border mt-8">
-    <p class="text-[10px] tracking-[2px] text-slate-700 uppercase">SDA Ao Vivo 2026 • Dashboard Automático • Claude AI</p>
+  <div class="nav-status">
+    <div class="status-dot loading" id="status-dot"></div>
+    <span class="status-text" id="status-text">carregando</span>
   </div>
+  <button class="nav-refresh" onclick="fetchData()" id="btn-refresh">↻</button>
+</nav>
+
+<!-- PROGRESS BAR -->
+<div class="refresh-bar">
+  <div class="refresh-bar-fill" id="progress-fill" style="transform:scaleX(1)"></div>
 </div>
 
-<!-- FIM DO BODY -->
+<!-- MENSAGEM TOAST -->
+<div id="msg-bar"></div>
+
+<!-- PÁGINA -->
+<div class="page">
+
+  <!-- ─── OVERVIEW ─────────────────────────── -->
+  <section class="section reveal" id="overview">
+    <div class="section-label">01 — Performance Geral</div>
+    <div class="section-title">Visão Geral</div>
+
+    <div id="alert-container"></div>
+    <div id="resumo-container"></div>
+
+    <!-- MÉTRICAS HERO -->
+    <div class="hero-grid" id="hero-metrics">
+      <!-- injetado via JS -->
+    </div>
+
+    <!-- CONVERT RATE + NOTA -->
+    <div class="hero-grid-bottom" id="hero-bottom">
+      <!-- injetado via JS -->
+    </div>
+
+    <!-- TIMELINE -->
+    <div style="margin-top:12px" id="timeline-container">
+      <!-- injetado via JS -->
+    </div>
+
+  </section>
+
+  <!-- ─── DISPOSITIVOS ─────────────────────────── -->
+  <section class="section reveal" id="dispositivos">
+    <div class="section-label">02 — Breakdown por Plataforma</div>
+    <div class="section-title">Dispositivos</div>
+    <div class="devices-grid" id="devices-content">
+      <!-- injetado via JS -->
+    </div>
+  </section>
+
+  <!-- ─── UX ─────────────────────────────────── -->
+  <section class="section reveal" id="ux">
+    <div class="section-label">03 — Diagnóstico da Interface</div>
+    <div class="section-title">Análise UX</div>
+    <div class="ux-grid" id="ux-content">
+      <!-- injetado via JS -->
+    </div>
+  </section>
+
+  <!-- ─── CRO ─────────────────────────────────── -->
+  <section class="section reveal" id="cro">
+    <div class="section-label">04 — Plano de Otimização</div>
+    <div class="section-title">Ações CRO</div>
+    <div id="ab-container" style="margin-bottom:16px"></div>
+    <div class="cro-grid" id="cro-content">
+      <!-- injetado via JS -->
+    </div>
+  </section>
+
+</div>
+
+<footer>SDA Ao Vivo 2026 · Dashboard Automático · <span id="footer-update">—</span></footer>
 
 <script>
-var WEB_APP="https://script.google.com/macros/s/AKfycbz5NEXfcvzY-VrhQp02JfbGKc6tFcp-wkxE4CmtSQbaVpNt_K-WmWQZEpWFofORVJqXDA/exec";
-var CACHE_KEY="sda_dash_v4";
-var REFRESH_MS=30*60*1000;
-var D=null;
-var targetTime=Date.now()+REFRESH_MS;
+/* ─── CONFIG ─────────────────────────────────── */
+var WEB_APP = "https://script.google.com/macros/s/AKfycbz5NEXfcvzY-VrhQp02JfbGKc6tFcp-wkxE4CmtSQbaVpNt_K-WmWQZEpWFofORVJqXDA/exec";
+var CACHE_KEY = "sda_dash_v5";
+var REFRESH_MS = 30 * 60 * 1000;
+var D = null;
+var targetTime = Date.now() + REFRESH_MS;
 
-// --- TABS ---
-function switchTab(id,el){
-  document.querySelectorAll('.tab-btn').forEach(function(t){t.classList.remove('active')});
-  el.classList.add('active');
-  ['overview','devices','ux','cro'].forEach(function(t){
-    var tab=document.getElementById('tab-'+t);
-    tab.classList.toggle('hidden',t!==id);
-  });
+/* ─── MOCK DATA (fallback visual) ─────────────── */
+var MOCK = {
+  nota_performance: 6.2,
+  resumo: "A landing page apresenta ativos fortes — palestrantes de alto engajamento e prova social consolidada — mas perde conversão por inconsistências de data, headline genérica e fluxo de CTA ambíguo.",
+  alerta: "Datas conflitantes detectadas: título diz 24-26/Abril mas grade mostra 11-13/Abril. Corrigir imediatamente.",
+  sessoes: 14820,
+  visitantes: 11340,
+  leads_7d: 612,
+  taxa_conversao: "4.1%",
+  media_leads_dia: 87,
+  paginas_por_sessao: 2.4,
+  tendencia: "crescendo",
+  tendencia_detalhe: "+23% em relação à semana anterior",
+  leads_por_dia: {
+    "2026-02-12": 72,
+    "2026-02-13": 81,
+    "2026-02-14": 95,
+    "2026-02-15": 68,
+    "2026-02-16": 103,
+    "2026-02-17": 118,
+    "2026-02-18": 75
+  },
+  sessoes_por_dia: {
+    "2026-02-12": 1850,
+    "2026-02-13": 2100,
+    "2026-02-14": 2380,
+    "2026-02-15": 1920,
+    "2026-02-16": 2650,
+    "2026-02-17": 2840,
+    "2026-02-18": 1080
+  },
+  variantes: [
+    {variante:"A", leads: 312, pct:"51%"},
+    {variante:"B", leads: 190, pct:"31%"},
+    {variante:"C", leads: 110, pct:"18%"}
+  ],
+  dispositivos: [
+    {tipo:"Mobile", pct:"67%", sessoes:9929, visitantes:7598, convert_rate:"3.8%"},
+    {tipo:"Desktop", pct:"28%", sessoes:4150, visitantes:3175, convert_rate:"5.1%"},
+    {tipo:"Tablet",  pct:"5%",  sessoes:741,  visitantes:567,  convert_rate:"2.9%"}
+  ],
+  diagnostico_ux: [
+    {area:"Consistência de Dados", impacto:"alto", problema:"Datas conflitantes em 3 pontos da página: título (24-26/Abr), grade (11-13/Abr) e cards de ingresso. Destrói credibilidade antes de qualquer argumento de venda.", sugestao:"Unificar todas as referências de data para 24-26 de Abril de 2026. Atualizar 'Kit SDA 2025' para 'Kit SDA 2026' e copyright © 2025 para © 2026."},
+    {area:"Headline Above the Fold", impacto:"alto", problema:"A headline atual é uma pergunta retórica genérica que não comunica o que é o evento, para quem é ou quando acontece — as 3 perguntas dos primeiros 5 segundos.", sugestao:"Substituir por headline com público-alvo explícito, data e autoridade. Ex: 'O Evento Que +15.000 Empresários Usam Para Escalar no Digital — 24-26 Abr 2026, Teatro Bradesco'."},
+    {area:"Hierarquia de Palestrantes", impacto:"alto", problema:"Pablo Marçal, Alfredo Soares e Natalia Beauty — o maior asset de conversão — aparecem abaixo do vídeo de apresentação, enterrados no scroll.", sugestao:"Mover fotos e nomes dos palestrantes confirmados para imediatamente abaixo do headline, antes de qualquer outro bloco de conteúdo."},
+    {area:"Fluxo de CTA", impacto:"alto", problema:"Dois fluxos competindo: 'Lista de Espera' (topo) e preços com botões de compra (meio). Cria microdecisão prematura que paralisa a decisão pelo paradoxo da escolha.", sugestao:"Definir fase única: se em lista de espera, remover cards de preço e manter apenas um CTA. Se venda aberta, remover o conceito de 'lista de espera'."},
+    {area:"Prova Social Mobile", impacto:"médio", problema:"Todos os depoimentos estão em formato de vídeo exclusivo. No mobile, maioria dos usuários não assiste vídeos em landing pages sem fone.", sugestao:"Adicionar resultado numérico escaneável junto ao thumbnail: 'R$74k → R$500k/mês' em destaque tipográfico acima do botão de play."},
+    {area:"Garantia de 7 dias", impacto:"médio", problema:"A garantia existe mas está posicionada em bloco discreto, distante dos CTAs. Para ticket de R$1.297-R$4.297 é o principal redutor de risco.", sugestao:"Mover ícone de garantia para imediatamente abaixo de cada botão de compra. Usar linguagem clara: '7 dias. Não gostou, devolvemos 100%.'"}
+  ],
+  acoes_cro: [
+    {prioridade:"#1", acao:"Corrigir todas as inconsistências de datas em toda a página", impacto_esperado:"+5–10% conversão"},
+    {prioridade:"#2", acao:"Reescrever headline com público-alvo + data + autoridade", impacto_esperado:"+8–15% conversão"},
+    {prioridade:"#3", acao:"Mover palestrantes 2026 para above the fold", impacto_esperado:"+5–10% conversão"},
+    {prioridade:"#4", acao:"Implementar sticky CTA mobile (aparece após 30% scroll)", impacto_esperado:"+8–12% conversão mobile"},
+    {prioridade:"#5", acao:"Adicionar resultado numérico nos cards de depoimento", impacto_esperado:"+5–8% engajamento"},
+    {prioridade:"#6", acao:"Destacar garantia 7 dias adjacente a cada CTA de compra", impacto_esperado:"+3–6% conversão"}
+  ]
+};
+
+/* ─── STATUS ─────────────────────────────────── */
+function setStatus(s) {
+  var dot = document.getElementById('status-dot');
+  var txt = document.getElementById('status-text');
+  dot.className = 'status-dot ' + s;
+  var labels = {online:'ao vivo', cache:'cache', loading:'carregando', error:'offline'};
+  txt.textContent = labels[s] || s;
 }
 
-// --- STATUS ---
-function setStatus(s){
-  var dot=document.getElementById('status-dot');
-  var label=document.getElementById('status-label');
-  var map={online:{c:'bg-sda-green',t:'Ao Vivo'},cache:{c:'bg-sda-yellow',t:'Cache'},loading:{c:'bg-sda-blue',t:'Carregando'},error:{c:'bg-sda-red',t:'Offline'}};
-  var m=map[s]||map.error;
-  dot.className='w-2 h-2 rounded-full animate-pulse '+m.c;
-  label.textContent=m.t;
-  label.style.color=s==='online'?'#00ff88':s==='cache'?'#ffd93d':s==='loading'?'#4dabf7':'#ff6b6b';
+/* ─── TOAST ─────────────────────────────────── */
+function toast(msg, color) {
+  var el = document.getElementById('msg-bar');
+  el.textContent = msg;
+  el.style.background = color === 'red' ? 'rgba(255,77,109,.15)' : color === 'yellow' ? 'rgba(255,217,61,.12)' : 'rgba(0,232,122,.12)';
+  el.style.border = '1px solid ' + (color === 'red' ? 'rgba(255,77,109,.3)' : color === 'yellow' ? 'rgba(255,217,61,.25)' : 'rgba(0,232,122,.25)');
+  el.style.color = color === 'red' ? '#ff8fa3' : color === 'yellow' ? '#ffe066' : '#4df5a0';
+  el.classList.add('show');
+  setTimeout(function() { el.classList.remove('show'); }, 3500);
 }
 
-// --- TIMER ---
-function updateTimer(){
-  var remaining=Math.max(0,targetTime-Date.now());
-  var m=Math.floor(remaining/60000),s=Math.floor((remaining%60000)/1000);
-  document.getElementById('countdown-text').textContent=String(m).padStart(2,'0')+':'+String(s).padStart(2,'0');
-  document.getElementById('progress-bar').style.transform='scaleX('+(remaining/REFRESH_MS)+')';
-  if(remaining===0){targetTime=Date.now()+REFRESH_MS;fetchData()}
-  requestAnimationFrame(updateTimer);
+/* ─── TIMER ─────────────────────────────────── */
+function tick() {
+  var remaining = Math.max(0, targetTime - Date.now());
+  var fill = document.getElementById('progress-fill');
+  fill.style.transform = 'scaleX(' + (remaining / REFRESH_MS) + ')';
+  if (remaining === 0) { targetTime = Date.now() + REFRESH_MS; fetchData(); }
+  requestAnimationFrame(tick);
 }
-requestAnimationFrame(updateTimer);
+requestAnimationFrame(tick);
 
-// --- CACHE ---
-function saveCache(data){try{localStorage.setItem(CACHE_KEY,JSON.stringify({data:data,at:new Date().toISOString()}))}catch(e){}}
-function loadCache(){try{var c=localStorage.getItem(CACHE_KEY);if(c)return JSON.parse(c)}catch(e){}return null}
+/* ─── CACHE ─────────────────────────────────── */
+function saveCache(data) {
+  try { localStorage.setItem(CACHE_KEY, JSON.stringify({data: data, at: new Date().toISOString()})); } catch(e) {}
+}
+function loadCache() {
+  try { var c = localStorage.getItem(CACHE_KEY); return c ? JSON.parse(c) : null; } catch(e) { return null; }
+}
 
-// --- FETCH ---
-function fetchData(){
+/* ─── FETCH ─────────────────────────────────── */
+function fetchData() {
   setStatus('loading');
-  var btn=document.getElementById('refresh-btn');
-  btn.disabled=true;btn.innerHTML='⏳ ...';
+  var btn = document.getElementById('btn-refresh');
+  btn.textContent = '...'; btn.disabled = true;
 
-  fetch(WEB_APP,{redirect:'follow'})
-  .then(function(r){return r.text()})
-  .then(function(text){
-    var clean=text.trim();
-    var s=clean.indexOf('{'),e=clean.lastIndexOf('}');
-    if(s>=0&&e>s) clean=clean.substring(s,e+1);
-    D=JSON.parse(clean);
-    setStatus('online');
-    saveCache(D);
-    targetTime=Date.now()+REFRESH_MS;
-    document.getElementById('last-update').textContent='Atualizado: '+new Date().toLocaleString('pt-BR');
-    document.getElementById('status-message').className='hidden';
-    render();
-  })
-  .catch(function(){
-    var c=loadCache();
-    if(c&&c.data){D=c.data;setStatus('cache');document.getElementById('last-update').textContent='Cache: '+new Date(c.at).toLocaleString('pt-BR');render();
-      showMsg('📦 Exibindo dados em cache. Clique Atualizar para dados frescos.','bg-yellow-950 text-yellow-400 border border-yellow-800');
-    }else{setStatus('error');showMsg('⚠️ Não foi possível carregar. Verifique a Web App.','bg-red-950 text-red-400 border border-red-800')}
-  })
-  .finally(function(){btn.disabled=false;btn.innerHTML='🔄 Atualizar'});
+  fetch(WEB_APP, {redirect: 'follow'})
+    .then(function(r) { return r.text(); })
+    .then(function(text) {
+      var clean = text.trim();
+      var s = clean.indexOf('{'), e = clean.lastIndexOf('}');
+      if (s >= 0 && e > s) clean = clean.substring(s, e + 1);
+      D = JSON.parse(clean);
+      setStatus('online');
+      saveCache(D);
+      targetTime = Date.now() + REFRESH_MS;
+      var now = new Date().toLocaleString('pt-BR');
+      document.getElementById('footer-update').textContent = 'Atualizado ' + now;
+      render(D);
+      toast('✓ Dados atualizados', 'green');
+    })
+    .catch(function() {
+      var c = loadCache();
+      if (c && c.data) {
+        D = c.data;
+        setStatus('cache');
+        document.getElementById('footer-update').textContent = 'Cache: ' + new Date(c.at).toLocaleString('pt-BR');
+        render(D);
+        toast('📦 Exibindo cache', 'yellow');
+      } else {
+        D = MOCK;
+        setStatus('cache');
+        document.getElementById('footer-update').textContent = 'Dados demonstrativos';
+        render(D);
+        toast('⚠ Usando dados demo', 'yellow');
+      }
+    })
+    .finally(function() { btn.textContent = '↻'; btn.disabled = false; });
 }
 
-function showMsg(text,cls){var el=document.getElementById('status-message');el.textContent=text;el.className='p-3 rounded-xl mb-4 text-center text-sm font-medium '+cls}
+/* ─── HELPERS ─────────────────────────────── */
+function n(v) { return typeof v === 'number' ? v.toLocaleString('pt-BR') : (v || '—'); }
+function pct(v) { return (parseFloat(v) || 0); }
 
-// --- EMAIL ---
-function showEmailModal(){var m=document.getElementById('email-modal');m.classList.remove('opacity-0','pointer-events-none');document.getElementById('email-modal-inner').classList.remove('scale-95');document.getElementById('email-msg').textContent='';document.getElementById('email-input').focus()}
-function closeEmailModal(){var m=document.getElementById('email-modal');m.classList.add('opacity-0','pointer-events-none');document.getElementById('email-modal-inner').classList.add('scale-95')}
-
-function sendEmail(){
-  var email=document.getElementById('email-input').value.trim();
-  var msg=document.getElementById('email-msg');
-  if(!email||!email.includes('@')){msg.style.color='#ff6b6b';msg.textContent='Digite um e-mail válido';return}
-  msg.style.color='#ffd93d';msg.textContent='Enviando...';
-  
-  var conversao=D&&D.taxa_conversao?D.taxa_conversao:'N/A';
-  
-  fetch(WEB_APP,{
-    method:'POST',
-    redirect:'follow',
-    headers:{'Content-Type':'text/plain;charset=utf-8'},
-    body:JSON.stringify({action:'email',to:email,conversao:conversao})
-  })
-  .then(function(r){return r.json()})
-  .then(function(result){
-    if(result.status==='success'){
-      msg.style.color='#00ff88';msg.textContent='✅ '+result.message;
-      setTimeout(closeEmailModal,2500);
-    }else{
-      throw new Error(result.message||'Erro desconhecido');
-    }
-  })
-  .catch(function(err){
-    msg.style.color='#ff6b6b';msg.textContent='⚠️ Erro ao enviar. Tente novamente.';
-    console.error('Email error:',err);
-  });
+function impactColor(level) {
+  return level === 'alto' ? '#ff4d6d' : level === 'médio' ? '#ffd93d' : '#00e87a';
+}
+function impactBg(level) {
+  return level === 'alto' ? 'rgba(255,77,109,.1)' : level === 'médio' ? 'rgba(255,217,61,.1)' : 'rgba(0,232,122,.1)';
 }
 
-// --- HELPERS ---
-function num(v){return typeof v==='number'?v.toLocaleString('pt-BR'):v}
-function progress(pct,color){return '<div class="w-full bg-sda-bg rounded-full h-2 overflow-hidden"><div class="h-2 rounded-full transition-all duration-500" style="background:'+color+';width:'+Math.min(parseFloat(pct)||0,100)+'%"></div></div>'}
-function badge(level){var c={alto:'#ff6b6b','médio':'#ffd93d',baixo:'#00ff88'}[level]||'#888';return '<span class="px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider" style="background:'+c+'15;color:'+c+'">'+level+'</span>'}
-
-function metricCard(title,value,sub,color){
-  return '<div class="glass rounded-2xl p-5 relative overflow-hidden"><div class="absolute top-0 left-0 right-0 h-[3px]" style="background:'+color+'"></div>'+
-  '<p class="text-[10px] tracking-[2px] uppercase font-bold text-slate-500">'+title+'</p>'+
-  '<p class="text-3xl font-black mt-2 mb-1" style="color:'+color+'">'+(typeof value==='number'?num(value):value)+'</p>'+
-  (sub?'<p class="text-[11px] text-slate-600">'+sub+'</p>':'')+'</div>';
+/* ─── RENDER ─────────────────────────────── */
+function render(d) {
+  renderOverview(d);
+  renderDevices(d);
+  renderUX(d);
+  renderCRO(d);
+  initScrollReveal();
+  initNavSpy();
 }
 
-// --- RENDER ---
-function render(){
-  if(!D) return;
-  var d=D;
-  var nota=parseFloat(d.nota_performance)||0;
-  var nC=nota>=7?'#00ff88':nota>=4?'#ffd93d':'#ff6b6b';
-  var nL=nota>=7?'SAUDÁVEL':nota>=4?'ATENÇÃO':'CRÍTICO';
-  var tI=d.tendencia==='crescendo'?'📈':d.tendencia==='caindo'?'📉':'➡️';
-  var tC=d.tendencia==='crescendo'?'#00ff88':d.tendencia==='caindo'?'#ff6b6b':'#ffd93d';
+/* ─── OVERVIEW ─────────────────────────────── */
+function renderOverview(d) {
+  // Alerta
+  var alertEl = document.getElementById('alert-container');
+  alertEl.innerHTML = d.alerta && d.alerta !== 'null' && d.alerta !== null
+    ? '<div class="alert-box"><span class="alert-icon">🚨</span><div class="alert-text"><strong>Alerta:</strong> ' + d.alerta + '</div></div>'
+    : '';
 
-  // CHART
-  var chartHTML='';
-  if(d.leads_por_dia&&typeof d.leads_por_dia==='object'){
-    var entries=Object.entries(d.leads_por_dia).sort(function(a,b){return a[0].localeCompare(b[0])});
-    var max=Math.max.apply(null,entries.map(function(e){return e[1]}))||1;
-    chartHTML='<div class="flex items-end gap-2 h-32 mt-4">';
-    entries.forEach(function(e){
-      var h=Math.max((e[1]/max)*110,8);
-      var label=e[0].substring(8,10)+'/'+e[0].substring(5,7);
-      chartHTML+='<div class="flex-1 flex flex-col items-center"><div class="w-full max-w-[40px] rounded-t-lg" style="height:'+h+'px;background:linear-gradient(180deg,#00ff88,#00ff8830)"></div><p class="text-xs font-bold text-sda-green mt-2">'+e[1]+'</p><p class="text-[10px] text-slate-600">'+label+'</p></div>';
+  // Resumo
+  var resumoEl = document.getElementById('resumo-container');
+  resumoEl.innerHTML = d.resumo
+    ? '<div class="resumo-box">' + d.resumo + '</div>'
+    : '';
+
+  // Cards de métricas
+  var metrics = [
+    {label:'Sessões', value: n(d.sessoes), sub:'últimos 7 dias', color: '#4da6ff'},
+    {label:'Visitantes', value: n(d.visitantes), sub:'únicos', color: '#b06bff'},
+    {label:'Leads LP', value: n(d.leads_7d), sub:'cadastros', color: '#00e87a'},
+  ];
+  var heroEl = document.getElementById('hero-metrics');
+  heroEl.innerHTML = metrics.map(function(m) {
+    return '<div class="card">' +
+      '<div class="card-accent" style="background:' + m.color + '"></div>' +
+      '<div class="card-label">' + m.label + '</div>' +
+      '<div class="card-value" style="color:' + m.color + '">' + m.value + '</div>' +
+      '<div class="card-sub">' + m.sub + '</div>' +
+    '</div>';
+  }).join('');
+
+  // Convert Rate + Nota
+  var convRate = pct(d.taxa_conversao);
+  var nota = parseFloat(d.nota_performance) || 0;
+  var notaColor = nota >= 7 ? '#00e87a' : nota >= 4 ? '#ffd93d' : '#ff4d6d';
+  var notaStatus = nota >= 7 ? 'Saudável' : nota >= 4 ? 'Atenção' : 'Crítico';
+  var tendIcon = d.tendencia === 'crescendo' ? '↗' : d.tendencia === 'caindo' ? '↘' : '→';
+  var tendColor = d.tendencia === 'crescendo' ? '#00e87a' : d.tendencia === 'caindo' ? '#ff4d6d' : '#ffd93d';
+
+  var circum = 2 * Math.PI * 40;
+  var dashOffset = circum - (nota / 10) * circum;
+
+  document.getElementById('hero-bottom').innerHTML =
+    // CONVERT RATE card
+    '<div class="convert-hero card">' +
+      '<div class="card-label">Convert Rate</div>' +
+      '<div class="convert-big">' + (d.taxa_conversao || '—') + '</div>' +
+      '<div style="display:flex;align-items:center;gap:10px;margin-top:4px">' +
+        '<span class="trend-pill" style="background:' + tendColor + '18;color:' + tendColor + ';border:1px solid ' + tendColor + '30">' +
+          tendIcon + ' ' + (d.tendencia || '') +
+        '</span>' +
+        '<span style="font-size:12px;color:var(--muted)">' + (d.tendencia_detalhe || '') + '</span>' +
+      '</div>' +
+      '<div class="convert-bar-wrap">' +
+        '<div class="convert-bar" style="width:' + Math.min(convRate * 10, 100) + '%"></div>' +
+      '</div>' +
+      '<div style="display:flex;justify-content:space-between;margin-top:6px">' +
+        '<span style="font-size:10px;font-family:DM Mono,monospace;color:var(--muted)">0%</span>' +
+        '<span style="font-size:10px;font-family:DM Mono,monospace;color:var(--muted)">Média mercado: ~2%</span>' +
+        '<span style="font-size:10px;font-family:DM Mono,monospace;color:var(--muted)">10%</span>' +
+      '</div>' +
+      '<div style="margin-top:16px;padding-top:14px;border-top:1px solid var(--border);display:flex;gap:16px">' +
+        '<div><div class="card-label">Média/dia</div><div style="font-family:Syne,sans-serif;font-weight:700;font-size:20px">' + n(d.media_leads_dia) + '</div></div>' +
+        '<div><div class="card-label">Pág/Sessão</div><div style="font-family:Syne,sans-serif;font-weight:700;font-size:20px">' + (d.paginas_por_sessao || '—') + '</div></div>' +
+      '</div>' +
+    '</div>' +
+
+    // NOTA card
+    '<div class="nota-card">' +
+      '<div class="nota-ring">' +
+        '<svg width="100" height="100" viewBox="0 0 100 100">' +
+          '<circle cx="50" cy="50" r="40" fill="none" stroke="rgba(255,255,255,0.05)" stroke-width="8"/>' +
+          '<circle cx="50" cy="50" r="40" fill="none" stroke="' + notaColor + '" stroke-width="8" stroke-linecap="round"' +
+            ' stroke-dasharray="' + circum + '" stroke-dashoffset="' + dashOffset + '" style="transition:stroke-dashoffset 1s ease"/>' +
+        '</svg>' +
+        '<div class="nota-num" style="color:' + notaColor + '">' + d.nota_performance + '</div>' +
+        '<div class="nota-denom">/10</div>' +
+      '</div>' +
+      '<div class="nota-status" style="color:' + notaColor + '">' + notaStatus + '</div>' +
+      '<div style="font-size:11px;color:var(--muted);margin-top:6px">Nota da Landing Page</div>' +
+    '</div>';
+
+  // Timeline
+  renderTimeline(d);
+}
+
+/* ─── TIMELINE ─────────────────────────────── */
+function renderTimeline(d) {
+  var container = document.getElementById('timeline-container');
+
+  // Merge sessões e leads por dia
+  var sessoesDia = d.sessoes_por_dia || {};
+  var leadsDia = d.leads_por_dia || {};
+
+  var allKeys = Object.keys(Object.assign({}, sessoesDia, leadsDia)).sort();
+  if (!allKeys.length) { container.innerHTML = ''; return; }
+
+  var maxSessoes = Math.max.apply(null, allKeys.map(function(k) { return sessoesDia[k] || 0; })) || 1;
+  var maxLeads = Math.max.apply(null, allKeys.map(function(k) { return leadsDia[k] || 0; })) || 1;
+  var maxVal = Math.max(maxSessoes, 1);
+
+  // Grid lines
+  var gridLines = [maxVal, Math.round(maxVal * .75), Math.round(maxVal * .5), Math.round(maxVal * .25)];
+  var gridHTML = gridLines.map(function(v) {
+    return '<div class="chart-grid-line"><span>' + n(v) + '</span></div>';
+  }).join('');
+
+  // Bars
+  var barsHTML = allKeys.map(function(k) {
+    var s = sessoesDia[k] || 0;
+    var l = leadsDia[k] || 0;
+    var hS = Math.max((s / maxVal) * 110, 4);
+    var hL = Math.max((l / maxVal) * 110, 2);
+    var label = k.substring(8, 10) + '/' + k.substring(5, 7);
+    var convDia = s > 0 ? ((l / s) * 100).toFixed(1) + '%' : '—';
+    return '<div class="bar-group">' +
+      '<div class="bar-wrap">' +
+        '<div class="bar" style="height:' + hS + 'px;background:rgba(77,166,255,0.35)">' +
+          '<div class="bar-tooltip">Sessões: ' + n(s) + '</div>' +
+        '</div>' +
+        '<div class="bar" style="height:' + hL + 'px;background:var(--orange)">' +
+          '<div class="bar-tooltip">Leads: ' + n(l) + ' · Conv: ' + convDia + '</div>' +
+        '</div>' +
+      '</div>' +
+      '<div class="bar-label">' + label + '</div>' +
+    '</div>';
+  }).join('');
+
+  // Stats abaixo do chart
+  var totalSessoes = allKeys.reduce(function(acc, k) { return acc + (sessoesDia[k] || 0); }, 0);
+  var totalLeads = allKeys.reduce(function(acc, k) { return acc + (leadsDia[k] || 0); }, 0);
+  var melhorDia = allKeys.reduce(function(best, k) { return (leadsDia[k] || 0) > (leadsDia[best] || 0) ? k : best; }, allKeys[0]);
+  var convGeral = totalSessoes > 0 ? ((totalLeads / totalSessoes) * 100).toFixed(2) + '%' : '—';
+  var melhorLabel = melhorDia ? melhorDia.substring(8, 10) + '/' + melhorDia.substring(5, 7) : '—';
+
+  container.innerHTML =
+    '<div class="timeline-card">' +
+      '<div class="timeline-header">' +
+        '<div class="timeline-title">Acessos & Leads — Últimos 7 Dias</div>' +
+        '<div class="timeline-legend">' +
+          '<div class="legend-item"><div class="legend-dot" style="background:rgba(77,166,255,0.5)"></div>Sessões</div>' +
+          '<div class="legend-item"><div class="legend-dot" style="background:var(--orange)"></div>Leads</div>' +
+        '</div>' +
+      '</div>' +
+      '<div class="chart-area">' +
+        '<div class="chart-grid">' + gridHTML + '</div>' +
+        barsHTML +
+      '</div>' +
+      '<div class="timeline-stats">' +
+        '<div class="tstat"><div class="tstat-label">Total Sessões</div><div class="tstat-value" style="color:var(--blue)">' + n(totalSessoes) + '</div></div>' +
+        '<div class="tstat"><div class="tstat-label">Total Leads</div><div class="tstat-value" style="color:var(--orange)">' + n(totalLeads) + '</div></div>' +
+        '<div class="tstat"><div class="tstat-label">Conv. Período</div><div class="tstat-value" style="color:var(--green)">' + convGeral + '</div></div>' +
+        '<div class="tstat"><div class="tstat-label">Melhor Dia</div><div class="tstat-value" style="color:var(--yellow)">' + melhorLabel + '</div></div>' +
+      '</div>' +
+    '</div>';
+}
+
+/* ─── DEVICES ─────────────────────────────── */
+function renderDevices(d) {
+  var devColors = {Mobile:'#00e87a', Desktop:'#4da6ff', Tablet:'#ffd93d'};
+  var devIcons = {Mobile:'📱', Desktop:'🖥️', Tablet:'📟'};
+  var el = document.getElementById('devices-content');
+  el.innerHTML = (d.dispositivos || []).map(function(dv) {
+    var cor = devColors[dv.tipo] || '#888';
+    var p = parseFloat(dv.pct) || 0;
+    return '<div class="device-card" style="border-top:3px solid ' + cor + '">' +
+      '<div class="device-icon">' + (devIcons[dv.tipo] || '📟') + '</div>' +
+      '<div class="device-name" style="color:' + cor + '">' + dv.tipo + '</div>' +
+      '<div class="device-pct" style="color:' + cor + '">' + dv.pct + '</div>' +
+      '<div style="font-size:11px;color:var(--muted);margin-bottom:8px">do tráfego total</div>' +
+      '<div class="device-bar"><div class="device-bar-fill" style="width:' + p + '%;background:' + cor + '"></div></div>' +
+      '<div class="device-row"><span class="device-row-label">Sessões</span><span class="device-row-val" style="color:' + cor + '">' + n(dv.sessoes) + '</span></div>' +
+      '<div class="device-row"><span class="device-row-label">Visitantes</span><span class="device-row-val">' + n(dv.visitantes) + '</span></div>' +
+      '<div class="device-row"><span class="device-row-label">Convert Rate</span><span class="device-row-val" style="color:var(--green)">' + (dv.convert_rate || '—') + '</span></div>' +
+    '</div>';
+  }).join('');
+}
+
+/* ─── UX ─────────────────────────────── */
+function renderUX(d) {
+  var el = document.getElementById('ux-content');
+  el.innerHTML = (d.diagnostico_ux || []).map(function(ux, i) {
+    var cor = impactColor(ux.impacto);
+    var bg = impactBg(ux.impacto);
+    return '<div class="ux-card" style="border-left:3px solid ' + cor + '">' +
+      '<div class="ux-num" style="color:' + cor + '40">' + String(i+1).padStart(2,'0') + '</div>' +
+      '<div>' +
+        '<div class="ux-area">' + ux.area + '</div>' +
+        '<div class="ux-problem">' + ux.problema + '</div>' +
+        '<div class="ux-fix">' + ux.sugestao + '</div>' +
+      '</div>' +
+      '<div class="impact-badge" style="background:' + bg + ';color:' + cor + ';border:1px solid ' + cor + '30">' + ux.impacto + '</div>' +
+    '</div>';
+  }).join('');
+}
+
+/* ─── CRO ─────────────────────────────── */
+function renderCRO(d) {
+  // Variantes AB
+  var abEl = document.getElementById('ab-container');
+  if (d.variantes && d.variantes.length) {
+    var maxLeads = Math.max.apply(null, d.variantes.map(function(v) { return v.leads; }));
+    var colors = ['#ff6b00','#4da6ff','#b06bff','#00e87a'];
+    abEl.innerHTML =
+      '<div class="ab-card" style="margin-bottom:16px">' +
+        '<div style="font-family:Syne,sans-serif;font-weight:700;font-size:15px;color:#fff;margin-bottom:16px">Variantes A/B</div>' +
+        d.variantes.map(function(v, i) {
+          var w = maxLeads > 0 ? (v.leads / maxLeads) * 100 : 0;
+          var c = colors[i % colors.length];
+          return '<div class="ab-row">' +
+            '<div class="ab-label" style="color:' + c + '">' + v.variante + '</div>' +
+            '<div class="ab-bar-outer"><div class="ab-bar-inner" style="width:' + w + '%;background:' + c + '"></div></div>' +
+            '<div class="ab-leads" style="color:' + c + '">' + n(v.leads) + '</div>' +
+            '<div class="ab-pct">' + v.pct + '</div>' +
+          '</div>';
+        }).join('') +
+      '</div>';
+  } else { abEl.innerHTML = ''; }
+
+  // Ações CRO
+  var croEl = document.getElementById('cro-content');
+  var colors2 = ['#ff4d6d','#ff8c3a','#ffd93d','#00e87a','#4da6ff','#b06bff'];
+  croEl.innerHTML = (d.acoes_cro || []).map(function(a, i) {
+    var c = colors2[i % colors2.length];
+    return '<div class="cro-card">' +
+      '<div class="cro-priority" style="color:' + c + '">' + (i+1) + '</div>' +
+      '<div>' +
+        '<div class="cro-action">' + a.acao + '</div>' +
+        '<div class="cro-impact">' + (a.impacto_esperado || '') + '</div>' +
+      '</div>' +
+    '</div>';
+  }).join('');
+}
+
+/* ─── NAV ACTIVE SCROLL ─────────────────────── */
+function initNavSpy() {
+  var sections = ['overview','dispositivos','ux','cro'];
+  var links = document.querySelectorAll('.nav-link');
+  function spy() {
+    var scrollY = window.scrollY + 100;
+    var current = sections[0];
+    sections.forEach(function(id) {
+      var el = document.getElementById(id);
+      if (el && el.offsetTop <= scrollY) current = id;
     });
-    chartHTML+='</div>';
-  }
-
-  // VARIANTES
-  var varHTML='';
-  if(d.variantes&&d.variantes.length){
-    varHTML='<h3 class="text-sm font-bold text-white mt-6 mb-3">🔀 Variantes da LP</h3><div class="glass rounded-2xl overflow-hidden">';
-    d.variantes.forEach(function(v,i){
-      varHTML+='<div class="flex items-center gap-4 px-5 py-4'+(i<d.variantes.length-1?' border-b border-sda-border':'')+'"><span class="text-xl font-black text-sda-purple min-w-[30px]">'+v.variante+'</span><div class="flex-1">'+progress(parseFloat(v.pct),'#c084fc')+'</div><span class="text-lg font-bold text-sda-purple min-w-[40px] text-right">'+v.leads+'</span><span class="text-xs text-slate-500 min-w-[50px] text-right">'+v.pct+'</span></div>';
+    links.forEach(function(l) {
+      var href = l.getAttribute('href').replace('#','');
+      l.classList.toggle('active', href === current);
     });
-    varHTML+='</div>';
   }
-
-  // OVERVIEW
-  document.getElementById('tab-overview').innerHTML=
-    // NOTA
-    '<div class="text-center py-5"><div class="inline-block glass rounded-3xl px-12 py-7 relative overflow-hidden" style="border-color:'+nC+'33"><div class="absolute top-0 left-1/2 -translate-x-1/2 w-3/5 h-[3px] rounded-b" style="background:'+nC+'"></div>'+
-    '<p class="text-[10px] tracking-[2px] uppercase font-bold text-slate-500">Nota da LP</p>'+
-    '<p class="text-5xl font-black mt-2 mb-1" style="color:'+nC+'">'+d.nota_performance+'<span class="text-xl text-slate-600">/10</span></p>'+
-    '<p class="text-[11px] font-bold tracking-wider" style="color:'+nC+'">'+nL+'</p></div></div>'+
-
-    // RESUMO
-    '<div class="glass rounded-2xl p-5 mb-4 relative overflow-hidden"><div class="absolute left-0 top-0 bottom-0 w-[3px] bg-sda-green rounded-r"></div><p class="text-sm text-slate-400 leading-relaxed pl-3">'+(d.resumo||'')+'</p></div>'+
-
-    // ALERTA
-    (d.alerta&&d.alerta!=='null'&&d.alerta!==null?'<div class="bg-red-950/30 border border-red-900/30 rounded-2xl p-4 mb-4 flex gap-3 items-start"><span class="text-lg">🚨</span><p class="text-sm text-sda-red"><strong>ALERTA:</strong> '+d.alerta+'</p></div>':'')+
-
-    // MÉTRICAS
-    '<div class="grid grid-cols-2 md:grid-cols-3 gap-3 mb-3">'+
-    metricCard('Sessões',d.sessoes||0,'7 dias','#4dabf7')+
-    metricCard('Visitantes',d.visitantes||0,'únicos','#c084fc')+
-    metricCard('Leads LP',d.leads_7d||0,'variante preenchida','#00ff88')+
-    '</div><div class="grid grid-cols-2 md:grid-cols-3 gap-3 mb-6">'+
-    metricCard('Convert Rate',d.taxa_conversao||'0%','leads / sessões','#ff6b6b')+
-    metricCard('Média/Dia',d.media_leads_dia||0,'leads','#ffd93d')+
-    metricCard('Pág/Sessão',d.paginas_por_sessao||0,'engajamento','#4dabf7')+
-    '</div>'+
-
-    // TENDÊNCIA
-    '<div class="glass rounded-2xl p-5 mb-4"><div class="flex items-center gap-3 mb-2"><span class="text-2xl">'+tI+'</span><div><p class="font-bold text-base uppercase tracking-wider" style="color:'+tC+'">'+(d.tendencia||'')+'</p><p class="text-xs text-slate-500 mt-0.5">'+(d.tendencia_detalhe||'')+'</p></div></div>'+chartHTML+'</div>'+
-    varHTML;
-
-  // DEVICES
-  var devC={Mobile:'#00ff88',mobile:'#00ff88',Desktop:'#4dabf7',desktop:'#4dabf7',Tablet:'#ffd93d',tablet:'#ffd93d'};
-  var devI={Mobile:'📱',mobile:'📱',Desktop:'🖥️',desktop:'🖥️',Tablet:'📟',tablet:'📟'};
-  var devHTML='<h3 class="text-sm font-bold text-white mb-4">📱 Performance por Dispositivo</h3>';
-  (d.dispositivos||[]).forEach(function(dv){
-    var cor=devC[dv.tipo]||'#888';
-    devHTML+='<div class="glass rounded-2xl p-5 mb-3" style="border-left:3px solid '+cor+'"><div class="flex justify-between items-center mb-4"><span class="font-bold text-base">'+(devI[dv.tipo]||'📟')+' '+dv.tipo+'</span><span class="px-3 py-1 rounded-full text-xs font-bold" style="background:'+cor+'15;color:'+cor+'">'+dv.pct+' tráfego</span></div>'+
-    '<div class="grid grid-cols-3 gap-3">'+
-    '<div class="bg-sda-bg rounded-xl p-3 text-center"><p class="text-[9px] uppercase tracking-wider text-slate-500 font-semibold">Sessões</p><p class="text-xl font-extrabold mt-1" style="color:'+cor+'">'+(typeof dv.sessoes==='number'?num(dv.sessoes):dv.sessoes)+'</p></div>'+
-    '<div class="bg-sda-bg rounded-xl p-3 text-center"><p class="text-[9px] uppercase tracking-wider text-slate-500 font-semibold">Visitantes</p><p class="text-xl font-extrabold mt-1 text-slate-200">'+(typeof dv.visitantes==='number'?num(dv.visitantes):dv.visitantes)+'</p></div>'+
-    '<div class="bg-sda-bg rounded-xl p-3 text-center"><p class="text-[9px] uppercase tracking-wider text-slate-500 font-semibold">Conv. Rate</p><p class="text-xl font-extrabold mt-1 text-sda-green">'+(dv.convert_rate||'—')+'</p></div></div></div>';
-  });
-  if(d.dispositivos&&d.dispositivos.length){
-    devHTML+='<div class="glass rounded-2xl p-5 mt-2"><p class="text-[10px] uppercase tracking-[2px] text-slate-500 font-semibold mb-3">Distribuição de Tráfego</p><div class="flex rounded-xl overflow-hidden h-8">';
-    d.dispositivos.forEach(function(dv){devHTML+='<div class="flex items-center justify-center text-[10px] font-bold text-sda-bg" style="width:'+(parseFloat(dv.pct)||0)+'%;background:'+(devC[dv.tipo]||'#888')+'">'+dv.tipo+' '+dv.pct+'</div>'});
-    devHTML+='</div></div>';
-  }
-  document.getElementById('tab-devices').innerHTML=devHTML;
-
-  // UX
-  var uxHTML='<h3 class="text-sm font-bold text-white mb-2">🔍 Diagnóstico UI/UX</h3><p class="text-xs text-slate-500 mb-4">Problemas por área da LP, ordenados por impacto na conversão</p>';
-  (d.diagnostico_ux||[]).forEach(function(ux){
-    var corI=ux.impacto==='alto'?'#ff6b6b':ux.impacto==='médio'?'#ffd93d':'#00ff88';
-    var ic=ux.impacto==='alto'?'🔴':ux.impacto==='médio'?'🟡':'🟢';
-    uxHTML+='<div class="glass rounded-2xl p-5 mb-3" style="border-left:3px solid '+corI+'"><div class="flex justify-between items-center mb-3"><span class="font-bold text-sm text-white">'+ic+' '+ux.area+'</span>'+badge(ux.impacto)+'</div><p class="text-sm text-slate-400 leading-relaxed mb-3">'+ux.problema+'</p><div class="bg-sda-green/5 border border-sda-green/10 rounded-xl p-3"><p class="text-xs text-sda-green leading-relaxed">💡 '+ux.sugestao+'</p></div></div>';
-  });
-  document.getElementById('tab-ux').innerHTML=uxHTML;
-
-  // CRO
-  var croHTML='<h3 class="text-sm font-bold text-white mb-2">🎯 Ações de CRO</h3><p class="text-xs text-slate-500 mb-4">Otimizações por prioridade de impacto na conversão</p>';
-  (d.acoes_cro||[]).forEach(function(a){
-    croHTML+='<div class="glass rounded-2xl p-5 mb-3 flex gap-4 items-start"><div class="bg-sda-green/10 text-sda-green min-w-[44px] h-[44px] rounded-full flex items-center justify-center font-black text-base flex-shrink-0">'+a.prioridade+'</div><div><p class="text-sm font-semibold text-white mb-1">'+a.acao+'</p><span class="inline-block bg-sda-green/10 px-3 py-1 rounded-full text-xs font-bold text-sda-green">'+(a.impacto_esperado||'')+'</span></div></div>';
-  });
-  document.getElementById('tab-cro').innerHTML=croHTML;
+  window.addEventListener('scroll', spy, {passive:true});
+  spy();
 }
 
-// INIT
-(function(){
-  var c=loadCache();
-  if(c&&c.data){D=c.data;setStatus('cache');document.getElementById('last-update').textContent='Cache: '+new Date(c.at).toLocaleString('pt-BR');render()}
+/* ─── SCROLL REVEAL ─────────────────────────── */
+function initScrollReveal() {
+  var els = document.querySelectorAll('.reveal');
+  var obs = new IntersectionObserver(function(entries) {
+    entries.forEach(function(e) {
+      if (e.isIntersecting) { e.target.classList.add('visible'); obs.unobserve(e.target); }
+    });
+  }, {threshold:0.08});
+  els.forEach(function(el) { obs.observe(el); });
+}
+
+/* ─── INIT ─────────────────────────────────── */
+(function() {
+  var c = loadCache();
+  if (c && c.data) {
+    D = c.data;
+    setStatus('cache');
+    document.getElementById('footer-update').textContent = 'Cache: ' + new Date(c.at).toLocaleString('pt-BR');
+    render(D);
+  } else {
+    // Renderiza mock imediatamente para não ficar em branco
+    D = MOCK;
+    render(D);
+  }
   fetchData();
 })();
 </script>
