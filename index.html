@@ -412,73 +412,29 @@ footer{text-align:center;padding:32px 24px;border-top:1px solid var(--border);fo
 
     <!-- PAINEL: PROBLEMAS -->
     <div class="diag-panel active" id="panel-problemas">
+
+      <!-- STATUS CHECKS AUTOMÁTICOS (dinâmico via API) -->
       <div style="background:var(--s1);border:1px solid var(--border);border-radius:var(--r);padding:20px;margin-bottom:14px">
-        <div style="font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;margin-bottom:14px">Impacto na Conversão por Problema</div>
-        <div class="mbar-row"><div class="mbar-lbl">Datas erradas (/comercial/)</div><div class="mbar-track"><div class="mbar-fill" style="width:95%;background:var(--red)"></div></div><div class="mbar-val" style="color:var(--red)">Crítico</div></div>
-        <div class="mbar-row"><div class="mbar-lbl">Headline genérica</div><div class="mbar-track"><div class="mbar-fill" style="width:88%;background:var(--red)"></div></div><div class="mbar-val" style="color:var(--red)">Alto</div></div>
-        <div class="mbar-row"><div class="mbar-lbl">Conflito de CTAs</div><div class="mbar-track"><div class="mbar-fill" style="width:85%;background:var(--red)"></div></div><div class="mbar-val" style="color:var(--red)">Alto</div></div>
-        <div class="mbar-row"><div class="mbar-lbl">Âncora negativa (lotes)</div><div class="mbar-track"><div class="mbar-fill" style="width:75%;background:var(--orange)"></div></div><div class="mbar-val" style="color:var(--orange2)">Alto</div></div>
-        <div class="mbar-row"><div class="mbar-lbl">Hierarquia invertida</div><div class="mbar-track"><div class="mbar-fill" style="width:72%;background:var(--orange)"></div></div><div class="mbar-val" style="color:var(--orange2)">Alto</div></div>
-        <div class="mbar-row"><div class="mbar-lbl">Prova social mal posicionada</div><div class="mbar-track"><div class="mbar-fill" style="width:58%;background:var(--yellow)"></div></div><div class="mbar-val" style="color:var(--yellow)">Médio</div></div>
-        <div class="mbar-row"><div class="mbar-lbl">Para quem é — definição tardia</div><div class="mbar-track"><div class="mbar-fill" style="width:48%;background:var(--yellow)"></div></div><div class="mbar-val" style="color:var(--yellow)">Médio</div></div>
-      </div>
-      <div class="diag-list">
-        <div class="diag-item" style="border-color:rgba(255,77,109,.35);background:linear-gradient(135deg,rgba(255,77,109,.05),var(--s1))">
-          <div class="diag-num" style="color:rgba(255,77,109,.4)">01</div>
-          <div>
-            <div class="diag-title">DATAS ERRADAS na página /comercial/</div>
-            <div class="diag-desc">A programação exibe <strong style="color:var(--red)">11, 12 e 13 de abril</strong> mas o evento é <strong style="color:var(--green)">24, 25 e 26 de abril</strong>. Quebra credibilidade instantaneamente.</div>
-            <div class="diag-fix">Unificar todas as datas para 24-26 de Abril 2026. Atualizar copyright © 2025 para © 2026. Zero esforço, impacto imediato.</div>
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+          <div style="font-family:Syne,sans-serif;font-weight:700;font-size:15px;color:#fff">
+            🔍 Verificação Automática das LPs
           </div>
-          <span class="tag tag-urgente">Urgente</span>
+          <div id="checks-status" style="font-size:11px;color:var(--muted)">Aguardando dados...</div>
         </div>
-        <div class="diag-item">
-          <div class="diag-num">02</div>
-          <div>
-            <div class="diag-title">A promessa não está clara nos primeiros 5 segundos</div>
-            <div class="diag-desc">Headline abre com pergunta retórica genérica. Não informa o QUÊ é o evento, QUANDO acontece, ONDE é, nem POR QUE agir agora.</div>
-            <div class="diag-fix">Substituir por headline com data, local e benefício central. Ex: "3 dias com quem domina audiência, tráfego e escala — 24-26 Abr 2026, Teatro Bradesco"</div>
+        <div id="checks-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:10px">
+          <!-- preenchido dinamicamente pela função renderChecks() -->
+          <div style="color:var(--muted);font-size:13px;grid-column:1/-1;text-align:center;padding:20px 0">
+            ⏳ Carregando verificações das páginas...
           </div>
-          <span class="tag tag-alto">Alto</span>
         </div>
-        <div class="diag-item">
-          <div class="diag-num">03</div>
-          <div>
-            <div class="diag-title">Conflito de atenção — 5+ CTAs competindo</div>
-            <div class="diag-desc">Identificados: "Falar com Especialista", "Quero Participar!", "Assista o Vídeo", "Comprar Agora", "Adquira seu Ingresso". Lei de Hick aplicada ao avesso — paralisia de decisão.</div>
-            <div class="diag-fix">Definir 1 CTA principal por página. CTA secundário apenas no rodapé. Remover todos os outros.</div>
-          </div>
-          <span class="tag tag-alto">Alto</span>
-        </div>
-        <div class="diag-item">
-          <div class="diag-num">04</div>
-          <div>
-            <div class="diag-title">Urgência mal aplicada — âncora negativa</div>
-            <div class="diag-desc">VIP e Platinum aparecem como "ENCERRADOS" sem alternativa. Cria sensação de "cheguei tarde" → abandono. O usuário de alto valor sai sem deixar contato.</div>
-            <div class="diag-fix">Adicionar botão de "Lista de espera" nos cards encerrados. Captura lead qualificado e mantém pipeline ativo para próxima edição.</div>
-          </div>
-          <span class="tag tag-alto">Alto</span>
-        </div>
-        <div class="diag-item">
-          <div class="diag-num">05</div>
-          <div>
-            <div class="diag-title">Prova social forte, posicionada errado</div>
-            <div class="diag-desc">Cases R$74k→R$500k/mês, TICTO criada no SDA, Dra. Marina — excelentes. Mas aparecem no meio da página, depois de muito scroll. Usuário decide antes de chegar lá.</div>
-            <div class="diag-fix">Mover números de resultado para logo abaixo da headline. Deve ser a 2ª coisa que o usuário vê.</div>
-          </div>
-          <span class="tag tag-medio">Médio</span>
-        </div>
-        <div class="diag-item">
-          <div class="diag-num">06</div>
-          <div>
-            <div class="diag-title">Para quem é o evento — definição tardia</div>
-            <div class="diag-desc">Público-alvo ("empreendedores, donos de negócio físico, infoprodutores") está no FAQ — menos de 30% dos usuários lê. O visitante precisa se identificar em 10 segundos.</div>
-            <div class="diag-fix">Adicionar 1 linha de público-alvo abaixo da headline: "Para empreendedores, donos de negócio e experts que querem crescer no digital em 2026."</div>
-          </div>
-          <span class="tag tag-medio">Médio</span>
+        <div style="margin-top:14px;padding-top:14px;border-top:1px solid var(--border);font-size:11px;color:var(--muted)">
+          Verificação automática a cada 1 hora via Apps Script · Lê as páginas ao vivo e detecta problemas automaticamente
         </div>
       </div>
-    </div>
+
+      <!-- PROBLEMAS ESTÁTICOS (removidos — agora tudo é dinâmico via checks) -->
+
+    </div><!-- /panel-problemas -->
 
     <!-- PAINEL: COPY -->
     <div class="diag-panel" id="panel-copy">
@@ -758,12 +714,6 @@ function fetchData(){
     .finally(function(){btn.textContent='↻';btn.disabled=false;});
 }
 
-/* RENDER */
-function render(d){
-  renderOverview(d);renderDevices(d);renderUX(d);renderCRO(d);
-  initScrollReveal();initNavSpy();
-}
-
 function renderOverview(d){
   document.getElementById('alert-container').innerHTML=d.alerta&&d.alerta!=='null'
     ?'<div class="alert-box"><span class="alert-icon">🚨</span><div class="alert-text"><strong>Alerta:</strong> '+d.alerta+'</div></div>':'';
@@ -860,6 +810,16 @@ function renderDevices(d){
   }).join('');
 }
 
+function render(d){
+  renderOverview(d);
+  renderDevices(d);
+  renderChecks(d);
+  renderUX(d);
+  renderCRO(d);
+  initScrollReveal();
+  initNavSpy();
+}
+
 function renderUX(d){
   document.getElementById('ux-content').innerHTML=(d.diagnostico_ux||[]).map(function(ux,i){
     var cor=impactColor(ux.impacto),bg=impactBg(ux.impacto);
@@ -889,6 +849,50 @@ function renderCRO(d){
     var c=croColors[i%croColors.length];
     return'<div class="cro-card"><div class="cro-priority" style="color:'+c+'">'+(i+1)+'</div>'+
       '<div><div class="cro-action">'+a.acao+'</div><div class="cro-impact">'+(a.impacto_esperado||'')+'</div></div></div>';
+  }).join('');
+}
+
+/* CHECKS AUTOMÁTICOS */
+function renderChecks(d){
+  var checks = d.checks;
+  var grid = document.getElementById('checks-grid');
+  var statusEl = document.getElementById('checks-status');
+  if(!grid) return;
+
+  if(!checks || !checks.length){
+    grid.innerHTML='<div style="color:var(--muted);font-size:13px;grid-column:1/-1;text-align:center;padding:20px 0">⚠️ Dados de verificação ainda não disponíveis — execute <strong>verificarLPs()</strong> no Apps Script</div>';
+    return;
+  }
+
+  var ok = checks.filter(function(c){return c.status==='ok';}).length;
+  var prob = checks.filter(function(c){return c.status==='problema';}).length;
+  var err = checks.filter(function(c){return c.status==='erro';}).length;
+  var ultima = checks[0] ? checks[0].ultima_verificacao : '—';
+
+  statusEl.innerHTML = 
+    '<span style="color:var(--green)">✅ '+ok+' ok</span> · '+
+    '<span style="color:var(--red)">🔴 '+prob+' problema(s)</span> · '+
+    '<span style="color:#ffd93d">⚠️ '+err+' erro(s)</span> · '+
+    'Última: '+ultima;
+
+  grid.innerHTML = checks.map(function(c){
+    var bg, icon, borderColor, labelColor;
+    if(c.status === 'ok'){
+      bg='rgba(0,232,122,0.08)'; icon='✅'; borderColor='var(--green)'; labelColor='var(--green)';
+    } else if(c.status === 'problema'){
+      bg='rgba(255,77,109,0.08)'; icon='🔴'; borderColor='var(--red)'; labelColor='var(--red)';
+    } else {
+      bg='rgba(255,217,61,0.08)'; icon='⚠️'; borderColor='#ffd93d'; labelColor='#ffd93d';
+    }
+    var impactoBadge = c.impacto === 'Alto' ? 'var(--red)' : c.impacto === 'Médio' ? '#ffd93d' : 'var(--muted)';
+    return '<div style="background:'+bg+';border:1px solid '+borderColor+'30;border-left:3px solid '+borderColor+';border-radius:8px;padding:14px">'+
+      '<div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:8px">'+
+        '<div style="font-size:13px;font-weight:600;color:#fff;flex:1;padding-right:8px">'+icon+' '+c.descricao+'</div>'+
+        '<div style="font-size:10px;font-weight:700;color:'+impactoBadge+';white-space:nowrap">'+c.impacto+'</div>'+
+      '</div>'+
+      '<div style="font-size:11px;color:var(--muted);margin-bottom:6px">'+c.pagina+'</div>'+
+      '<div style="font-size:12px;color:'+labelColor+'">'+c.detalhe+'</div>'+
+    '</div>';
   }).join('');
 }
 
