@@ -396,23 +396,38 @@ body{background:var(--bg);color:var(--text);font-family:"Poppins",sans-serif;fon
 
       <!-- Canvas card -->
       <div style="background:var(--s1);border:1px solid var(--border);border-radius:var(--r);overflow:hidden">
-        <div style="padding:12px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between">
-          <div style="display:flex;gap:3px;background:var(--s3);border-radius:8px;padding:3px">
-            <button id="hm-tab-click" onclick="hmSetTab('click')" style="display:flex;align-items:center;gap:5px;padding:5px 12px;border-radius:6px;border:none;cursor:pointer;font-size:12px;font-family:'DM Mono',monospace;transition:all .15s;background:var(--s1);color:var(--text)">
-              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 3l14 9-14 9V3z"/></svg>Cliques
-            </button>
-            <button id="hm-tab-scroll" onclick="hmSetTab('scroll')" style="display:flex;align-items:center;gap:5px;padding:5px 12px;border-radius:6px;border:none;cursor:pointer;font-size:12px;font-family:'DM Mono',monospace;transition:all .15s;background:transparent;color:var(--muted)">
-              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><polyline points="19 12 12 19 5 12"/></svg>Scroll
-            </button>
+        <div style="padding:12px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">
+          <div style="display:flex;gap:6px;align-items:center">
+            <!-- Device selector -->
+            <div style="display:flex;gap:3px;background:var(--s3);border-radius:8px;padding:3px">
+              <button id="hm-dev-mobile" onclick="hmSetDevice('mobile')" style="display:flex;align-items:center;gap:5px;padding:5px 11px;border-radius:6px;border:none;cursor:pointer;font-size:12px;font-family:'DM Mono',monospace;transition:all .15s;background:var(--s1);color:var(--text)">
+                <svg width="10" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12" y2="18.01"/></svg>Mobile
+              </button>
+              <button id="hm-dev-desktop" onclick="hmSetDevice('desktop')" style="display:flex;align-items:center;gap:5px;padding:5px 11px;border-radius:6px;border:none;cursor:pointer;font-size:12px;font-family:'DM Mono',monospace;transition:all .15s;background:transparent;color:var(--muted)">
+                <svg width="13" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>Desktop
+              </button>
+            </div>
+            <!-- Type tabs -->
+            <div style="display:flex;gap:3px;background:var(--s3);border-radius:8px;padding:3px">
+              <button id="hm-tab-click" onclick="hmSetTab('click')" style="display:flex;align-items:center;gap:5px;padding:5px 11px;border-radius:6px;border:none;cursor:pointer;font-size:12px;font-family:'DM Mono',monospace;transition:all .15s;background:var(--s1);color:var(--text)">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 3l14 9-14 9V3z"/></svg>Cliques
+              </button>
+              <button id="hm-tab-scroll" onclick="hmSetTab('scroll')" style="display:flex;align-items:center;gap:5px;padding:5px 11px;border-radius:6px;border:none;cursor:pointer;font-size:12px;font-family:'DM Mono',monospace;transition:all .15s;background:transparent;color:var(--muted)">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><polyline points="19 12 12 19 5 12"/></svg>Scroll
+              </button>
+            </div>
           </div>
           <div style="display:flex;gap:7px;align-items:center;font-size:11px;color:var(--muted);font-family:'DM Mono',monospace">
             <span style="display:inline-block;width:44px;height:5px;border-radius:3px;background:linear-gradient(90deg,#4da6ff,#00e87a,#ffd93d,#ff4d6d)"></span>
             baixo → alto
           </div>
         </div>
-        <div style="padding:18px">
+        <div style="padding:14px">
           <div id="hm-msg" style="font-size:12px;color:var(--muted);text-align:center;padding:30px 0">Carregando...</div>
-          <canvas id="hm-canvas" style="display:none;width:100%;border-radius:8px"></canvas>
+          <!-- Canvas in scrollable container — page can be very tall -->
+          <div id="hm-canvas-wrap" style="display:none;max-height:640px;overflow-y:auto;border-radius:8px;background:#0a0a14;border:1px solid var(--border)">
+            <canvas id="hm-canvas" style="width:100%;display:block"></canvas>
+          </div>
         </div>
       </div>
 
@@ -964,7 +979,7 @@ function updateTime(){document.getElementById("last-updated").textContent="Atual
 // === HEATMAP DATE PICKER ===
 let _hmFrom=null,_hmTo=null,_hmSelFrom=null,_hmSelTo=null;
 let _hmCalY=new Date().getFullYear(),_hmCalM=new Date().getMonth();
-let _hmTab='click',_hmData=null;
+let _hmTab='click',_hmData=null,_hmDevice='mobile';
 
 function hmTogglePicker(e){
   e&&e.stopPropagation();
@@ -1059,6 +1074,15 @@ function hmApply(){
   hmPickerClose();loadHeatmap();
 }
 
+// === DEVICE ===
+function hmSetDevice(dev){
+  _hmDevice=dev;
+  const dm=document.getElementById('hm-dev-mobile'),dd=document.getElementById('hm-dev-desktop');
+  if(dm){dm.style.background=dev==='mobile'?'var(--s1)':'transparent';dm.style.color=dev==='mobile'?'var(--text)':'var(--muted)';}
+  if(dd){dd.style.background=dev==='desktop'?'var(--s1)':'transparent';dd.style.color=dev==='desktop'?'var(--text)':'var(--muted)';}
+  if(_hmData)hmRenderByTab();
+}
+
 // === MAP TYPE ===
 function hmSetTab(tab){
   _hmTab=tab;
@@ -1068,16 +1092,18 @@ function hmSetTab(tab){
   if(_hmData)hmRenderByTab();
 }
 function hmRenderByTab(){
-  const canvas=document.getElementById('hm-canvas'),msg=document.getElementById('hm-msg');
-  const clicks=_hmData.clicks||[];
+  const canvas=document.getElementById('hm-canvas'),msg=document.getElementById('hm-msg'),wrap=document.getElementById('hm-canvas-wrap');
+  const all=_hmData.clicks||[];
+  // Filter by device: mobile = vw<900, desktop = vw>=900
+  const clicks=_hmDevice==='mobile'?all.filter(c=>!c.vw||c.vw<900):all.filter(c=>c.vw>=900);
   if(_hmTab==='click'){
     const oc=clicks.filter(c=>c.type==='click');
-    if(!oc.length){canvas.style.display='none';msg.style.display='block';msg.textContent='Nenhum clique registrado no período.';}
-    else{msg.style.display='none';canvas.style.display='block';renderHeatmapCanvas(oc,canvas);}
+    if(!oc.length){if(wrap)wrap.style.display='none';msg.style.display='block';msg.textContent='Nenhum clique de '+(_hmDevice==='mobile'?'mobile':'desktop')+' no período.';}
+    else{msg.style.display='none';if(wrap)wrap.style.display='block';renderHeatmapCanvas(oc,canvas);}
   }else{
     const sc=clicks.filter(c=>c.type&&c.type.startsWith('scroll_'));
-    if(!sc.length){canvas.style.display='none';msg.style.display='block';msg.textContent='Nenhum dado de scroll registrado no período.';}
-    else{msg.style.display='none';canvas.style.display='block';renderScrollCanvas(sc,canvas);}
+    if(!sc.length){if(wrap)wrap.style.display='none';msg.style.display='block';msg.textContent='Nenhum dado de scroll de '+(_hmDevice==='mobile'?'mobile':'desktop')+' no período.';}
+    else{msg.style.display='none';if(wrap)wrap.style.display='block';renderScrollCanvas(sc,canvas);}
   }
 }
 
@@ -1132,65 +1158,69 @@ function renderScrollBars(s25,s50,s75,s100){
   }).join("");
 }
 
+async function hmLoadScreenshot(){
+  try{
+    const sr=await fetch(API+'/monitor/screenshot?strategy='+_hmDevice);
+    if(!sr.ok)return null;
+    const sd=await sr.json();
+    if(!sd.data)return null;
+    return await new Promise((res,rej)=>{const i=new Image();i.onload=()=>res(i);i.onerror=()=>res(null);i.src=sd.data;});
+  }catch(e){return null;}
+}
+
 async function renderHeatmapCanvas(clicks,canvas){
   const W=800;
-  // Try to load LP screenshot as background
-  let bgImg=null,H=1400;
-  try{
-    const sr=await fetch(API+'/monitor/screenshot?strategy=mobile');
-    if(sr.ok){
-      const sd=await sr.json();
-      if(sd.data){
-        bgImg=await new Promise((res,rej)=>{const i=new Image();i.onload=()=>res(i);i.onerror=rej;i.src=sd.data;});
-        H=Math.round(W*bgImg.height/bgImg.width);
-      }
-    }
-  }catch(e){}
+  const bgImg=await hmLoadScreenshot();
+  const H=bgImg?Math.round(W*bgImg.height/bgImg.width):3000;
   canvas.width=W;canvas.height=H;
   const ctx=canvas.getContext('2d');
   if(bgImg){
-    // Draw LP screenshot as background
     ctx.drawImage(bgImg,0,0,W,H);
-    // Dark overlay so heatmap is visible
-    ctx.fillStyle='rgba(7,7,15,0.55)';
+    // Leve escurecimento apenas para destacar as manchas — LP já é escura, não precisamos de overlay pesado
+    ctx.fillStyle='rgba(0,0,0,0.18)';
     ctx.fillRect(0,0,W,H);
   }else{
-    ctx.fillStyle='#0d0d1a';ctx.fillRect(0,0,W,H);
+    ctx.fillStyle='#0a0a14';ctx.fillRect(0,0,W,H);
     ctx.strokeStyle='rgba(255,255,255,0.04)';ctx.lineWidth=1;
     for(let i=0;i<=10;i++){ctx.beginPath();ctx.moveTo(i*(W/10),0);ctx.lineTo(i*(W/10),H);ctx.stroke();}
     for(let i=0;i<=20;i++){ctx.beginPath();ctx.moveTo(0,i*(H/20));ctx.lineTo(W,i*(H/20));ctx.stroke();}
   }
-  // Draw heat dots
+  // Manchas de calor — dupla passagem: glow largo + núcleo intenso
   clicks.forEach(c=>{
     const x=c.x/100*W,y=c.y/100*H;
-    const r=Math.max(20,Math.min(60,32*(1920/(c.vw||1920))));
+    const base=_hmDevice==='mobile'?26:22;
+    const r=Math.max(base,Math.min(70,base*2*(1440/(c.vw||1440))));
+    // Glow externo
     const g=ctx.createRadialGradient(x,y,0,x,y,r);
-    g.addColorStop(0,'rgba(255,77,109,0.55)');
-    g.addColorStop(0.3,'rgba(255,217,61,0.25)');
-    g.addColorStop(0.65,'rgba(77,166,255,0.08)');
+    g.addColorStop(0,'rgba(255,100,50,0.0)');
+    g.addColorStop(0.2,'rgba(255,150,30,0.35)');
+    g.addColorStop(0.5,'rgba(255,220,0,0.15)');
     g.addColorStop(1,'rgba(0,0,0,0)');
     ctx.beginPath();ctx.fillStyle=g;ctx.arc(x,y,r,0,Math.PI*2);ctx.fill();
+    // Núcleo quente
+    const g2=ctx.createRadialGradient(x,y,0,x,y,r*0.35);
+    g2.addColorStop(0,'rgba(255,80,80,0.85)');
+    g2.addColorStop(0.5,'rgba(255,150,30,0.5)');
+    g2.addColorStop(1,'rgba(0,0,0,0)');
+    ctx.beginPath();ctx.fillStyle=g2;ctx.arc(x,y,r*0.35,0,Math.PI*2);ctx.fill();
   });
-  // % labels on left edge
-  ctx.fillStyle='rgba(255,255,255,0.5)';ctx.font='10px DM Mono,monospace';
+  // Régua de % na lateral
   for(let i=0;i<=100;i+=25){
     const yy=i/100*H;
-    ctx.fillStyle='rgba(0,0,0,0.5)';ctx.fillRect(0,yy-1,28,13);
-    ctx.fillStyle='rgba(255,255,255,0.7)';ctx.fillText(i+'%',3,yy+10);
+    ctx.fillStyle='rgba(0,0,0,0.6)';ctx.fillRect(0,yy,30,14);
+    ctx.fillStyle='rgba(255,255,255,0.75)';ctx.font='bold 10px DM Mono,monospace';
+    ctx.fillText(i+'%',3,yy+11);
   }
 }
 
 async function renderScrollCanvas(sd,canvas){
   const W=800;
-  let bgImg=null,H=1400;
-  try{
-    const sr=await fetch(API+'/monitor/screenshot?strategy=mobile');
-    if(sr.ok){const sd2=await sr.json();if(sd2.data){bgImg=await new Promise((res,rej)=>{const i=new Image();i.onload=()=>res(i);i.onerror=rej;i.src=sd2.data;});H=Math.round(W*bgImg.height/bgImg.width);}}
-  }catch(e){}
+  const bgImg=await hmLoadScreenshot();
+  const H=bgImg?Math.round(W*bgImg.height/bgImg.width):3000;
   canvas.width=W;canvas.height=H;
   const ctx=canvas.getContext("2d");
-  if(bgImg){ctx.drawImage(bgImg,0,0,W,H);ctx.fillStyle='rgba(7,7,15,0.6)';ctx.fillRect(0,0,W,H);}
-  else{ctx.fillStyle="#0d0d1a";ctx.fillRect(0,0,W,H);}
+  if(bgImg){ctx.drawImage(bgImg,0,0,W,H);ctx.fillStyle='rgba(0,0,0,0.22)';ctx.fillRect(0,0,W,H);}
+  else{ctx.fillStyle="#0a0a14";ctx.fillRect(0,0,W,H);}
   const counts={scroll_25:0,scroll_50:0,scroll_75:0,scroll_100:0};
   sd.forEach(s=>{if(counts[s.type]!==undefined)counts[s.type]++;});
   const max=Math.max(...Object.values(counts),1);
