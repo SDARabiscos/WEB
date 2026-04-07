@@ -255,6 +255,10 @@ body{background:var(--bg);color:var(--text);font-family:"Poppins",sans-serif;fon
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
       Audiência
     </button>
+    <button class="sb-link" onclick="showView('heatmap',this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z" stroke-dasharray="3 2"/><circle cx="12" cy="12" r="7" opacity=".4"/></svg>
+      Mapas de Calor
+    </button>
     <button class="sb-link" onclick="showView('performance',this)">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
       Performance
@@ -325,6 +329,60 @@ body{background:var(--bg);color:var(--text);font-family:"Poppins",sans-serif;fon
     <div class="sec-hd"><span class="sec-tag">02</span><span class="sec-title">Audiência — Variantes Ativas</span></div>
     <div id="aud-grid">
       <div class="vt-empty">Carregando...</div>
+    </div>
+  </div>
+
+  <!-- MAPAS DE CALOR -->
+  <div class="view" id="view-heatmap">
+    <div class="sec-hd" style="display:flex;align-items:center;justify-content:space-between">
+      <div><span class="sec-tag">06</span><span class="sec-title">Mapas de Calor</span></div>
+      <button onclick="loadHeatmap()" style="display:flex;align-items:center;gap:6px;background:var(--s2);border:1px solid var(--border2);color:var(--text);padding:6px 14px;border-radius:8px;font-size:12px;font-family:'Poppins',sans-serif;cursor:pointer;transition:all .2s" onmouseover="this.style.borderColor='var(--orange)';this.style.color='var(--orange)'" onmouseout="this.style.borderColor='var(--border2)';this.style.color='var(--text)'">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+        Atualizar
+      </button>
+    </div>
+    <div style="display:flex;gap:10px;margin-bottom:18px;flex-wrap:wrap">
+      <div style="display:flex;gap:6px;align-items:center">
+        <span style="font-size:11px;color:var(--muted);font-family:'DM Mono',monospace">Página:</span>
+        <select id="hm-path" onchange="loadHeatmap()" style="background:var(--s2);border:1px solid var(--border2);color:var(--text);padding:5px 10px;border-radius:7px;font-size:12px;font-family:'DM Mono',monospace;cursor:pointer">
+          <option value="">Todas</option>
+          <option value="/">Principal</option>
+          <option value="/sda-b">Variante B</option>
+        </select>
+      </div>
+      <div style="display:flex;gap:6px;align-items:center">
+        <span style="font-size:11px;color:var(--muted);font-family:'DM Mono',monospace">Período:</span>
+        <select id="hm-days" onchange="loadHeatmap()" style="background:var(--s2);border:1px solid var(--border2);color:var(--text);padding:5px 10px;border-radius:7px;font-size:12px;font-family:'DM Mono',monospace;cursor:pointer">
+          <option value="7">7 dias</option>
+          <option value="30" selected>30 dias</option>
+          <option value="90">90 dias</option>
+        </select>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:18px" id="hm-stats">
+      <div class="card"><div class="card-label">Total de Cliques</div><div class="card-value" id="hm-total-clicks">—</div><div class="card-accent orange"></div></div>
+      <div class="card"><div class="card-label">Scroll 50%+</div><div class="card-value" id="hm-scroll50">—</div><div class="card-accent blue"></div></div>
+      <div class="card"><div class="card-label">Scroll 75%+</div><div class="card-value" id="hm-scroll75">—</div><div class="card-accent green"></div></div>
+      <div class="card"><div class="card-label">Leram tudo</div><div class="card-value" id="hm-scroll100">—</div><div class="card-accent purple"></div></div>
+    </div>
+    <div style="background:var(--s1);border:1px solid var(--border);border-radius:var(--r);overflow:hidden">
+      <div style="padding:14px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between">
+        <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:14px">Mapa de Cliques</div>
+        <div style="display:flex;gap:8px;align-items:center;font-size:11px;color:var(--muted);font-family:'DM Mono',monospace">
+          <span style="display:inline-block;width:40px;height:6px;border-radius:3px;background:linear-gradient(90deg,#4da6ff,#00e87a,#ffd93d,#ff4d6d)"></span>
+          baixo → alto
+        </div>
+      </div>
+      <div style="padding:18px;position:relative">
+        <div id="hm-msg" style="font-size:12px;color:var(--muted);text-align:center;padding:20px 0">Carregando...</div>
+        <canvas id="hm-canvas" style="display:none;width:100%;border-radius:8px;image-rendering:pixelated"></canvas>
+      </div>
+    </div>
+    <div style="margin-top:14px;background:var(--s1);border:1px solid var(--border);border-radius:var(--r);overflow:hidden">
+      <div style="padding:14px 18px;border-bottom:1px solid var(--border)"><div style="font-family:'Syne',sans-serif;font-weight:700;font-size:14px">Profundidade de Scroll</div></div>
+      <div style="padding:18px" id="hm-scroll-bars">
+        <div style="font-size:12px;color:var(--muted)">Carregando...</div>
+      </div>
     </div>
   </div>
 
@@ -617,6 +675,7 @@ function showView(view,el){
     if(view==="audiencia"){loadVariantData().then(d=>renderAudiencia(d));}
     if(view==="performance")loadPageSpeed();
     if(view==="registros")loadConversions();
+    if(view==="heatmap")loadHeatmap();
   }
 }
 
@@ -846,6 +905,92 @@ function animProgress(){
 }
 
 function updateTime(){document.getElementById("last-updated").textContent="Atualizado: "+new Date().toLocaleTimeString("pt-BR");}
+
+async function loadHeatmap(){
+  const path=document.getElementById("hm-path")?.value||"";
+  const days=document.getElementById("hm-days")?.value||30;
+  const msg=document.getElementById("hm-msg");
+  const canvas=document.getElementById("hm-canvas");
+  if(msg)msg.style.display="block",msg.textContent="Carregando dados...";
+  if(canvas)canvas.style.display="none";
+  try{
+    const qs=new URLSearchParams({days});
+    if(path)qs.set("path",path);
+    const r=await fetch(API+"/track/heatmap?"+qs);
+    if(!r.ok)throw new Error("HTTP "+r.status);
+    const data=await r.json();
+    const clicks=data.clicks||[];
+    const onlyClicks=clicks.filter(c=>c.type==="click");
+    const scroll50=clicks.filter(c=>c.type==="scroll_50"||c.type==="scroll_75"||c.type==="scroll_100").length;
+    const scroll75=clicks.filter(c=>c.type==="scroll_75"||c.type==="scroll_100").length;
+    const scroll100=clicks.filter(c=>c.type==="scroll_100").length;
+    document.getElementById("hm-total-clicks").textContent=onlyClicks.length.toLocaleString("pt-BR");
+    document.getElementById("hm-scroll50").textContent=scroll50.toLocaleString("pt-BR");
+    document.getElementById("hm-scroll75").textContent=scroll75.toLocaleString("pt-BR");
+    document.getElementById("hm-scroll100").textContent=scroll100.toLocaleString("pt-BR");
+    renderScrollBars(scroll50,scroll75,scroll100,data.total);
+    if(!onlyClicks.length){if(msg)msg.textContent="Nenhum clique registrado no período.";return;}
+    if(msg)msg.style.display="none";
+    if(canvas)canvas.style.display="block";
+    renderHeatmapCanvas(onlyClicks,canvas);
+  }catch(e){if(msg)msg.textContent="Erro ao carregar: "+e.message;}
+}
+
+function renderScrollBars(s50,s75,s100,total){
+  const el=document.getElementById("hm-scroll-bars");
+  if(!el)return;
+  const visits=total||1;
+  const bars=[
+    {label:"Scroll 25%+",val:s50,color:"var(--blue)"},
+    {label:"Scroll 50%+",val:s50,color:"var(--green)"},
+    {label:"Scroll 75%+",val:s75,color:"var(--yellow)"},
+    {label:"Scroll 100%",val:s100,color:"var(--orange)"},
+  ];
+  el.innerHTML=bars.map(b=>{
+    const pct=visits?Math.round(b.val/visits*100):0;
+    return`<div style="margin-bottom:12px">
+      <div style="display:flex;justify-content:space-between;margin-bottom:5px">
+        <span style="font-size:12px;color:var(--text);font-family:'DM Mono',monospace">${b.label}</span>
+        <span style="font-size:12px;color:var(--muted);font-family:'DM Mono',monospace">${b.val.toLocaleString("pt-BR")} sessões (${pct}%)</span>
+      </div>
+      <div style="background:var(--s3);border-radius:4px;height:8px;overflow:hidden">
+        <div style="height:100%;border-radius:4px;background:${b.color};width:${Math.min(pct,100)}%;transition:width .6s ease"></div>
+      </div></div>`;
+  }).join("");
+}
+
+function renderHeatmapCanvas(clicks,canvas){
+  const W=800,H=1200;
+  canvas.width=W;canvas.height=H;
+  const ctx=canvas.getContext("2d");
+  ctx.fillStyle="#0d0d1a";
+  ctx.fillRect(0,0,W,H);
+  // draw grid
+  ctx.strokeStyle="rgba(255,255,255,0.04)";
+  ctx.lineWidth=1;
+  for(let i=0;i<=10;i++){ctx.beginPath();ctx.moveTo(i*(W/10),0);ctx.lineTo(i*(W/10),H);ctx.stroke();}
+  for(let i=0;i<=20;i++){ctx.beginPath();ctx.moveTo(0,i*(H/20));ctx.lineTo(W,i*(H/20));ctx.stroke();}
+  // draw heatmap dots
+  clicks.forEach(c=>{
+    const x=c.x/100*W;
+    const y=c.y/100*H;
+    const r=Math.max(20,Math.min(60,30*(1920/(c.vw||1920))));
+    const grad=ctx.createRadialGradient(x,y,0,x,y,r);
+    grad.addColorStop(0,"rgba(255,77,109,0.35)");
+    grad.addColorStop(0.4,"rgba(255,217,61,0.15)");
+    grad.addColorStop(1,"rgba(0,0,0,0)");
+    ctx.beginPath();
+    ctx.fillStyle=grad;
+    ctx.arc(x,y,r,0,Math.PI*2);
+    ctx.fill();
+  });
+  // axis labels
+  ctx.fillStyle="rgba(90,90,122,0.8)";
+  ctx.font="10px 'DM Mono',monospace";
+  for(let i=0;i<=100;i+=25){
+    ctx.fillText(i+"%",4,i/100*H+4);
+  }
+}
 
 async function loadAll(){
   animProgress();
