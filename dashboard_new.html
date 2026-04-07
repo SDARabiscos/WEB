@@ -223,6 +223,8 @@ body{background:var(--bg);color:var(--text);font-family:"Poppins",sans-serif;fon
 .fix-text{font-size:12px;color:var(--text);line-height:1.5}
 .fix-text strong{color:#fff}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+.hm-p{background:var(--s3);border:1px solid var(--border);color:var(--muted);padding:4px 10px;border-radius:6px;font-size:11px;font-family:'DM Mono',monospace;cursor:pointer;transition:all .15s}
+.hm-p:hover,.hm-p.active{background:rgba(255,107,0,.1);border-color:rgba(255,107,0,.4);color:var(--orange)}
 @media(max-width:1100px){.hero-grid{grid-template-columns:1fr 1fr}.urow{grid-template-columns:1fr 1fr}}
 @media(max-width:800px){.sidebar{transform:translateX(-100%)}.main{margin-left:0}.view{padding:18px}}
 @media(max-width:600px){.hero-grid{grid-template-columns:1fr}.conv-th>div:nth-child(2),.conv-th>div:nth-child(3),.conv-time,.conv-form,.conv-row>div:last-child{display:none}.cv-tag{flex:0 0 70px}}
@@ -341,7 +343,9 @@ body{background:var(--bg);color:var(--text);font-family:"Poppins",sans-serif;fon
         Atualizar
       </button>
     </div>
-    <div style="display:flex;gap:10px;margin-bottom:18px;flex-wrap:wrap">
+
+    <!-- Filtros -->
+    <div style="display:flex;gap:12px;margin-bottom:18px;flex-wrap:wrap;align-items:center">
       <div style="display:flex;gap:6px;align-items:center">
         <span style="font-size:11px;color:var(--muted);font-family:'DM Mono',monospace">Página:</span>
         <select id="hm-path" onchange="loadHeatmap()" style="background:var(--s2);border:1px solid var(--border2);color:var(--text);padding:5px 10px;border-radius:7px;font-size:12px;font-family:'DM Mono',monospace;cursor:pointer">
@@ -350,39 +354,90 @@ body{background:var(--bg);color:var(--text);font-family:"Poppins",sans-serif;fon
           <option value="/sda-b">Variante B</option>
         </select>
       </div>
-      <div style="display:flex;gap:6px;align-items:center">
+      <!-- Date range picker -->
+      <div style="display:flex;gap:6px;align-items:center;position:relative">
         <span style="font-size:11px;color:var(--muted);font-family:'DM Mono',monospace">Período:</span>
-        <select id="hm-days" onchange="loadHeatmap()" style="background:var(--s2);border:1px solid var(--border2);color:var(--text);padding:5px 10px;border-radius:7px;font-size:12px;font-family:'DM Mono',monospace;cursor:pointer">
-          <option value="7">7 dias</option>
-          <option value="30" selected>30 dias</option>
-          <option value="90">90 dias</option>
-        </select>
+        <button id="hm-dr-btn" onclick="hmTogglePicker(event)" style="display:flex;align-items:center;gap:7px;background:var(--s2);border:1px solid var(--border2);color:var(--text);padding:5px 12px;border-radius:7px;font-size:12px;font-family:'DM Mono',monospace;cursor:pointer;white-space:nowrap;transition:border-color .2s" onmouseover="this.style.borderColor='var(--orange)'" onmouseout="this.style.borderColor='var(--border2)'">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          <span id="hm-dr-label">Últimos 30 dias</span>
+          <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+        <div id="hm-picker" style="display:none;position:absolute;top:calc(100% + 8px);left:0;z-index:300;background:var(--s2);border:1px solid var(--border2);border-radius:12px;box-shadow:0 12px 40px rgba(0,0,0,.6);min-width:310px">
+          <div style="padding:10px 12px;border-bottom:1px solid var(--border);display:flex;gap:6px;flex-wrap:wrap">
+            <button onclick="hmPreset(7)" class="hm-p">7 dias</button>
+            <button onclick="hmPreset(14)" class="hm-p">14 dias</button>
+            <button onclick="hmPreset(30)" class="hm-p">30 dias</button>
+            <button onclick="hmPreset(90)" class="hm-p">90 dias</button>
+            <button onclick="hmPresetMonth(0)" class="hm-p">Este mês</button>
+            <button onclick="hmPresetMonth(-1)" class="hm-p">Mês anterior</button>
+          </div>
+          <div id="hm-cal"></div>
+          <div style="padding:10px 14px;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between">
+            <span id="hm-sel-label" style="font-size:11px;color:var(--orange);font-family:'DM Mono',monospace">Selecione o período</span>
+            <div style="display:flex;gap:8px">
+              <button onclick="hmPickerClose()" style="background:transparent;border:1px solid var(--border2);color:var(--muted);padding:5px 12px;border-radius:7px;font-size:11px;cursor:pointer">Cancelar</button>
+              <button onclick="hmApply()" style="background:var(--orange);border:none;color:#fff;padding:5px 14px;border-radius:7px;font-size:11px;font-weight:600;cursor:pointer">Aplicar</button>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
-    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:18px" id="hm-stats">
+
+    <!-- Cards de stats -->
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px">
       <div class="card"><div class="card-label">Total de Cliques</div><div class="card-value" id="hm-total-clicks">—</div><div class="card-accent orange"></div></div>
       <div class="card"><div class="card-label">Scroll 50%+</div><div class="card-value" id="hm-scroll50">—</div><div class="card-accent blue"></div></div>
       <div class="card"><div class="card-label">Scroll 75%+</div><div class="card-value" id="hm-scroll75">—</div><div class="card-accent green"></div></div>
       <div class="card"><div class="card-label">Leram tudo</div><div class="card-value" id="hm-scroll100">—</div><div class="card-accent purple"></div></div>
     </div>
-    <div style="background:var(--s1);border:1px solid var(--border);border-radius:var(--r);overflow:hidden">
-      <div style="padding:14px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between">
-        <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:14px">Mapa de Cliques</div>
-        <div style="display:flex;gap:8px;align-items:center;font-size:11px;color:var(--muted);font-family:'DM Mono',monospace">
-          <span style="display:inline-block;width:40px;height:6px;border-radius:3px;background:linear-gradient(90deg,#4da6ff,#00e87a,#ffd93d,#ff4d6d)"></span>
-          baixo → alto
+
+    <!-- Mapa + IA lado a lado -->
+    <div style="display:grid;grid-template-columns:1fr 340px;gap:14px;margin-bottom:14px;align-items:start">
+
+      <!-- Canvas card -->
+      <div style="background:var(--s1);border:1px solid var(--border);border-radius:var(--r);overflow:hidden">
+        <div style="padding:12px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between">
+          <div style="display:flex;gap:3px;background:var(--s3);border-radius:8px;padding:3px">
+            <button id="hm-tab-click" onclick="hmSetTab('click')" style="display:flex;align-items:center;gap:5px;padding:5px 12px;border-radius:6px;border:none;cursor:pointer;font-size:12px;font-family:'DM Mono',monospace;transition:all .15s;background:var(--s1);color:var(--text)">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 3l14 9-14 9V3z"/></svg>Cliques
+            </button>
+            <button id="hm-tab-scroll" onclick="hmSetTab('scroll')" style="display:flex;align-items:center;gap:5px;padding:5px 12px;border-radius:6px;border:none;cursor:pointer;font-size:12px;font-family:'DM Mono',monospace;transition:all .15s;background:transparent;color:var(--muted)">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><polyline points="19 12 12 19 5 12"/></svg>Scroll
+            </button>
+          </div>
+          <div style="display:flex;gap:7px;align-items:center;font-size:11px;color:var(--muted);font-family:'DM Mono',monospace">
+            <span style="display:inline-block;width:44px;height:5px;border-radius:3px;background:linear-gradient(90deg,#4da6ff,#00e87a,#ffd93d,#ff4d6d)"></span>
+            baixo → alto
+          </div>
+        </div>
+        <div style="padding:18px">
+          <div id="hm-msg" style="font-size:12px;color:var(--muted);text-align:center;padding:30px 0">Carregando...</div>
+          <canvas id="hm-canvas" style="display:none;width:100%;border-radius:8px"></canvas>
         </div>
       </div>
-      <div style="padding:18px;position:relative">
-        <div id="hm-msg" style="font-size:12px;color:var(--muted);text-align:center;padding:20px 0">Carregando...</div>
-        <canvas id="hm-canvas" style="display:none;width:100%;border-radius:8px;image-rendering:pixelated"></canvas>
+
+      <!-- AI insights box -->
+      <div style="background:var(--s1);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;display:flex;flex-direction:column">
+        <div style="padding:12px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between">
+          <div style="display:flex;align-items:center;gap:8px">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--purple)" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+            <span style="font-family:'Syne',sans-serif;font-weight:700;font-size:14px">IA Insights</span>
+          </div>
+          <button id="hm-ai-btn" onclick="runHmAI()" style="display:flex;align-items:center;gap:5px;background:linear-gradient(135deg,rgba(176,107,255,.15),rgba(176,107,255,.05));border:1px solid rgba(176,107,255,.3);color:var(--purple);padding:5px 12px;border-radius:7px;font-size:11px;font-family:'DM Mono',monospace;cursor:pointer;transition:all .2s" onmouseover="this.style.borderColor='var(--purple)'" onmouseout="this.style.borderColor='rgba(176,107,255,.3)'">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+            Analisar
+          </button>
+        </div>
+        <div id="hm-ai-result" style="padding:18px;min-height:220px;max-height:520px;overflow-y:auto;flex:1">
+          <div style="color:var(--muted);font-size:12px;line-height:1.7;text-align:center;padding:30px 10px">Clique em <strong style="color:var(--purple)">Analisar</strong> para a IA interpretar o mapa e trazer insights de melhoria da LP.</div>
+        </div>
       </div>
     </div>
-    <div style="margin-top:14px;background:var(--s1);border:1px solid var(--border);border-radius:var(--r);overflow:hidden">
+
+    <!-- Scroll depth bars -->
+    <div style="background:var(--s1);border:1px solid var(--border);border-radius:var(--r);overflow:hidden">
       <div style="padding:14px 18px;border-bottom:1px solid var(--border)"><div style="font-family:'Syne',sans-serif;font-weight:700;font-size:14px">Profundidade de Scroll</div></div>
-      <div style="padding:18px" id="hm-scroll-bars">
-        <div style="font-size:12px;color:var(--muted)">Carregando...</div>
-      </div>
+      <div style="padding:18px" id="hm-scroll-bars"><div style="font-size:12px;color:var(--muted)">Carregando...</div></div>
     </div>
   </div>
 
@@ -906,48 +961,166 @@ function animProgress(){
 
 function updateTime(){document.getElementById("last-updated").textContent="Atualizado: "+new Date().toLocaleTimeString("pt-BR");}
 
+// === HEATMAP DATE PICKER ===
+let _hmFrom=null,_hmTo=null,_hmSelFrom=null,_hmSelTo=null;
+let _hmCalY=new Date().getFullYear(),_hmCalM=new Date().getMonth();
+let _hmTab='click',_hmData=null;
+
+function hmTogglePicker(e){
+  e&&e.stopPropagation();
+  const p=document.getElementById('hm-picker');
+  if(p.style.display==='none'){
+    _hmSelFrom=_hmFrom;_hmSelTo=_hmTo;
+    hmRenderCal();
+    p.style.display='block';
+    setTimeout(()=>document.addEventListener('click',hmOutside),50);
+  }else{hmPickerClose();}
+}
+function hmOutside(e){
+  const p=document.getElementById('hm-picker'),b=document.getElementById('hm-dr-btn');
+  if(p&&!p.contains(e.target)&&b&&!b.contains(e.target)){hmPickerClose();}
+  else if(p&&p.style.display!=='none'){setTimeout(()=>document.addEventListener('click',hmOutside),50);}
+}
+function hmPickerClose(){
+  const p=document.getElementById('hm-picker');
+  if(p)p.style.display='none';
+  document.removeEventListener('click',hmOutside);
+}
+function hmFmt(d){return d.toISOString().split('T')[0];}
+function hmDisp(s){if(!s)return'—';const[y,m,d]=s.split('-');return d+'/'+m;}
+function hmPreset(days){
+  document.querySelectorAll('.hm-p').forEach(b=>b.classList.remove('active'));
+  event&&event.target&&event.target.classList.add('active');
+  const to=new Date(),from=new Date(Date.now()-days*86400000);
+  _hmSelFrom=hmFmt(from);_hmSelTo=hmFmt(to);
+  hmRenderCal();hmUpdSel();
+}
+function hmPresetMonth(offset){
+  document.querySelectorAll('.hm-p').forEach(b=>b.classList.remove('active'));
+  event&&event.target&&event.target.classList.add('active');
+  const now=new Date(),d=new Date(now.getFullYear(),now.getMonth()+offset,1);
+  _hmSelFrom=hmFmt(new Date(d.getFullYear(),d.getMonth(),1));
+  _hmSelTo=hmFmt(new Date(d.getFullYear(),d.getMonth()+1,0));
+  _hmCalY=d.getFullYear();_hmCalM=d.getMonth();
+  hmRenderCal();hmUpdSel();
+}
+function hmUpdSel(){
+  const el=document.getElementById('hm-sel-label');
+  if(el)el.textContent=_hmSelFrom&&_hmSelTo?hmDisp(_hmSelFrom)+' → '+hmDisp(_hmSelTo):_hmSelFrom?'De: '+hmDisp(_hmSelFrom):'Selecione o período';
+}
+function hmCalPrev(){_hmCalM--;if(_hmCalM<0){_hmCalM=11;_hmCalY--;}hmRenderCal();}
+function hmCalNext(){_hmCalM++;if(_hmCalM>11){_hmCalM=0;_hmCalY++;}hmRenderCal();}
+function hmClickDay(s){
+  document.querySelectorAll('.hm-p').forEach(b=>b.classList.remove('active'));
+  if(!_hmSelFrom||(_hmSelFrom&&_hmSelTo)){_hmSelFrom=s;_hmSelTo=null;}
+  else{if(s<_hmSelFrom){_hmSelTo=_hmSelFrom;_hmSelFrom=s;}else{_hmSelTo=s;}}
+  hmRenderCal();hmUpdSel();
+}
+function hmRenderCal(){
+  const cal=document.getElementById('hm-cal');if(!cal)return;
+  const MN=['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+  const DN=['D','S','T','Q','Q','S','S'];
+  const y=_hmCalY,m=_hmCalM;
+  const first=new Date(y,m,1).getDay(),days=new Date(y,m+1,0).getDate();
+  const today=hmFmt(new Date());
+  const cells=[];
+  for(let i=0;i<42;i++){
+    const day=i-first+1;
+    if(day<1||day>days){cells.push('');continue;}
+    const ds=`${y}-${String(m+1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
+    const isFr=ds===_hmSelFrom,isTo=ds===_hmSelTo;
+    const inRange=_hmSelFrom&&_hmSelTo&&ds>_hmSelFrom&&ds<_hmSelTo;
+    const isTod=ds===today;
+    let bg=isFr||isTo?'var(--orange)':inRange?'rgba(255,107,0,.15)':'transparent';
+    let col=isFr||isTo?'#fff':inRange?'var(--orange2)':'var(--text)';
+    let fw=isFr||isTo?'700':'400';
+    cells.push(`<div onclick="hmClickDay('${ds}')" style="text-align:center;padding:6px 2px;cursor:pointer;border-radius:6px;background:${bg};color:${col};font-weight:${fw};font-size:12px;font-family:'DM Mono',monospace;position:relative" onmouseover="if(this.style.background==='transparent')this.style.background='rgba(255,255,255,.05)'" onmouseout="if(this.style.background==='rgba(255, 255, 255, 0.05)')this.style.background='transparent'">${day}${isTod&&!isFr&&!isTo?'<div style="position:absolute;bottom:2px;left:50%;transform:translateX(-50%);width:3px;height:3px;border-radius:50%;background:var(--orange)"></div>':''}</div>`);
+  }
+  cal.innerHTML=`<div style="padding:12px">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+      <button onclick="hmCalPrev()" style="background:var(--s3);border:1px solid var(--border);color:var(--text);width:28px;height:28px;border-radius:6px;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;line-height:1">‹</button>
+      <span style="font-family:'Syne',sans-serif;font-weight:700;font-size:13px">${MN[m]} ${y}</span>
+      <button onclick="hmCalNext()" style="background:var(--s3);border:1px solid var(--border);color:var(--text);width:28px;height:28px;border-radius:6px;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;line-height:1">›</button>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:2px;margin-bottom:4px">
+      ${DN.map(d=>`<div style="text-align:center;font-size:10px;color:var(--muted);font-family:'DM Mono',monospace;padding:3px 0">${d}</div>`).join('')}
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:2px">${cells.join('')}</div>
+  </div>`;
+  hmUpdSel();
+}
+function hmApply(){
+  _hmFrom=_hmSelFrom;_hmTo=_hmSelTo;
+  const lbl=document.getElementById('hm-dr-label');
+  if(lbl){
+    if(_hmFrom&&_hmTo)lbl.textContent=hmDisp(_hmFrom)+' → '+hmDisp(_hmTo);
+    else if(_hmFrom)lbl.textContent='A partir de '+hmDisp(_hmFrom);
+  }
+  hmPickerClose();loadHeatmap();
+}
+
+// === MAP TYPE ===
+function hmSetTab(tab){
+  _hmTab=tab;
+  const tc=document.getElementById('hm-tab-click'),ts=document.getElementById('hm-tab-scroll');
+  if(tc){tc.style.background=tab==='click'?'var(--s1)':'transparent';tc.style.color=tab==='click'?'var(--text)':'var(--muted)';}
+  if(ts){ts.style.background=tab==='scroll'?'var(--s1)':'transparent';ts.style.color=tab==='scroll'?'var(--text)':'var(--muted)';}
+  if(_hmData)hmRenderByTab();
+}
+function hmRenderByTab(){
+  const canvas=document.getElementById('hm-canvas'),msg=document.getElementById('hm-msg');
+  const clicks=_hmData.clicks||[];
+  if(_hmTab==='click'){
+    const oc=clicks.filter(c=>c.type==='click');
+    if(!oc.length){canvas.style.display='none';msg.style.display='block';msg.textContent='Nenhum clique registrado no período.';}
+    else{msg.style.display='none';canvas.style.display='block';renderHeatmapCanvas(oc,canvas);}
+  }else{
+    const sc=clicks.filter(c=>c.type&&c.type.startsWith('scroll_'));
+    if(!sc.length){canvas.style.display='none';msg.style.display='block';msg.textContent='Nenhum dado de scroll registrado no período.';}
+    else{msg.style.display='none';canvas.style.display='block';renderScrollCanvas(sc,canvas);}
+  }
+}
+
+// === LOAD ===
 async function loadHeatmap(){
   const path=document.getElementById("hm-path")?.value||"";
-  const days=document.getElementById("hm-days")?.value||30;
-  const msg=document.getElementById("hm-msg");
-  const canvas=document.getElementById("hm-canvas");
-  if(msg)msg.style.display="block",msg.textContent="Carregando dados...";
+  const msg=document.getElementById("hm-msg"),canvas=document.getElementById("hm-canvas");
+  if(msg){msg.style.display="block";msg.textContent="Carregando dados...";}
   if(canvas)canvas.style.display="none";
   try{
-    const qs=new URLSearchParams({days});
+    const qs=new URLSearchParams();
     if(path)qs.set("path",path);
+    if(_hmFrom&&_hmTo){qs.set("from",new Date(_hmFrom+'T00:00:00').getTime());qs.set("to",new Date(_hmTo+'T23:59:59').getTime());}
+    else qs.set("days",30);
     const r=await fetch(API+"/track/heatmap?"+qs);
     if(!r.ok)throw new Error("HTTP "+r.status);
-    const data=await r.json();
-    const clicks=data.clicks||[];
-    const onlyClicks=clicks.filter(c=>c.type==="click");
-    const scroll50=clicks.filter(c=>c.type==="scroll_50"||c.type==="scroll_75"||c.type==="scroll_100").length;
-    const scroll75=clicks.filter(c=>c.type==="scroll_75"||c.type==="scroll_100").length;
-    const scroll100=clicks.filter(c=>c.type==="scroll_100").length;
-    document.getElementById("hm-total-clicks").textContent=onlyClicks.length.toLocaleString("pt-BR");
-    document.getElementById("hm-scroll50").textContent=scroll50.toLocaleString("pt-BR");
-    document.getElementById("hm-scroll75").textContent=scroll75.toLocaleString("pt-BR");
-    document.getElementById("hm-scroll100").textContent=scroll100.toLocaleString("pt-BR");
-    renderScrollBars(scroll50,scroll75,scroll100,data.total);
-    if(!onlyClicks.length){if(msg)msg.textContent="Nenhum clique registrado no período.";return;}
-    if(msg)msg.style.display="none";
-    if(canvas)canvas.style.display="block";
-    renderHeatmapCanvas(onlyClicks,canvas);
+    _hmData=await r.json();
+    const clicks=_hmData.clicks||[];
+    const oc=clicks.filter(c=>c.type==="click");
+    const s25=clicks.filter(c=>["scroll_25","scroll_50","scroll_75","scroll_100"].includes(c.type)).length;
+    const s50=clicks.filter(c=>["scroll_50","scroll_75","scroll_100"].includes(c.type)).length;
+    const s75=clicks.filter(c=>["scroll_75","scroll_100"].includes(c.type)).length;
+    const s100=clicks.filter(c=>c.type==="scroll_100").length;
+    document.getElementById("hm-total-clicks").textContent=oc.length.toLocaleString("pt-BR");
+    document.getElementById("hm-scroll50").textContent=s50.toLocaleString("pt-BR");
+    document.getElementById("hm-scroll75").textContent=s75.toLocaleString("pt-BR");
+    document.getElementById("hm-scroll100").textContent=s100.toLocaleString("pt-BR");
+    renderScrollBars(s25,s50,s75,s100);
+    hmRenderByTab();
   }catch(e){if(msg)msg.textContent="Erro ao carregar: "+e.message;}
 }
 
-function renderScrollBars(s50,s75,s100,total){
-  const el=document.getElementById("hm-scroll-bars");
-  if(!el)return;
-  const visits=total||1;
+function renderScrollBars(s25,s50,s75,s100){
+  const el=document.getElementById("hm-scroll-bars");if(!el)return;
+  const base=Math.max(s25,1);
   const bars=[
-    {label:"Scroll 25%+",val:s50,color:"var(--blue)"},
+    {label:"Scroll 25%+",val:s25,color:"var(--blue)"},
     {label:"Scroll 50%+",val:s50,color:"var(--green)"},
     {label:"Scroll 75%+",val:s75,color:"var(--yellow)"},
     {label:"Scroll 100%",val:s100,color:"var(--orange)"},
   ];
   el.innerHTML=bars.map(b=>{
-    const pct=visits?Math.round(b.val/visits*100):0;
+    const pct=Math.round(b.val/base*100);
     return`<div style="margin-bottom:12px">
       <div style="display:flex;justify-content:space-between;margin-bottom:5px">
         <span style="font-size:12px;color:var(--text);font-family:'DM Mono',monospace">${b.label}</span>
@@ -960,35 +1133,79 @@ function renderScrollBars(s50,s75,s100,total){
 }
 
 function renderHeatmapCanvas(clicks,canvas){
-  const W=800,H=1200;
-  canvas.width=W;canvas.height=H;
+  const W=800,H=1400;canvas.width=W;canvas.height=H;
   const ctx=canvas.getContext("2d");
-  ctx.fillStyle="#0d0d1a";
-  ctx.fillRect(0,0,W,H);
-  // draw grid
-  ctx.strokeStyle="rgba(255,255,255,0.04)";
-  ctx.lineWidth=1;
+  ctx.fillStyle="#0d0d1a";ctx.fillRect(0,0,W,H);
+  ctx.strokeStyle="rgba(255,255,255,0.04)";ctx.lineWidth=1;
   for(let i=0;i<=10;i++){ctx.beginPath();ctx.moveTo(i*(W/10),0);ctx.lineTo(i*(W/10),H);ctx.stroke();}
   for(let i=0;i<=20;i++){ctx.beginPath();ctx.moveTo(0,i*(H/20));ctx.lineTo(W,i*(H/20));ctx.stroke();}
-  // draw heatmap dots
   clicks.forEach(c=>{
-    const x=c.x/100*W;
-    const y=c.y/100*H;
-    const r=Math.max(20,Math.min(60,30*(1920/(c.vw||1920))));
-    const grad=ctx.createRadialGradient(x,y,0,x,y,r);
-    grad.addColorStop(0,"rgba(255,77,109,0.35)");
-    grad.addColorStop(0.4,"rgba(255,217,61,0.15)");
-    grad.addColorStop(1,"rgba(0,0,0,0)");
-    ctx.beginPath();
-    ctx.fillStyle=grad;
-    ctx.arc(x,y,r,0,Math.PI*2);
-    ctx.fill();
+    const x=c.x/100*W,y=c.y/100*H;
+    const r=Math.max(18,Math.min(55,28*(1920/(c.vw||1920))));
+    const g=ctx.createRadialGradient(x,y,0,x,y,r);
+    g.addColorStop(0,"rgba(255,77,109,0.28)");g.addColorStop(0.35,"rgba(255,217,61,0.12)");
+    g.addColorStop(0.7,"rgba(77,166,255,0.05)");g.addColorStop(1,"rgba(0,0,0,0)");
+    ctx.beginPath();ctx.fillStyle=g;ctx.arc(x,y,r,0,Math.PI*2);ctx.fill();
   });
-  // axis labels
-  ctx.fillStyle="rgba(90,90,122,0.8)";
-  ctx.font="10px 'DM Mono',monospace";
-  for(let i=0;i<=100;i+=25){
-    ctx.fillText(i+"%",4,i/100*H+4);
+  ctx.fillStyle="rgba(90,90,122,0.7)";ctx.font="10px DM Mono,monospace";
+  for(let i=0;i<=100;i+=25)ctx.fillText(i+"%",4,i/100*H+12);
+}
+
+function renderScrollCanvas(sd,canvas){
+  const W=800,H=1400;canvas.width=W;canvas.height=H;
+  const ctx=canvas.getContext("2d");
+  ctx.fillStyle="#0d0d1a";ctx.fillRect(0,0,W,H);
+  const counts={scroll_25:0,scroll_50:0,scroll_75:0,scroll_100:0};
+  sd.forEach(s=>{if(counts[s.type]!==undefined)counts[s.type]++;});
+  const max=Math.max(...Object.values(counts),1);
+  const ms=[
+    {t:'scroll_25',y:25,lbl:'25%',c:[77,166,255]},
+    {t:'scroll_50',y:50,lbl:'50%',c:[0,232,122]},
+    {t:'scroll_75',y:75,lbl:'75%',c:[255,217,61]},
+    {t:'scroll_100',y:100,lbl:'100%',c:[255,77,109]},
+  ];
+  ms.forEach((m,i)=>{
+    const yPx=m.y/100*H,startY=i===0?0:ms[i-1].y/100*H;
+    const intensity=counts[m.t]/max;
+    const g=ctx.createLinearGradient(0,startY,0,yPx);
+    g.addColorStop(0,`rgba(${m.c},0)`);g.addColorStop(1,`rgba(${m.c},${0.12+intensity*0.38})`);
+    ctx.fillStyle=g;ctx.fillRect(0,startY,W,yPx-startY);
+    ctx.strokeStyle=`rgba(${m.c},.5)`;ctx.setLineDash([4,4]);ctx.lineWidth=1.5;
+    ctx.beginPath();ctx.moveTo(0,yPx);ctx.lineTo(W,yPx);ctx.stroke();ctx.setLineDash([]);
+    ctx.fillStyle=`rgba(${m.c},.9)`;ctx.font='bold 11px DM Mono,monospace';
+    ctx.fillText(`${m.lbl} — ${counts[m.t].toLocaleString('pt-BR')} sessões`,10,yPx-6);
+  });
+}
+
+// === IA INSIGHTS ===
+async function runHmAI(){
+  const btn=document.getElementById('hm-ai-btn'),res=document.getElementById('hm-ai-result');
+  if(!_hmData){res.innerHTML='<div style="color:var(--muted);font-size:12px">Carregue o mapa primeiro.</div>';return;}
+  btn.disabled=true;btn.innerHTML='<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg> Analisando...';
+  res.innerHTML='<div style="color:var(--muted);font-size:12px;text-align:center;padding:30px 0">Consultando IA...</div>';
+  try{
+    const clicks=_hmData.clicks||[];
+    const oc=clicks.filter(c=>c.type==='click');
+    const s25=clicks.filter(c=>["scroll_25","scroll_50","scroll_75","scroll_100"].includes(c.type)).length;
+    const s50=clicks.filter(c=>["scroll_50","scroll_75","scroll_100"].includes(c.type)).length;
+    const s75=clicks.filter(c=>["scroll_75","scroll_100"].includes(c.type)).length;
+    const s100=clicks.filter(c=>c.type==="scroll_100").length;
+    const payload={
+      totalClicks:oc.length,
+      topClicks:oc.filter(c=>c.y<33).length,
+      midClicks:oc.filter(c=>c.y>=33&&c.y<66).length,
+      botClicks:oc.filter(c=>c.y>=66).length,
+      scroll25:s25,scroll50:s50,scroll75:s75,scroll100:s100,
+      path:document.getElementById('hm-path')?.value||'/'
+    };
+    const r=await fetch(API+'/track/heatmap/insights',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
+    if(!r.ok){const e=await r.json().catch(()=>({}));throw new Error(e.error||'HTTP '+r.status);}
+    const data=await r.json();
+    res.innerHTML=`<div style="font-size:13px;color:var(--text);line-height:1.75;white-space:pre-wrap">${data.insights}</div>`;
+  }catch(e){
+    res.innerHTML=`<div style="color:var(--red);font-size:12px">Erro: ${e.message}</div>`;
+  }finally{
+    btn.disabled=false;btn.innerHTML='<svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg> Analisar';
   }
 }
 
