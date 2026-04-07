@@ -1132,29 +1132,65 @@ function renderScrollBars(s25,s50,s75,s100){
   }).join("");
 }
 
-function renderHeatmapCanvas(clicks,canvas){
-  const W=800,H=1400;canvas.width=W;canvas.height=H;
-  const ctx=canvas.getContext("2d");
-  ctx.fillStyle="#0d0d1a";ctx.fillRect(0,0,W,H);
-  ctx.strokeStyle="rgba(255,255,255,0.04)";ctx.lineWidth=1;
-  for(let i=0;i<=10;i++){ctx.beginPath();ctx.moveTo(i*(W/10),0);ctx.lineTo(i*(W/10),H);ctx.stroke();}
-  for(let i=0;i<=20;i++){ctx.beginPath();ctx.moveTo(0,i*(H/20));ctx.lineTo(W,i*(H/20));ctx.stroke();}
+async function renderHeatmapCanvas(clicks,canvas){
+  const W=800;
+  // Try to load LP screenshot as background
+  let bgImg=null,H=1400;
+  try{
+    const sr=await fetch(API+'/monitor/screenshot?strategy=mobile');
+    if(sr.ok){
+      const sd=await sr.json();
+      if(sd.data){
+        bgImg=await new Promise((res,rej)=>{const i=new Image();i.onload=()=>res(i);i.onerror=rej;i.src=sd.data;});
+        H=Math.round(W*bgImg.height/bgImg.width);
+      }
+    }
+  }catch(e){}
+  canvas.width=W;canvas.height=H;
+  const ctx=canvas.getContext('2d');
+  if(bgImg){
+    // Draw LP screenshot as background
+    ctx.drawImage(bgImg,0,0,W,H);
+    // Dark overlay so heatmap is visible
+    ctx.fillStyle='rgba(7,7,15,0.55)';
+    ctx.fillRect(0,0,W,H);
+  }else{
+    ctx.fillStyle='#0d0d1a';ctx.fillRect(0,0,W,H);
+    ctx.strokeStyle='rgba(255,255,255,0.04)';ctx.lineWidth=1;
+    for(let i=0;i<=10;i++){ctx.beginPath();ctx.moveTo(i*(W/10),0);ctx.lineTo(i*(W/10),H);ctx.stroke();}
+    for(let i=0;i<=20;i++){ctx.beginPath();ctx.moveTo(0,i*(H/20));ctx.lineTo(W,i*(H/20));ctx.stroke();}
+  }
+  // Draw heat dots
   clicks.forEach(c=>{
     const x=c.x/100*W,y=c.y/100*H;
-    const r=Math.max(18,Math.min(55,28*(1920/(c.vw||1920))));
+    const r=Math.max(20,Math.min(60,32*(1920/(c.vw||1920))));
     const g=ctx.createRadialGradient(x,y,0,x,y,r);
-    g.addColorStop(0,"rgba(255,77,109,0.28)");g.addColorStop(0.35,"rgba(255,217,61,0.12)");
-    g.addColorStop(0.7,"rgba(77,166,255,0.05)");g.addColorStop(1,"rgba(0,0,0,0)");
+    g.addColorStop(0,'rgba(255,77,109,0.55)');
+    g.addColorStop(0.3,'rgba(255,217,61,0.25)');
+    g.addColorStop(0.65,'rgba(77,166,255,0.08)');
+    g.addColorStop(1,'rgba(0,0,0,0)');
     ctx.beginPath();ctx.fillStyle=g;ctx.arc(x,y,r,0,Math.PI*2);ctx.fill();
   });
-  ctx.fillStyle="rgba(90,90,122,0.7)";ctx.font="10px DM Mono,monospace";
-  for(let i=0;i<=100;i+=25)ctx.fillText(i+"%",4,i/100*H+12);
+  // % labels on left edge
+  ctx.fillStyle='rgba(255,255,255,0.5)';ctx.font='10px DM Mono,monospace';
+  for(let i=0;i<=100;i+=25){
+    const yy=i/100*H;
+    ctx.fillStyle='rgba(0,0,0,0.5)';ctx.fillRect(0,yy-1,28,13);
+    ctx.fillStyle='rgba(255,255,255,0.7)';ctx.fillText(i+'%',3,yy+10);
+  }
 }
 
-function renderScrollCanvas(sd,canvas){
-  const W=800,H=1400;canvas.width=W;canvas.height=H;
+async function renderScrollCanvas(sd,canvas){
+  const W=800;
+  let bgImg=null,H=1400;
+  try{
+    const sr=await fetch(API+'/monitor/screenshot?strategy=mobile');
+    if(sr.ok){const sd2=await sr.json();if(sd2.data){bgImg=await new Promise((res,rej)=>{const i=new Image();i.onload=()=>res(i);i.onerror=rej;i.src=sd2.data;});H=Math.round(W*bgImg.height/bgImg.width);}}
+  }catch(e){}
+  canvas.width=W;canvas.height=H;
   const ctx=canvas.getContext("2d");
-  ctx.fillStyle="#0d0d1a";ctx.fillRect(0,0,W,H);
+  if(bgImg){ctx.drawImage(bgImg,0,0,W,H);ctx.fillStyle='rgba(7,7,15,0.6)';ctx.fillRect(0,0,W,H);}
+  else{ctx.fillStyle="#0d0d1a";ctx.fillRect(0,0,W,H);}
   const counts={scroll_25:0,scroll_50:0,scroll_75:0,scroll_100:0};
   sd.forEach(s=>{if(counts[s.type]!==undefined)counts[s.type]++;});
   const max=Math.max(...Object.values(counts),1);
