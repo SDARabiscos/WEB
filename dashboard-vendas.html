@@ -1,0 +1,812 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SDA 2026 — Vendas PITCH</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#07070f;
+  --s1:#0d0d1a;
+  --s2:#12121f;
+  --s3:#18182a;
+  --border:rgba(255,255,255,0.06);
+  --border2:rgba(255,255,255,0.1);
+  --text:#e8e8f2;
+  --muted:#5a5a7a;
+  --muted2:#3a3a5a;
+  --orange:#ff6b00;
+  --orange2:#ff8c3a;
+  --green:#00e87a;
+  --green2:#00c265;
+  --blue:#4da6ff;
+  --red:#ff4d6d;
+  --yellow:#ffd93d;
+  --purple:#b06bff;
+  --r:14px;
+  --nav-h:64px;
+}
+html{scroll-behavior:smooth}
+body{
+  background:var(--bg);
+  color:var(--text);
+  font-family:'DM Sans',sans-serif;
+  font-size:14px;
+  line-height:1.6;
+  min-height:100vh;
+  overflow-x:hidden;
+}
+body::before{
+  content:'';
+  position:fixed;inset:0;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.025'/%3E%3C/svg%3E");
+  pointer-events:none;z-index:0;opacity:.5;
+}
+
+nav{
+  position:fixed;top:0;left:0;right:0;
+  height:var(--nav-h);
+  background:rgba(7,7,15,0.92);
+  backdrop-filter:blur(20px);
+  border-bottom:1px solid var(--border);
+  z-index:100;
+  display:flex;align-items:center;
+  padding:0 28px;gap:0;
+}
+.nav-logo{
+  font-family:'Syne',sans-serif;
+  font-size:15px;font-weight:800;
+  color:#fff;letter-spacing:-.02em;
+  display:flex;align-items:center;gap:10px;
+  text-decoration:none;
+}
+.nav-logo-dot{
+  width:8px;height:8px;
+  background:var(--orange);
+  border-radius:50%;
+  box-shadow:0 0 8px var(--orange);
+}
+.nav-sep{width:1px;height:28px;background:var(--border2);margin:0 20px}
+.nav-back{
+  font-size:12px;color:var(--muted);
+  text-decoration:none;
+  display:flex;align-items:center;gap:6px;
+  transition:color .2s;
+}
+.nav-back:hover{color:var(--text)}
+.nav-badge{
+  margin-left:auto;
+  display:flex;align-items:center;gap:8px;
+  font-family:'DM Mono',monospace;
+  font-size:11px;color:var(--muted);
+  letter-spacing:.04em;
+}
+.badge-live{
+  display:flex;align-items:center;gap:5px;
+  background:rgba(0,232,122,.08);
+  border:1px solid rgba(0,232,122,.2);
+  color:var(--green);
+  padding:4px 10px;border-radius:20px;
+  font-size:10px;font-weight:500;letter-spacing:.06em;
+}
+.badge-live::before{
+  content:'';width:6px;height:6px;
+  background:var(--green);border-radius:50%;
+  animation:blink 1.4s infinite;
+}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+
+.page{
+  padding-top:calc(var(--nav-h) + 36px);
+  padding-bottom:80px;
+  max-width:1120px;
+  margin:0 auto;
+  padding-left:28px;
+  padding-right:28px;
+  position:relative;z-index:1;
+}
+
+.page-header{margin-bottom:40px}
+.page-eyebrow{
+  font-family:'DM Mono',monospace;
+  font-size:11px;color:var(--orange);
+  letter-spacing:.1em;text-transform:uppercase;
+  margin-bottom:8px;
+  display:flex;align-items:center;gap:8px;
+}
+.page-eyebrow::before{content:'';display:block;width:20px;height:1px;background:var(--orange)}
+.page-title{
+  font-family:'Syne',sans-serif;
+  font-size:32px;font-weight:800;
+  color:#fff;letter-spacing:-.04em;
+  line-height:1.1;
+}
+.page-title span{color:var(--orange)}
+.page-subtitle{
+  font-size:14px;color:var(--muted);
+  margin-top:8px;
+  font-weight:300;
+}
+
+.section{margin-bottom:60px}
+.section-label{
+  font-family:'DM Mono',monospace;
+  font-size:10px;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--muted);
+  margin-bottom:6px;
+  display:flex;align-items:center;gap:8px;
+}
+.section-label::before{content:'';display:block;width:16px;height:1px;background:var(--orange)}
+.section-title{
+  font-family:'Syne',sans-serif;
+  font-size:20px;font-weight:700;
+  color:#fff;margin-bottom:20px;
+  letter-spacing:-.03em;
+}
+
+/* KPI GRID */
+.kpi-grid{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:12px;
+  margin-bottom:12px;
+}
+@media(max-width:800px){.kpi-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:480px){.kpi-grid{grid-template-columns:1fr}}
+
+.kpi-card{
+  background:var(--s2);
+  border:1px solid var(--border);
+  border-radius:var(--r);
+  padding:20px 22px;
+  position:relative;overflow:hidden;
+  transition:border-color .2s,transform .15s;
+}
+.kpi-card:hover{border-color:var(--border2);transform:translateY(-2px)}
+.kpi-card::before{
+  content:'';
+  position:absolute;top:0;left:0;right:0;height:2px;
+  background:linear-gradient(90deg,var(--accent,var(--orange)) 0%,transparent 100%);
+}
+.kpi-card.green{--accent:var(--green)}
+.kpi-card.blue{--accent:var(--blue)}
+.kpi-card.red{--accent:var(--red)}
+.kpi-label{
+  font-family:'DM Mono',monospace;
+  font-size:10px;letter-spacing:.08em;
+  text-transform:uppercase;color:var(--muted);
+  margin-bottom:10px;
+}
+.kpi-value{
+  font-family:'Syne',sans-serif;
+  font-size:26px;font-weight:800;
+  color:#fff;letter-spacing:-.04em;
+  line-height:1;
+}
+.kpi-value.green{color:var(--green)}
+.kpi-value.orange{color:var(--orange)}
+.kpi-sub{
+  font-size:11px;color:var(--muted);
+  margin-top:8px;
+}
+.kpi-icon{
+  position:absolute;right:16px;top:50%;transform:translateY(-50%);
+  font-size:28px;opacity:.08;
+}
+
+/* CHART CARDS */
+.chart-card{
+  background:var(--s2);
+  border:1px solid var(--border);
+  border-radius:var(--r);
+  padding:24px;
+}
+.chart-card-title{
+  font-family:'Syne',sans-serif;
+  font-size:14px;font-weight:700;
+  color:#fff;margin-bottom:4px;
+  letter-spacing:-.02em;
+}
+.chart-card-sub{font-size:11px;color:var(--muted);margin-bottom:20px}
+
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media(max-width:700px){.two-col{grid-template-columns:1fr}}
+
+.three-col{display:grid;grid-template-columns:1.6fr 1fr 1fr;gap:16px}
+@media(max-width:900px){.three-col{grid-template-columns:1fr}}
+
+canvas{display:block}
+
+/* LEGENDA CUSTOM */
+.legend-list{display:flex;flex-direction:column;gap:8px;margin-top:8px}
+.legend-item{
+  display:flex;align-items:center;justify-content:space-between;
+  gap:8px;
+}
+.legend-left{display:flex;align-items:center;gap:8px}
+.legend-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.legend-name{font-size:12px;color:var(--muted)}
+.legend-val{
+  font-family:'DM Mono',monospace;
+  font-size:11px;color:var(--text);
+  white-space:nowrap;
+}
+.legend-bar-wrap{
+  height:3px;background:var(--s3);
+  border-radius:2px;margin:2px 0 6px;
+  overflow:hidden;
+}
+.legend-bar-fill{height:100%;border-radius:2px;transition:width .6s ease}
+
+/* PARCELAS BARS */
+.parc-row{display:flex;flex-direction:column;gap:12px}
+.parc-item{}
+.parc-header{display:flex;justify-content:space-between;margin-bottom:5px}
+.parc-label{font-size:12px;color:var(--text)}
+.parc-val{font-family:'DM Mono',monospace;font-size:11px;color:var(--muted)}
+.parc-bar{height:6px;background:var(--s3);border-radius:3px;overflow:hidden}
+.parc-fill{height:100%;border-radius:3px;background:var(--orange)}
+
+/* TABLE */
+.data-table{width:100%;border-collapse:collapse}
+.data-table th{
+  font-family:'DM Mono',monospace;
+  font-size:10px;letter-spacing:.07em;
+  text-transform:uppercase;
+  color:var(--muted);
+  padding:8px 12px;
+  border-bottom:1px solid var(--border);
+  text-align:left;font-weight:400;
+}
+.data-table td{
+  padding:10px 12px;
+  border-bottom:1px solid var(--border);
+  font-size:12px;
+  color:var(--text);
+  vertical-align:middle;
+}
+.data-table tr:last-child td{border-bottom:none}
+.data-table tr:hover td{background:rgba(255,255,255,.02)}
+.td-mono{font-family:'DM Mono',monospace;font-size:11px}
+.td-badge{
+  display:inline-flex;align-items:center;
+  padding:2px 8px;border-radius:20px;
+  font-size:10px;font-family:'DM Mono',monospace;
+  letter-spacing:.04em;
+}
+.td-badge.green{background:rgba(0,232,122,.1);color:var(--green)}
+.td-badge.orange{background:rgba(255,107,0,.1);color:var(--orange)}
+.rank{
+  font-family:'DM Mono',monospace;
+  font-size:11px;color:var(--muted2);
+  width:24px;text-align:center;
+}
+.rank.top{color:var(--orange);font-weight:500}
+
+/* TIMELINE FULL */
+.timeline-wrap{position:relative;height:200px}
+
+/* REVEAL */
+.reveal{opacity:0;transform:translateY(20px);transition:opacity .5s,transform .5s}
+.reveal.visible{opacity:1;transform:none}
+
+/* DIVIDER */
+.divider{
+  border:none;
+  border-top:1px solid var(--border);
+  margin:48px 0;
+}
+
+/* TOTAL BAR */
+.total-row{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:14px 18px;
+  background:rgba(255,107,0,.06);
+  border:1px solid rgba(255,107,0,.15);
+  border-radius:10px;
+  margin-top:12px;
+}
+.total-row-label{font-size:12px;color:var(--orange);font-weight:500}
+.total-row-val{
+  font-family:'Syne',sans-serif;
+  font-size:18px;font-weight:800;
+  color:var(--orange);
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="nav-logo">
+    <div class="nav-logo-dot"></div>
+    SDA 2026
+  </a>
+  <div class="nav-sep"></div>
+  <a href="index.html" class="nav-back">
+    ← CRO Dashboard
+  </a>
+  <div class="nav-badge">
+    <div class="badge-live">PITCH AO VIVO</div>
+    <span>24 ABR 2026</span>
+  </div>
+</nav>
+
+<div class="page">
+
+  <!-- HEADER -->
+  <div class="page-header reveal">
+    <div class="page-eyebrow">Vendas em tempo real</div>
+    <div class="page-title">Dashboard de <span>Vendas</span><br>PITCH SDA 2026</div>
+    <div class="page-subtitle">52 transações · Todas aprovadas · Eduzz · 24/04/2026 — 17:44 às 18:44</div>
+  </div>
+
+  <!-- KPIs -->
+  <div class="section reveal">
+    <div class="kpi-grid">
+      <div class="kpi-card">
+        <div class="kpi-label">Faturamento Bruto</div>
+        <div class="kpi-value orange">R$ 814.889</div>
+        <div class="kpi-sub">52 vendas aprovadas</div>
+        <div class="kpi-icon">💰</div>
+      </div>
+      <div class="kpi-card green">
+        <div class="kpi-label">Ganho Líquido</div>
+        <div class="kpi-value green">R$ 782.245</div>
+        <div class="kpi-sub">Após taxas Eduzz</div>
+        <div class="kpi-icon">📈</div>
+      </div>
+      <div class="kpi-card red">
+        <div class="kpi-label">Taxa Eduzz</div>
+        <div class="kpi-value" style="color:var(--red)">R$ 32.644</div>
+        <div class="kpi-sub">4,0% do bruto</div>
+        <div class="kpi-icon">🏦</div>
+      </div>
+      <div class="kpi-card blue">
+        <div class="kpi-label">Ticket Médio</div>
+        <div class="kpi-value" style="color:var(--blue)">R$ 15.671</div>
+        <div class="kpi-sub">por transação</div>
+        <div class="kpi-icon">🎫</div>
+      </div>
+    </div>
+
+    <div class="kpi-grid" style="grid-template-columns:repeat(3,1fr);margin-top:0">
+      <div class="kpi-card">
+        <div class="kpi-label">Vendas no Crédito</div>
+        <div class="kpi-value">R$ 719.901</div>
+        <div class="kpi-sub">88,3% do total — 37 vendas</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Vendas no Pix</div>
+        <div class="kpi-value">R$ 94.988</div>
+        <div class="kpi-sub">11,7% do total — 15 vendas</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Parcelamento 12x</div>
+        <div class="kpi-value">R$ 594.916</div>
+        <div class="kpi-sub">73% do bruto — 35 vendas</div>
+      </div>
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <!-- TIMELINE -->
+  <div class="section reveal">
+    <div class="section-label">01 — Evolução temporal</div>
+    <div class="section-title">Acumulado de Vendas por Minuto</div>
+    <div class="chart-card">
+      <div class="chart-card-title">Faturamento Acumulado</div>
+      <div class="chart-card-sub">Pitch ao vivo · 17:44 → 18:44 · R$ 814.889 total</div>
+      <div style="height:220px;position:relative">
+        <canvas id="timelineChart"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <!-- PRODUTOS + PAGAMENTO -->
+  <div class="section reveal">
+    <div class="section-label">02 — Mix de Produtos</div>
+    <div class="section-title">Receita por Produto & Pagamento</div>
+    <div class="three-col">
+
+      <!-- Donut produtos -->
+      <div class="chart-card">
+        <div class="chart-card-title">Produtos Vendidos</div>
+        <div class="chart-card-sub">Distribuição por receita</div>
+        <div style="height:160px;position:relative">
+          <canvas id="produtosChart"></canvas>
+        </div>
+        <div class="legend-list" style="margin-top:16px">
+          <div class="legend-item">
+            <div class="legend-left">
+              <div class="legend-dot" style="background:#ff6b00"></div>
+              <div class="legend-name">Teatro + SDA ao VIVO</div>
+            </div>
+            <div class="legend-val">R$ 739.889 · 37</div>
+          </div>
+          <div class="legend-bar-wrap"><div class="legend-bar-fill" style="width:90.8%;background:#ff6b00"></div></div>
+          <div class="legend-item">
+            <div class="legend-left">
+              <div class="legend-dot" style="background:#4da6ff"></div>
+              <div class="legend-name">Sócio — Sócios</div>
+            </div>
+            <div class="legend-val">R$ 70.000 · 14</div>
+          </div>
+          <div class="legend-bar-wrap"><div class="legend-bar-fill" style="width:8.6%;background:#4da6ff"></div></div>
+          <div class="legend-item">
+            <div class="legend-left">
+              <div class="legend-dot" style="background:#ffd93d"></div>
+              <div class="legend-name">Teatro Bradesco</div>
+            </div>
+            <div class="legend-val">R$ 5.000 · 1</div>
+          </div>
+          <div class="legend-bar-wrap"><div class="legend-bar-fill" style="width:0.6%;background:#ffd93d"></div></div>
+        </div>
+      </div>
+
+      <!-- Forma de pagamento -->
+      <div class="chart-card">
+        <div class="chart-card-title">Forma de Pagamento</div>
+        <div class="chart-card-sub">Receita bruta por bandeira</div>
+        <div style="height:160px;position:relative">
+          <canvas id="formaChart"></canvas>
+        </div>
+      </div>
+
+      <!-- Parcelas -->
+      <div class="chart-card">
+        <div class="chart-card-title">Parcelamento</div>
+        <div class="chart-card-sub">Nº de parcelas escolhidas</div>
+        <div class="parc-row" style="margin-top:12px">
+          <div class="parc-item">
+            <div class="parc-header">
+              <span class="parc-label">12x</span>
+              <span class="parc-val">35 vendas · R$ 594.916</span>
+            </div>
+            <div class="parc-bar"><div class="parc-fill" style="width:73%"></div></div>
+          </div>
+          <div class="parc-item">
+            <div class="parc-header">
+              <span class="parc-label">À vista (1x)</span>
+              <span class="parc-val">15 vendas · R$ 194.976</span>
+            </div>
+            <div class="parc-bar"><div class="parc-fill" style="width:23.9%;background:var(--blue)"></div></div>
+          </div>
+          <div class="parc-item">
+            <div class="parc-header">
+              <span class="parc-label">10x</span>
+              <span class="parc-val">2 vendas · R$ 24.997</span>
+            </div>
+            <div class="parc-bar"><div class="parc-fill" style="width:3.1%;background:var(--purple)"></div></div>
+          </div>
+        </div>
+        <div style="height:100px;position:relative;margin-top:20px">
+          <canvas id="parcelasChart"></canvas>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <!-- TOP CLIENTES -->
+  <div class="section reveal">
+    <div class="section-label">03 — Ranking de Clientes</div>
+    <div class="section-title">Top Compradores</div>
+    <div class="chart-card">
+      <div class="chart-card-title">Clientes por Valor Total Investido</div>
+      <div class="chart-card-sub">Ordenado por receita bruta acumulada — 52 compradores únicos</div>
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Cliente</th>
+            <th>Produto Principal</th>
+            <th>Qtd</th>
+            <th style="text-align:right">Valor Total</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="rank top">01</span></td>
+            <td>Leonardo Carvalho Martinez</td>
+            <td><span class="td-badge blue">Sócio</span></td>
+            <td class="td-mono">3</td>
+            <td class="td-mono" style="text-align:right;color:var(--orange)">R$ 44.994</td>
+          </tr>
+          <tr>
+            <td><span class="rank top">02</span></td>
+            <td>Hugo Leonardo A C Dias</td>
+            <td><span class="td-badge blue">Sócio</span></td>
+            <td class="td-mono">2</td>
+            <td class="td-mono" style="text-align:right">R$ 24.997</td>
+          </tr>
+          <tr>
+            <td><span class="rank top">03</span></td>
+            <td>Frederico Olavo Colnago</td>
+            <td><span class="td-badge blue">Sócio</span></td>
+            <td class="td-mono">2</td>
+            <td class="td-mono" style="text-align:right">R$ 24.997</td>
+          </tr>
+          <tr>
+            <td><span class="rank top">04</span></td>
+            <td>Luis Fernando Maciel Hoffmann</td>
+            <td><span class="td-badge blue">Sócio</span></td>
+            <td class="td-mono">2</td>
+            <td class="td-mono" style="text-align:right">R$ 24.997</td>
+          </tr>
+          <tr>
+            <td><span class="rank top">05</span></td>
+            <td>Renato Ventura</td>
+            <td><span class="td-badge blue">Sócio</span></td>
+            <td class="td-mono">2</td>
+            <td class="td-mono" style="text-align:right">R$ 24.997</td>
+          </tr>
+          <tr>
+            <td><span class="rank top">06</span></td>
+            <td>Thiago de Alcântara Vitale Ferreira</td>
+            <td><span class="td-badge blue">Sócio</span></td>
+            <td class="td-mono">2</td>
+            <td class="td-mono" style="text-align:right">R$ 24.997</td>
+          </tr>
+          <tr>
+            <td><span class="rank top">07</span></td>
+            <td>MEIRYANI S PERUCHI</td>
+            <td><span class="td-badge blue">Sócio</span></td>
+            <td class="td-mono">2</td>
+            <td class="td-mono" style="text-align:right">R$ 24.997</td>
+          </tr>
+          <tr>
+            <td><span class="rank">08</span></td>
+            <td>Fernanda CR</td>
+            <td><span class="td-badge orange">SDA ao VIVO</span></td>
+            <td class="td-mono">1</td>
+            <td class="td-mono" style="text-align:right">R$ 19.997</td>
+          </tr>
+          <tr>
+            <td><span class="rank">09</span></td>
+            <td>Alana Caroline Neufert da Silveira</td>
+            <td><span class="td-badge orange">SDA ao VIVO</span></td>
+            <td class="td-mono">1</td>
+            <td class="td-mono" style="text-align:right">R$ 19.997</td>
+          </tr>
+          <tr>
+            <td><span class="rank">10</span></td>
+            <td>Anderson Martin</td>
+            <td><span class="td-badge orange">SDA ao VIVO</span></td>
+            <td class="td-mono">1</td>
+            <td class="td-mono" style="text-align:right">R$ 19.997</td>
+          </tr>
+          <tr>
+            <td><span class="rank">11</span></td>
+            <td>Arthur de Melo Duarte Azevedo</td>
+            <td><span class="td-badge orange">SDA ao VIVO</span></td>
+            <td class="td-mono">1</td>
+            <td class="td-mono" style="text-align:right">R$ 19.997</td>
+          </tr>
+          <tr>
+            <td><span class="rank">12</span></td>
+            <td>Bruno Henrique Varoni</td>
+            <td><span class="td-badge orange">SDA ao VIVO</span></td>
+            <td class="td-mono">1</td>
+            <td class="td-mono" style="text-align:right">R$ 19.997</td>
+          </tr>
+          <tr>
+            <td><span class="rank">13</span></td>
+            <td>Bruna Vaz de Almeida</td>
+            <td><span class="td-badge orange">SDA ao VIVO</span></td>
+            <td class="td-mono">1</td>
+            <td class="td-mono" style="text-align:right">R$ 19.997</td>
+          </tr>
+          <tr>
+            <td><span class="rank">14</span></td>
+            <td>Yago de Oliveira Downs</td>
+            <td><span class="td-badge orange">SDA ao VIVO</span></td>
+            <td class="td-mono">1</td>
+            <td class="td-mono" style="text-align:right">R$ 19.997</td>
+          </tr>
+          <tr>
+            <td><span class="rank">15</span></td>
+            <td>Ricardo Djehdian</td>
+            <td><span class="td-badge orange">SDA ao VIVO</span></td>
+            <td class="td-mono">1</td>
+            <td class="td-mono" style="text-align:right">R$ 19.997</td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="total-row">
+        <div class="total-row-label">TOTAL GERAL — 52 transações · 24 ABR 2026</div>
+        <div class="total-row-val">R$ 814.889</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// Defaults globais Chart.js
+Chart.defaults.color = '#5a5a7a';
+Chart.defaults.borderColor = 'rgba(255,255,255,0.06)';
+Chart.defaults.font.family = "'DM Mono', monospace";
+Chart.defaults.font.size = 10;
+
+// Utilitário
+function fmt(v){return'R$ '+v.toLocaleString('pt-BR')}
+
+// ─── TIMELINE ───
+const tlLabels = ['17:44','17:45','17:46','17:47','17:48','17:49','17:50','17:52','17:53','17:54','17:56','17:57','18:01','18:04','18:05','18:06','18:08','18:10','18:13','18:14','18:15','18:17','18:24','18:25','18:26','18:29','18:33','18:44'];
+const tlCum   = [39994,59991,119982,199970,239964,339949,379943,409940,474931,499928,534925,554922,574919,594916,599916,619913,644910,649910,654910,694904,714901,734898,759895,779892,784892,804889,809889,814889];
+const tlCount = [2,1,3,4,2,5,2,3,4,2,4,1,1,1,1,1,2,1,1,2,1,1,2,1,1,1,1,1];
+
+const tlCtx = document.getElementById('timelineChart').getContext('2d');
+const tlGrad = tlCtx.createLinearGradient(0,0,0,220);
+tlGrad.addColorStop(0,'rgba(255,107,0,0.25)');
+tlGrad.addColorStop(1,'rgba(255,107,0,0)');
+
+new Chart(tlCtx,{
+  type:'line',
+  data:{
+    labels:tlLabels,
+    datasets:[{
+      label:'Acumulado',
+      data:tlCum,
+      borderColor:'#ff6b00',
+      borderWidth:2,
+      pointBackgroundColor:'#ff6b00',
+      pointRadius:3,
+      pointHoverRadius:5,
+      fill:true,
+      backgroundColor:tlGrad,
+      tension:.35
+    }]
+  },
+  options:{
+    responsive:true,maintainAspectRatio:false,
+    interaction:{mode:'index',intersect:false},
+    plugins:{
+      legend:{display:false},
+      tooltip:{
+        backgroundColor:'rgba(13,13,26,0.95)',
+        borderColor:'rgba(255,107,0,0.3)',
+        borderWidth:1,
+        titleColor:'#fff',
+        bodyColor:'#9a9abf',
+        padding:10,
+        callbacks:{
+          label(ctx){return ' Acumulado: '+fmt(ctx.raw)},
+          afterLabel(ctx){
+            const i=ctx.dataIndex;
+            return ' +'+tlCount[i]+' venda'+(tlCount[i]>1?'s':'');
+          }
+        }
+      }
+    },
+    scales:{
+      x:{grid:{color:'rgba(255,255,255,0.04)'},ticks:{maxRotation:45}},
+      y:{
+        grid:{color:'rgba(255,255,255,0.04)'},
+        ticks:{callback:v=>'R$ '+(v/1000).toFixed(0)+'k'}
+      }
+    }
+  }
+});
+
+// ─── PRODUTOS DONUT ───
+new Chart(document.getElementById('produtosChart'),{
+  type:'doughnut',
+  data:{
+    labels:['Teatro + SDA ao VIVO','Sócio — Sócios','Teatro Bradesco'],
+    datasets:[{
+      data:[739889,70000,5000],
+      backgroundColor:['#ff6b00','#4da6ff','#ffd93d'],
+      borderColor:'#12121f',
+      borderWidth:3,
+      hoverOffset:6
+    }]
+  },
+  options:{
+    responsive:true,maintainAspectRatio:false,
+    cutout:'68%',
+    plugins:{
+      legend:{display:false},
+      tooltip:{
+        backgroundColor:'rgba(13,13,26,0.95)',
+        borderColor:'rgba(255,255,255,0.1)',
+        borderWidth:1,
+        titleColor:'#fff',
+        bodyColor:'#9a9abf',
+        padding:10,
+        callbacks:{label:ctx=>fmt(ctx.raw)+' ('+((ctx.raw/814889)*100).toFixed(1)+'%)'}
+      }
+    }
+  }
+});
+
+// ─── FORMA DE PAGAMENTO ───
+new Chart(document.getElementById('formaChart'),{
+  type:'bar',
+  data:{
+    labels:['Mastercard','Visa','Pix','Amex','Elo','Múltiplos'],
+    datasets:[{
+      data:[424940,174976,94988,74991,24997,19997],
+      backgroundColor:['rgba(255,107,0,0.8)','rgba(255,107,0,0.6)','rgba(0,232,122,0.7)','rgba(77,166,255,0.7)','rgba(176,107,255,0.7)','rgba(255,217,61,0.7)'],
+      borderRadius:5,
+      borderSkipped:false
+    }]
+  },
+  options:{
+    responsive:true,maintainAspectRatio:false,
+    indexAxis:'y',
+    plugins:{
+      legend:{display:false},
+      tooltip:{
+        backgroundColor:'rgba(13,13,26,0.95)',
+        borderColor:'rgba(255,255,255,0.1)',
+        borderWidth:1,
+        titleColor:'#fff',
+        bodyColor:'#9a9abf',
+        padding:10,
+        callbacks:{label:ctx=>fmt(ctx.raw)}
+      }
+    },
+    scales:{
+      x:{
+        grid:{color:'rgba(255,255,255,0.04)'},
+        ticks:{callback:v=>'R$ '+(v/1000).toFixed(0)+'k'}
+      },
+      y:{grid:{display:false}}
+    }
+  }
+});
+
+// ─── PARCELAS BAR ───
+new Chart(document.getElementById('parcelasChart'),{
+  type:'bar',
+  data:{
+    labels:['12x','1x (à vista)','10x'],
+    datasets:[{
+      label:'Vendas',
+      data:[35,15,2],
+      backgroundColor:['rgba(255,107,0,0.8)','rgba(77,166,255,0.8)','rgba(176,107,255,0.8)'],
+      borderRadius:5,
+      borderSkipped:false
+    }]
+  },
+  options:{
+    responsive:true,maintainAspectRatio:false,
+    plugins:{
+      legend:{display:false},
+      tooltip:{
+        backgroundColor:'rgba(13,13,26,0.95)',
+        borderColor:'rgba(255,255,255,0.1)',
+        borderWidth:1,
+        titleColor:'#fff',
+        bodyColor:'#9a9abf',
+        padding:8,
+        callbacks:{label:ctx=>ctx.raw+' vendas'}
+      }
+    },
+    scales:{
+      x:{grid:{display:false}},
+      y:{
+        grid:{color:'rgba(255,255,255,0.04)'},
+        ticks:{stepSize:5}
+      }
+    }
+  }
+});
+
+// ─── REVEAL ───
+const obs = new IntersectionObserver(function(entries){
+  entries.forEach(function(e){if(e.isIntersecting)e.target.classList.add('visible')});
+},{threshold:.1});
+document.querySelectorAll('.reveal').forEach(function(el){obs.observe(el)});
+</script>
+</body>
+</html>
