@@ -1,0 +1,47 @@
+services:
+  intra-api:
+    image: node:18-alpine
+    restart: always
+    working_dir: /app
+    command: sh -c "apk add --no-cache docker-cli && npm install express yaml nodemailer multer argon2 @anthropic-ai/sdk && node server.js"
+    environment:
+      - SMTP_HOST=smtp.gmail.com
+      - SMTP_PORT=465
+      - SMTP_USER=${SMTP_USER}
+      - SMTP_PASS=${SMTP_PASS}
+      - ADMIN_EMAIL=${ADMIN_EMAIL}
+      - PAGESPEED_KEY=${PAGESPEED_KEY}
+      - ANTHROPIC_KEY=${ANTHROPIC_KEY}
+    volumes:
+      - /docker/intra-api/server.js:/app/server.js
+      - /docker/intra-api/profiles.json:/app/profiles.json
+      - /docker/intra-api/notices.json:/app/notices.json
+      - /docker/static-site/html:/sites
+      - /docker/authelia/config:/authelia
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /docker/intra-api/tracking.json:/app/tracking.json
+      - /docker/intra-api/pagespeed_cache.json:/app/pagespeed_cache.json
+      - /docker/intra-api/logs.json:/app/logs.json
+      - /docker/intra-api/heatmap.json:/app/heatmap.json
+      - /docker/intra-api/beneficios.json:/app/beneficios.json
+    labels:
+      - traefik.enable=true
+      - "traefik.http.routers.intra-api.rule=Host(`intra.segredosdaaudiencia.com.br`) && PathPrefix(`/api`)"
+      - traefik.http.routers.intra-api.priority=100
+      - traefik.http.routers.intra-api.tls=true
+      - traefik.http.routers.intra-api.entrypoints=web,websecure
+      - traefik.http.routers.intra-api.tls.certresolver=myhttpchallenge
+      - traefik.http.routers.intra-api.middlewares=authelia-static@docker
+      - traefik.http.services.intra-api.loadbalancer.server.port=3000
+      - "traefik.http.routers.intra-api-public.rule=Host(`intra.segredosdaaudiencia.com.br`) && PathPrefix(`/api/track`)"
+      - traefik.http.routers.intra-api-public.priority=200
+      - traefik.http.routers.intra-api-public.tls=true
+      - traefik.http.routers.intra-api-public.entrypoints=web,websecure
+      - traefik.http.routers.intra-api-public.tls.certresolver=myhttpchallenge
+      - traefik.http.routers.intra-api-public.service=intra-api
+    networks:
+      - n8n_default
+
+networks:
+  n8n_default:
+    external: true
