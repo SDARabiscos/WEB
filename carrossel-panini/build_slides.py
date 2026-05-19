@@ -390,7 +390,7 @@ SLIDES = [
         "highlight_last": False,
         "fs_title": 80,
         "fs_body": 46,
-        "photo_centering": (0.5, 0.38),
+        "photo_centering": (0.5, 0.05),
         "text_y_offset": 36,
     },
     {
