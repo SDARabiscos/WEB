@@ -30,14 +30,16 @@ BLUE_VERIFY = (29, 155, 240)
 FONT_DIR    = Path("/usr/local/share/fonts/carousel")
 ROBOTO_DIR  = Path("/usr/share/fonts/truetype/roboto/unhinted/RobotoTTF")
 
-ANTON       = str(FONT_DIR / "Anton-Regular.ttf")
-ROBOTO_REG  = str(ROBOTO_DIR / "Roboto-Regular.ttf")
-ROBOTO_BOLD = str(ROBOTO_DIR / "Roboto-Bold.ttf")
-ROBOTO_BLK  = str(ROBOTO_DIR / "Roboto-Black.ttf")
+ANTON        = str(FONT_DIR / "Anton-Regular.ttf")
+ROBOTO_REG   = str(ROBOTO_DIR / "Roboto-Regular.ttf")
+ROBOTO_BOLD  = str(ROBOTO_DIR / "Roboto-Bold.ttf")
+ROBOTO_BLK   = str(ROBOTO_DIR / "Roboto-Black.ttf")
+NOTO_EMOJI   = "/usr/share/fonts/truetype/noto/NotoColorEmoji.ttf"
 
-AVATAR_PATH = Path(__file__).parent / "avatar.png"
-OUT_DIR     = Path(__file__).parent / "slides"
-PHOTOS_DIR  = Path(__file__).parent / "photos"
+AVATAR_PATH  = Path(__file__).parent / "avatar.png"
+BADGE_PATH   = Path(__file__).parent / "verified_badge.png"
+OUT_DIR      = Path(__file__).parent / "slides"
+PHOTOS_DIR   = Path(__file__).parent / "photos"
 
 
 def font(path, size):
@@ -147,7 +149,87 @@ def draw_headline(draw, number, title, y, fs=86):
 
 
 # ─── BODY RENDERER ────────────────────────────────────────────────────────────
-def draw_body(draw, text, y, fs=44, highlight_last=True, centered=True):
+EMOJI_RANGES = [
+    (0x1F000, 0x1FFFF),  # Most emoji
+    (0x2190,  0x27BF),   # Arrows + misc symbols + dingbats (↗ 0x2197, ❤ 0x2764)
+    (0x2300,  0x23FF),   # Misc technical
+    (0xFE00,  0xFE0F),   # Variation selectors
+    (0x200D,  0x200D),   # ZWJ
+]
+
+
+def _is_emoji_cp(cp):
+    for lo, hi in EMOJI_RANGES:
+        if lo <= cp <= hi:
+            return True
+    return False
+
+
+def has_emoji(text):
+    return any(_is_emoji_cp(ord(ch)) for ch in text)
+
+
+def split_emoji(text):
+    """Split text into (segment, is_emoji) pairs."""
+    segments = []
+    buf, buf_emoji = "", False
+    for ch in text:
+        is_e = _is_emoji_cp(ord(ch))
+        if is_e == buf_emoji:
+            buf += ch
+        else:
+            if buf:
+                segments.append((buf, buf_emoji))
+            buf, buf_emoji = ch, is_e
+    if buf:
+        segments.append((buf, buf_emoji))
+    return segments
+
+
+def draw_mixed_line(draw, img, line, f_text, f_emoji, color, x, y, centered, emoji_size=44):
+    """Draw a line with mixed text/emoji, handling emoji font separately."""
+    segs = split_emoji(line)
+    # measure total width
+    total_w = 0
+    widths = []
+    for seg, is_e in segs:
+        if is_e:
+            w = emoji_size
+        else:
+            bb = draw.textbbox((0, 0), seg, font=f_text)
+            w = bb[2] - bb[0]
+        widths.append(w)
+        total_w += w
+
+    cx = (W - total_w) // 2 if centered else x
+    for (seg, is_e), w in zip(segs, widths):
+        if is_e:
+            try:
+                # NotoColorEmoji only works at bitmap size 109; scale after render
+                f_em = ImageFont.truetype(NOTO_EMOJI, 109)
+                # render emoji onto temp RGBA image then scale to desired size
+                tmp = Image.new("RGBA", (109 * len(seg) + 20, 140), (255, 255, 255, 0))
+                td = ImageDraw.Draw(tmp)
+                td.text((0, 0), seg, font=f_em, embedded_color=True)
+                # crop to content
+                bbox = tmp.getbbox()
+                if bbox:
+                    tmp = tmp.crop(bbox)
+                    scale = emoji_size / tmp.height if tmp.height else 1
+                    nw = max(1, int(tmp.width * scale))
+                    nh = max(1, emoji_size)
+                    tmp = tmp.resize((nw, nh), Image.LANCZOS)
+                    # paste onto main image
+                    img.paste(tmp, (cx, y + 4), tmp)
+                    w = nw
+            except Exception:
+                draw.text((cx, y), seg, font=f_text, fill=color)
+        else:
+            draw.text((cx, y), seg, font=f_text, fill=color)
+        cx += w
+
+
+def draw_body(draw, text, y, fs=44, highlight_last=True, centered=True, img=None):
     """
     Body text centered. Last sentence in green bold if highlight_last.
     """
@@ -173,7 +255,9 @@ def draw_body(draw, text, y, fs=44, highlight_last=True, centered=True):
         for line in lines:
             if cy + lh > TEXT_MAX_Y:
                 break
-            if centered:
+            if has_emoji(line):
+                draw_mixed_line(draw, img, line, f, None, color, PAD_X, cy, centered, emoji_size=fs)
+            elif centered:
                 lw = text_width(draw, line, f)
                 draw.text(((W - lw) // 2, cy), line, font=f, fill=color)
             else:
@@ -239,12 +323,20 @@ def draw_signature(img):
     draw.text((tx, ty_n), name,   font=f_name,   fill=BLACK)
     draw.text((tx, ty_h), handle, font=f_handle, fill=DARK_GRAY)
 
-    # verified badge
-    vx = tx + hdl_w + 8
-    vy = ty_h + 4
-    draw.ellipse((vx, vy, vx + v_sz, vy + v_sz), fill=BLUE_VERIFY)
-    f_check = font(ROBOTO_BOLD, 17)
-    draw.text((vx + 5, vy + 4), "✓", font=f_check, fill=(255, 255, 255))
+    # verified badge — real Meta/Instagram badge image
+    vx = tx + hdl_w + 6
+    vy = ty_h + 2
+    if BADGE_PATH.exists():
+        try:
+            badge = Image.open(BADGE_PATH).convert("RGBA")
+            badge = badge.resize((v_sz + 4, v_sz + 4), Image.LANCZOS)
+            # make checkerboard (transparent) background white
+            bg = Image.new("RGBA", badge.size, (255, 255, 255, 255))
+            badge = Image.alpha_composite(bg, badge).convert("RGB")
+            # paste with white bg blend
+            img.paste(badge, (vx, vy))
+        except Exception:
+            draw.ellipse((vx, vy, vx + v_sz, vy + v_sz), fill=BLUE_VERIFY)
 
 
 # ─── SLIDE BUILDER ────────────────────────────────────────────────────────────
@@ -276,9 +368,8 @@ def build_slide(photo_path, number, title, body, output_path,
 
     # ── Body ──
     if body:
-        centered = (number == "")  # center body for insight slides; left for numbered
         y = draw_body(draw, body, y, fs=fs_body,
-                      highlight_last=highlight_last, centered=True)
+                      highlight_last=highlight_last, centered=True, img=img)
 
     # ── Signature ──
     draw_signature(img)
@@ -305,10 +396,10 @@ SLIDES = [
         "photo": "photo-02-bancas.png",
         "number": "1.",
         "title": "TICKET MÉDIO SUBIU 221% EM 7 DIAS",
-        "body": "Em 2022, o gasto médio era R$24. Em 2026, passou para R$55 — sem promoção e sem desconto. As pessoas simplesmente quiseram mais.",
+        "body": "Em 2022, o gasto médio por cliente era R$24. Em 2026, passou para R$55 — sem nenhuma promoção, sem desconto, sem influencer pago. As pessoas simplesmente quiseram mais.",
         "highlight_last": True,
-        "fs_title": 88,
-        "fs_body": 43,
+        "fs_title": 86,
+        "fs_body": 42,
     },
     {
         "id": "03-r16mil",
@@ -318,87 +409,87 @@ SLIDES = [
         "body": "Em São Paulo, bancas comuns registraram entre R$10 mil e R$16 mil em vendas num único dia. Vendendo pacotinhos de R$3,50. Isso é mais que muita loja de roupa fatura no mês.",
         "highlight_last": True,
         "fs_title": 82,
-        "fs_body": 43,
+        "fs_body": 42,
     },
     {
         "id": "04-produto",
         "photo": "photo-04-album.png",
         "number": "",
-        "title": "O QUE VOCÊ ACHA QUE ESTÁ COMPRANDO NÃO É O QUE ESTÁ COMPRANDO",
+        "title": "O QUE VOCÊ ACHA QUE ESTÁ COMPRANDO NÃO É O QUE VOCÊ ESTÁ COMPRANDO",
         "body": "Ninguém compra figurinha. Compram a antecipação de abrir o pacote. A dopamina da surpresa. O ritual que faz um adulto de 35 anos se sentir criança de novo. A figurinha é só a desculpa.",
         "highlight_last": True,
-        "fs_title": 72,
-        "fs_body": 43,
+        "fs_title": 70,
+        "fs_body": 42,
     },
     {
         "id": "05-conexao",
         "photo": "photo-05-amigos.png",
         "number": "3.",
-        "title": "CRIOU COMUNIDADE FÍSICA. SEM APP. SEM WHATSAPP.",
-        "body": "Filas em bancas. Trocas entre desconhecidos no elevador. Crianças parando adultos na rua. 40 milhões de álbuns distribuídos no Brasil. Nenhum aplicativo fez isso esse ano.",
+        "title": "CRIOU COMUNIDADE FÍSICA EM 2026. SEM APP. SEM GRUPO NO WHATSAPP.",
+        "body": "Filas em bancas. Trocas entre desconhecidos no elevador. Crianças parando adultos na rua. 40 milhões de álbuns distribuídos no Brasil. Nenhum aplicativo de rede social fez isso esse ano.",
         "highlight_last": True,
-        "fs_title": 80,
-        "fs_body": 43,
+        "fs_title": 74,
+        "fs_body": 41,
     },
     {
         "id": "06-falta",
         "photo": "photo-06-estadio.png",
         "number": "4.",
-        "title": "ELA LUCRA COM O QUE VOCÊ AINDA NÃO TEM",
-        "body": "São 670 figurinhas. A chance de completar comprando só pacotes é próxima de zero. Cada espaço vazio é uma missão incompleta. E missão incompleta vende o próximo pacote.",
+        "title": "O MODELO DE NEGÓCIO DEPENDE DE VOCÊ NÃO COMPLETAR",
+        "body": "São 670 figurinhas no total. A chance de completar comprando só pacotes é estatisticamente próxima de zero. Cada espaço vazio é uma missão incompleta. E missão incompleta vende o próximo pacote.",
         "highlight_last": True,
-        "fs_title": 84,
-        "fs_body": 43,
+        "fs_title": 76,
+        "fs_body": 41,
     },
     {
         "id": "07-preco",
         "photo": "photo-07-pacotes.png",
         "number": "5.",
         "title": "SUBIRAM 75% O PREÇO. A DEMANDA TRIPLICOU.",
-        "body": "De R$2,00 em 2022 para R$3,50 em 2026. Resultado? Filas maiores. Mais cobertura espontânea. Mais desejo. Preço alto não afastou ninguém. Sinalizou que valia ainda mais.",
+        "body": "De R$2,00 em 2022 para R$3,50 em 2026. Aumento de 75%. Resultado? Filas maiores. Mais cobertura espontânea na mídia. Mais desejo. Preço alto não afastou ninguém. Sinalizou que valia ainda mais.",
         "highlight_last": True,
         "fs_title": 82,
-        "fs_body": 42,
+        "fs_body": 41,
     },
     {
         "id": "08-viral",
         "photo": "photo-08-celular.png",
         "number": "6.",
-        "title": "VIRAL NÃO NASCE DE INFORMAÇÃO. NASCE DE IDENTIDADE.",
-        "body": "Ninguém compartilhou o álbum porque é útil. Compartilharam porque diz quem a pessoa é. Esse é o gatilho por trás de todo post que você já viu explodir sem motivo aparente.",
+        "title": "CONTEÚDO VIRAL NÃO NASCE DE INFORMAÇÃO. NASCE DE IDENTIDADE.",
+        "body": "Ninguém compartilhou o álbum porque é útil. Compartilharam porque diz quem a pessoa é: alguém que completa o que começa. Alguém que valoriza o ritual. Esse é o gatilho por trás de todo post que você já viu explodir sem motivo aparente.",
         "highlight_last": True,
-        "fs_title": 78,
-        "fs_body": 43,
+        "fs_title": 72,
+        "fs_body": 37,
     },
     {
         "id": "09-publico",
         "photo": "photo-09-instagram.png",
         "number": "7.",
         "title": "SEU SEGUIDOR NÃO TE SEGUE PELO QUE VOCÊ SABE",
-        "body": "A Panini tem concorrentes mais baratos. Ninguém liga. O que ela vende não é figurinha — é familiaridade, ritual, pertencimento. Audiência real não se constrói com informação. Constrói-se com identificação.",
+        "body": "A Panini tem concorrentes com produto mais barato. Ninguém liga. Porque o que ela vende não é figurinha — é familiaridade, é ritual, é pertencimento. Audiência real não é construída com informação. É construída com identificação.",
         "highlight_last": True,
         "fs_title": 78,
-        "fs_body": 41,
+        "fs_body": 40,
     },
     {
         "id": "10-atencao",
         "photo": "photo-10-estadio2.png",
         "number": "",
         "title": "UM PACOTINHO DE R$3,50 DEU UMA AULA SOBRE ATENÇÃO HUMANA",
-        "body": "R$700 milhões. 40 milhões de álbuns. Viral orgânico em todo o país. Filas de 2 horas. Sem Meta Ads. Sem influencer. Com papel e cola. O segredo? Venderam dopamina disfarçada de figurinha.",
+        "body": "R$700 milhões em faturamento. 40 milhões de álbuns. Viral orgânico em todo país. Filas de 2 horas. Sem Meta Ads. Sem influencer. Com papel e cola. O segredo? Venderam dopamina disfarçada de figurinha.",
         "highlight_last": True,
         "fs_title": 74,
-        "fs_body": 43,
+        "fs_body": 42,
     },
     {
         "id": "11-cta",
         "photo": "photo-11-cta.png",
         "number": "",
         "title": 'COMENTA "COPA" AQUI EMBAIXO',
-        "body": "Eu te mando no direct os 7 gatilhos psicológicos que fazem conteúdos virarem obsessão coletiva — os mesmos que a Panini usou.",
+        "body": "Eu te mando no direct os 7 gatilhos psicológicos que fazem qualquer conteúdo virar obsessão coletiva — os mesmos que a Panini usou sem você perceber. 🔖❤️💬↗️",
         "highlight_last": False,
-        "fs_title": 90,
-        "fs_body": 44,
+        "fs_title": 88,
+        "fs_body": 43,
     },
 ]
 
