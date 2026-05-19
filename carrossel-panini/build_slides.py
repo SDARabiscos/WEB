@@ -341,7 +341,7 @@ def draw_signature(img):
 
 # ─── SLIDE BUILDER ────────────────────────────────────────────────────────────
 def build_slide(photo_path, number, title, body, output_path,
-                highlight_last=True, fs_title=86, fs_body=44, text_y_offset=0):
+                highlight_last=True, fs_title=86, fs_body=44, text_y_offset=0, photo_centering=(0.5, 0.3)):
 
     img  = Image.new("RGB", (W, H), WHITE_BG)
     draw = ImageDraw.Draw(img)
@@ -350,7 +350,7 @@ def build_slide(photo_path, number, title, body, output_path,
     p = Path(photo_path)
     if p.exists():
         photo = Image.open(p).convert("RGB")
-        photo = ImageOps.fit(photo, (W, PHOTO_H), method=Image.LANCZOS, centering=(0.5, 0.3))
+        photo = ImageOps.fit(photo, (W, PHOTO_H), method=Image.LANCZOS, centering=photo_centering)
         img.paste(photo, (0, 0))
     else:
         draw.rectangle((0, 0, W, PHOTO_H), fill=(200, 200, 200))
@@ -390,6 +390,7 @@ SLIDES = [
         "highlight_last": False,
         "fs_title": 80,
         "fs_body": 46,
+        "photo_centering": (0.5, 0.48),
     },
     {
         "id": "02-221pct",
@@ -535,5 +536,6 @@ if __name__ == "__main__":
             fs_title=s["fs_title"],
             fs_body=s["fs_body"],
             text_y_offset=s.get("text_y_offset", 0),
+            photo_centering=s.get("photo_centering", (0.5, 0.3)),
         )
     print("\nDone.")
