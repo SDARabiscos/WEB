@@ -341,7 +341,7 @@ def draw_signature(img):
 
 # ─── SLIDE BUILDER ────────────────────────────────────────────────────────────
 def build_slide(photo_path, number, title, body, output_path,
-                highlight_last=True, fs_title=86, fs_body=44):
+                highlight_last=True, fs_title=86, fs_body=44, text_y_offset=0):
 
     img  = Image.new("RGB", (W, H), WHITE_BG)
     draw = ImageDraw.Draw(img)
@@ -361,7 +361,7 @@ def build_slide(photo_path, number, title, body, output_path,
     draw.rectangle((0, DIVIDER_Y, W, DIVIDER_Y + DIVIDER_H), fill=GREEN)
 
     # ── Headline ──
-    y = TEXT_START_Y
+    y = TEXT_START_Y + text_y_offset
     if title:
         y = draw_headline(draw, number, title, y, fs=fs_title)
         y += 14
@@ -420,6 +420,7 @@ SLIDES = [
         "highlight_last": True,
         "fs_title": 66,
         "fs_body": 39,
+        "text_y_offset": 30,
     },
     {
         "id": "05-conexao",
@@ -480,6 +481,7 @@ SLIDES = [
         "highlight_last": True,
         "fs_title": 70,
         "fs_body": 39,
+        "text_y_offset": 30,
     },
     {
         "id": "11-cta",
@@ -532,5 +534,6 @@ if __name__ == "__main__":
             highlight_last=s["highlight_last"],
             fs_title=s["fs_title"],
             fs_body=s["fs_body"],
+            text_y_offset=s.get("text_y_offset", 0),
         )
     print("\nDone.")
