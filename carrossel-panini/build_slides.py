@@ -10,10 +10,10 @@ from PIL import Image, ImageDraw, ImageFont, ImageOps
 
 # ─── CANVAS ───────────────────────────────────────────────────────────────────
 W, H = 1080, 1350          # Instagram 4:5
-PHOTO_H = 640              # top photo area height
+PHOTO_H = 570              # top photo area height
 DIVIDER_Y = PHOTO_H
 DIVIDER_H = 8
-TEXT_START_Y = PHOTO_H + DIVIDER_H + 38
+TEXT_START_Y = PHOTO_H + DIVIDER_H + 36
 PAD_X = 58                 # horizontal padding
 TEXT_W = W - PAD_X * 2
 SIG_Y    = H - 148         # signature baseline
@@ -418,8 +418,8 @@ SLIDES = [
         "title": "O QUE VOCÊ ACHA QUE ESTÁ COMPRANDO NÃO É O QUE VOCÊ ESTÁ COMPRANDO",
         "body": "Ninguém compra figurinha. Compram a antecipação de abrir o pacote. A dopamina da surpresa. O ritual que faz um adulto de 35 anos se sentir criança de novo. A figurinha é só a desculpa.",
         "highlight_last": True,
-        "fs_title": 70,
-        "fs_body": 42,
+        "fs_title": 66,
+        "fs_body": 39,
     },
     {
         "id": "05-conexao",
@@ -458,8 +458,8 @@ SLIDES = [
         "title": "CONTEÚDO VIRAL NÃO NASCE DE INFORMAÇÃO. NASCE DE IDENTIDADE.",
         "body": "Ninguém compartilhou o álbum porque é útil. Compartilharam porque diz quem a pessoa é: alguém que completa o que começa. Alguém que valoriza o ritual. Esse é o gatilho por trás de todo post que você já viu explodir sem motivo aparente.",
         "highlight_last": True,
-        "fs_title": 72,
-        "fs_body": 37,
+        "fs_title": 70,
+        "fs_body": 36,
     },
     {
         "id": "09-publico",
@@ -468,8 +468,8 @@ SLIDES = [
         "title": "SEU SEGUIDOR NÃO TE SEGUE PELO QUE VOCÊ SABE",
         "body": "A Panini tem concorrentes com produto mais barato. Ninguém liga. Porque o que ela vende não é figurinha — é familiaridade, é ritual, é pertencimento. Audiência real não é construída com informação. É construída com identificação.",
         "highlight_last": True,
-        "fs_title": 78,
-        "fs_body": 40,
+        "fs_title": 76,
+        "fs_body": 39,
     },
     {
         "id": "10-atencao",
@@ -478,8 +478,8 @@ SLIDES = [
         "title": "UM PACOTINHO DE R$3,50 DEU UMA AULA SOBRE ATENÇÃO HUMANA",
         "body": "R$700 milhões em faturamento. 40 milhões de álbuns. Viral orgânico em todo país. Filas de 2 horas. Sem Meta Ads. Sem influencer. Com papel e cola. O segredo? Venderam dopamina disfarçada de figurinha.",
         "highlight_last": True,
-        "fs_title": 74,
-        "fs_body": 42,
+        "fs_title": 70,
+        "fs_body": 39,
     },
     {
         "id": "11-cta",
