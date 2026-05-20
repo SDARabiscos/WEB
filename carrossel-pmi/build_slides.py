@@ -1,404 +1,476 @@
 #!/usr/bin/env python3
-"""PMI Carousel Builder — dark navy + grid + violet accent."""
+"""PMI Carousel — redesign com composição premium e backgrounds com profundidade."""
 
 from PIL import Image, ImageDraw, ImageFont, ImageFilter
-import os, math
+import math, os
 
 # ── Canvas ────────────────────────────────────────────────────────────────────
 W, H = 1080, 1350
+MARGIN = 72
 
-# ── Brand colors ──────────────────────────────────────────────────────────────
-BG          = (8,  10, 22)      # deep navy
-GRID_LINE   = (20, 24, 50)      # subtle grid
-ACCENT      = (134, 0, 255)     # violet #8600FF
-ACCENT_GLOW = (80,  0, 160)     # darker violet for glow layers
-WHITE       = (255, 255, 255)
-GRAY        = (160, 160, 185)
-LIGHT_GRAY  = (210, 210, 225)
+# ── Paleta ───────────────────────────────────────────────────────────────────
+BG        = (5,  10, 22)
+NAVY      = (8,  15, 32)
+VIOLET    = (134, 0, 255)
+VIOLET_DK = (60,  0, 120)
+VIOLET_LT = (180, 80, 255)
+CYAN      = (0, 190, 255)
+WHITE     = (255, 255, 255)
+OFF_WHITE = (230, 230, 245)
+GRAY      = (140, 145, 170)
+GRAY_LT   = (185, 190, 210)
+GREEN     = (0,  200, 100)
+RED_ACC   = (220, 40,  70)
 
-# ── Fonts ─────────────────────────────────────────────────────────────────────
-FONT_DIR_ROBOTO = "/usr/share/fonts/truetype/roboto/unhinted/RobotoTTF"
-FONT_DIR_COND   = "/usr/share/fonts/truetype/roboto/unhinted"
+# ── Fontes ───────────────────────────────────────────────────────────────────
+R = "/usr/share/fonts/truetype/roboto/unhinted/RobotoTTF"
+C = "/usr/share/fonts/truetype/roboto/unhinted"
 
-def font(name, size):
-    paths = {
-        "black":   f"{FONT_DIR_ROBOTO}/Roboto-Black.ttf",
-        "bold":    f"{FONT_DIR_ROBOTO}/Roboto-Bold.ttf",
-        "medium":  f"{FONT_DIR_ROBOTO}/Roboto-Medium.ttf",
-        "regular": f"{FONT_DIR_ROBOTO}/Roboto-Regular.ttf",
-        "light":   f"{FONT_DIR_ROBOTO}/Roboto-Light.ttf",
-        "cond_bold": f"{FONT_DIR_COND}/RobotoCondensed-Bold.ttf",
+def F(style, size):
+    m = {
+        "black":   f"{R}/Roboto-Black.ttf",
+        "bold":    f"{R}/Roboto-Bold.ttf",
+        "medium":  f"{R}/Roboto-Medium.ttf",
+        "regular": f"{R}/Roboto-Regular.ttf",
+        "light":   f"{R}/Roboto-Light.ttf",
+        "cbold":   f"{C}/RobotoCondensed-Bold.ttf",
     }
-    return ImageFont.truetype(paths[name], size)
+    return ImageFont.truetype(m[style], size)
 
 
-# ── Background helpers ─────────────────────────────────────────────────────────
-def make_background():
-    img = Image.new("RGB", (W, H), BG)
-    d = ImageDraw.Draw(img)
-
-    # dot-grid pattern
-    spacing = 54
-    for x in range(0, W + spacing, spacing):
-        for y in range(0, H + spacing, spacing):
-            d.ellipse([x-1, y-1, x+1, y+1], fill=GRID_LINE)
-
-    # subtle violet radial glow — top-left corner
-    glow = Image.new("RGB", (W, H), (0, 0, 0))
-    dg = ImageDraw.Draw(glow)
-    for r in range(600, 0, -30):
-        alpha = int(18 * (1 - r / 600))
-        c = tuple(min(255, v + alpha) for v in BG)
-        dg.ellipse([-r + 80, -r + 80, r + 80, r + 80], fill=c)
-    # tint with accent
-    glow_tint = Image.new("RGB", (W, H), (0, 0, 0))
-    dtint = ImageDraw.Draw(glow_tint)
-    for r in range(500, 0, -25):
-        alpha = int(25 * (1 - r / 500))
-        c = (min(255, ACCENT[0] * alpha // 255 + BG[0]),
-             min(255, ACCENT[1] * alpha // 255 + BG[1]),
-             min(255, ACCENT[2] * alpha // 255 + BG[2]))
-        dtint.ellipse([-r + 60, -r + 60, r + 60, r + 60], fill=c)
-    img = Image.blend(img, glow_tint, 0.18)
-
-    # bottom-right glow
-    glow2 = Image.new("RGB", (W, H), BG)
-    dg2 = ImageDraw.Draw(glow2)
-    for r in range(700, 0, -35):
-        alpha = int(20 * (1 - r / 700))
-        c = (min(255, ACCENT[0] * alpha // 255 + BG[0]),
-             min(255, ACCENT[1] * alpha // 255 + BG[1]),
-             min(255, ACCENT[2] * alpha // 255 + BG[2]))
-        dg2.ellipse([W - r - 100, H - r - 100, W + r - 100, H + r - 100], fill=c)
-    img = Image.blend(img, glow2, 0.12)
-
-    # redraw dots on top of glow
-    d2 = ImageDraw.Draw(img)
-    for x in range(0, W + spacing, spacing):
-        for y in range(0, H + spacing, spacing):
-            d2.ellipse([x-1, y-1, x+1, y+1], fill=GRID_LINE)
-
-    return img
-
-
-def add_logo(img, logo_path, margin=48, height=60):
-    """Place logo bottom-center."""
-    logo = Image.open(logo_path).convert("RGBA")
-    ratio = height / logo.height
-    new_w = int(logo.width * ratio)
-    logo = logo.resize((new_w, height), Image.LANCZOS)
-    x = (W - new_w) // 2
-    y = H - margin - height
-    # paste with alpha
-    img.paste(logo, (x, y), logo)
-    return img
-
-
-def add_counter(d, current, total, size=28):
-    """Slide counter top-right."""
-    f = font("regular", size)
-    txt = f"{current:02d} / {total:02d}"
-    bbox = d.textbbox((0, 0), txt, font=f)
-    tw = bbox[2] - bbox[0]
-    x = W - 64 - tw
-    y = 60
-    d.text((x, y), txt, font=f, fill=GRAY)
-
-
-def add_accent_line(d, y, x_start=64, x_end=W - 64, thickness=2):
-    """Thin violet horizontal rule."""
-    d.rectangle([x_start, y, x_end, y + thickness], fill=ACCENT)
-
-
-def wrap_text(text, fnt, max_width, draw):
-    """Word-wrap text to fit max_width."""
+# ── Utilidades de desenho ─────────────────────────────────────────────────────
+def wrap(text, fnt, max_w, d):
     words = text.split()
-    lines = []
-    current = ""
-    for word in words:
-        test = (current + " " + word).strip()
-        bbox = draw.textbbox((0, 0), test, font=fnt)
-        if bbox[2] - bbox[0] <= max_width:
-            current = test
+    lines, cur = [], ""
+    for w in words:
+        test = (cur + " " + w).strip()
+        if d.textbbox((0,0), test, font=fnt)[2] <= max_w:
+            cur = test
         else:
-            if current:
-                lines.append(current)
-            current = word
-    if current:
-        lines.append(current)
+            if cur: lines.append(cur)
+            cur = w
+    if cur: lines.append(cur)
     return lines
 
 
-def draw_tag(d, text, x, y, fnt, bg_color=ACCENT, text_color=WHITE, pad_x=18, pad_y=8):
-    """Draw a filled pill/rectangle tag."""
-    bbox = d.textbbox((0, 0), text, font=fnt)
-    tw, th = bbox[2] - bbox[0], bbox[3] - bbox[1]
-    rx1, ry1 = x, y
-    rx2, ry2 = x + tw + pad_x * 2, y + th + pad_y * 2
-    d.rounded_rectangle([rx1, ry1, rx2, ry2], radius=6, fill=bg_color)
-    d.text((rx1 + pad_x, ry1 + pad_y), text, font=fnt, fill=text_color)
-    return rx2, ry2  # bottom-right corner
+def tag(d, txt, x, y, fnt, fill=VIOLET, fg=WHITE, rx=14, ry=10):
+    bb = d.textbbox((0,0), txt, font=fnt)
+    tw, th = bb[2]-bb[0], bb[3]-bb[1]
+    d.rounded_rectangle([x, y, x+tw+rx*2, y+th+ry*2], radius=6, fill=fill)
+    d.text((x+rx, y+ry), txt, font=fnt, fill=fg)
+    return x+tw+rx*2, y+th+ry*2  # x2, y2
 
 
-LOGO_PATH = "/home/user/WEB/carrossel-pmi/logo_pmi_transparent.png"
-OUT_DIR   = "/home/user/WEB/carrossel-pmi/slides"
-os.makedirs(OUT_DIR, exist_ok=True)
+def hline(d, y, x1=MARGIN, x2=W-MARGIN, thick=2, color=VIOLET):
+    d.rectangle([x1, y, x2, y+thick], fill=color)
+
+
+def counter(d, n, total=5):
+    f = F("regular", 26)
+    txt = f"{n:02d} / {total:02d}"
+    bb = d.textbbox((0,0), txt, font=f)
+    d.text((W - MARGIN - (bb[2]-bb[0]), 58), txt, font=f, fill=GRAY)
+
+
+def logo(img, path=None, h=58, bottom_pad=46):
+    if path is None:
+        path = "/home/user/WEB/carrossel-pmi/logo_pmi_transparent.png"
+    lg = Image.open(path).convert("RGBA")
+    ratio = h / lg.height
+    nw = int(lg.width * ratio)
+    lg = lg.resize((nw, h), Image.LANCZOS)
+    x = (W - nw) // 2
+    y = H - bottom_pad - h
+    img.paste(lg, (x, y), lg)
+
+
+# ── Background engine ─────────────────────────────────────────────────────────
+def make_bg(variant="default"):
+    """
+    Cria background com camadas:
+    1. Base navy escuro
+    2. Rings geométricos decorativos (círculos parciais)
+    3. Glow direcional
+    4. Dot-grid sutil
+    """
+    base = Image.new("RGB", (W, H), BG)
+    layer = Image.new("RGBA", (W, H), (0,0,0,0))
+    dl = ImageDraw.Draw(layer)
+
+    if variant == "default":
+        # Ring grande bottom-right (violeta, parcial)
+        cx, cy, R_ring = W + 160, H + 100, 720
+        for t in range(12, 0, -1):
+            alpha = int(t * 5)
+            dl.ellipse([cx-R_ring-t*4, cy-R_ring-t*4, cx+R_ring+t*4, cy+R_ring+t*4],
+                       outline=(VIOLET[0], VIOLET[1], VIOLET[2], alpha), width=2)
+
+        # Ring médio top-left
+        cx2, cy2, R2 = -120, -80, 500
+        for t in range(10, 0, -1):
+            alpha = int(t * 6)
+            dl.ellipse([cx2-R2-t*3, cy2-R2-t*3, cx2+R2+t*3, cy2+R2+t*3],
+                       outline=(VIOLET_LT[0], VIOLET_LT[1], VIOLET_LT[2], alpha), width=2)
+
+        # Glow blob top-left
+        glow = Image.new("RGBA", (W, H), (0,0,0,0))
+        dg = ImageDraw.Draw(glow)
+        for r in range(500, 0, -20):
+            a = int(28 * (1 - r/500))
+            dg.ellipse([-r+200, -r+300, r+200, r+300],
+                       fill=(VIOLET[0], VIOLET[1], VIOLET[2], a))
+        glow = glow.filter(ImageFilter.GaussianBlur(60))
+        base.paste(glow, mask=glow.split()[3])
+
+        # Glow blob bottom-right
+        glow2 = Image.new("RGBA", (W, H), (0,0,0,0))
+        dg2 = ImageDraw.Draw(glow2)
+        for r in range(600, 0, -24):
+            a = int(20 * (1 - r/600))
+            dg2.ellipse([W-r-80, H-r-80, W+r-80, H+r-80],
+                        fill=(VIOLET_DK[0], VIOLET_DK[1], VIOLET_DK[2], a))
+        glow2 = glow2.filter(ImageFilter.GaussianBlur(80))
+        base.paste(glow2, mask=glow2.split()[3])
+
+    elif variant == "cta":
+        # CTA: glow centralizado mais intenso
+        glow = Image.new("RGBA", (W, H), (0,0,0,0))
+        dg = ImageDraw.Draw(glow)
+        for r in range(800, 0, -24):
+            a = int(35 * (1 - r/800))
+            dg.ellipse([W//2-r, H//2-r, W//2+r, H//2+r],
+                       fill=(VIOLET[0], VIOLET[1], VIOLET[2], a))
+        glow = glow.filter(ImageFilter.GaussianBlur(80))
+        base.paste(glow, mask=glow.split()[3])
+
+        # Ring decorativo central
+        for t in range(15, 0, -1):
+            a = int(t * 4)
+            layer.paste(Image.new("RGBA", (W,H), (0,0,0,0)))  # reset
+        dl.ellipse([W//2-500, H//2-500, W//2+500, H//2+500],
+                   outline=(VIOLET[0], VIOLET[1], VIOLET[2], 40), width=3)
+        dl.ellipse([W//2-380, H//2-380, W//2+380, H//2+380],
+                   outline=(VIOLET_LT[0], VIOLET_LT[1], VIOLET_LT[2], 25), width=2)
+
+    elif variant == "split":
+        # Split: linha diagonal no fundo
+        glow = Image.new("RGBA", (W, H), (0,0,0,0))
+        dg = ImageDraw.Draw(glow)
+        for r in range(500, 0, -20):
+            a = int(30 * (1 - r/500))
+            dg.ellipse([W//2-r, 400-r, W//2+r, 400+r],
+                       fill=(CYAN[0], CYAN[1], CYAN[2], a))
+        for r in range(400, 0, -20):
+            a = int(25 * (1 - r/400))
+            dg.ellipse([-r+100, -r+100, r+100, r+100],
+                       fill=(VIOLET[0], VIOLET[1], VIOLET[2], a))
+        glow = glow.filter(ImageFilter.GaussianBlur(60))
+        base.paste(glow, mask=glow.split()[3])
+
+    # Dot-grid sobre tudo
+    base.paste(layer, mask=layer.split()[3])
+    d = ImageDraw.Draw(base)
+    spacing = 54
+    dot_col = (18, 24, 48)
+    for x in range(0, W+spacing, spacing):
+        for y in range(0, H+spacing, spacing):
+            d.ellipse([x-1, y-1, x+1, y+1], fill=dot_col)
+
+    return base
 
 
 # ══════════════════════════════════════════════════════════════════════════════
-# SLIDE 01 — Capa
+# SLIDE 01 — CAPA
 # ══════════════════════════════════════════════════════════════════════════════
 def slide_01():
-    img = make_background()
+    img = make_bg("default")
     d = ImageDraw.Draw(img)
-    add_counter(d, 1, 5)
+    counter(d, 1)
 
-    # Tag "POSICIONAMENTO & AUTORIDADE"
-    f_tag = font("bold", 24)
-    draw_tag(d, "POSICIONAMENTO & AUTORIDADE", 64, 130, f_tag)
+    # — Overline tag
+    _, y2 = tag(d, "POSICIONAMENTO & AUTORIDADE", MARGIN, 96, F("bold", 24))
 
-    # Main headline
-    y = 240
-    f_h1 = font("black", 100)
-    f_h2 = font("black", 100)
-    d.text((64, y), "Marketing é", font=f_h1, fill=WHITE)
-    y += 115
-    d.text((64, y), "amplificador.", font=f_h2, fill=ACCENT)
-    y += 130
+    y = y2 + 56
 
-    add_accent_line(d, y)
-    y += 30
+    # — Linha accent
+    hline(d, y)
+    y += 28
 
-    # Negative statement
-    f_neg = font("bold", 46)
-    d.text((64, y), "Não é milagre.", font=f_neg, fill=LIGHT_GRAY)
+    # — Headline principal: 2 linhas, enorme
+    fh = F("black", 112)
+    d.text((MARGIN, y), "Marketing", font=fh, fill=WHITE)
+    y += 128
+    d.text((MARGIN, y), "é", font=fh, fill=WHITE)
+
+    # "amplificador." em violeta, tamanho menor para caber
+    fa = F("black", 96)
+    x_amp = MARGIN + d.textbbox((0,0), "é ", font=fh)[2] + 8
+    # nova linha
+    y += 128
+    d.text((MARGIN, y), "amplificador.", font=fa, fill=VIOLET)
+    y += 120
+
+    # — Bloco de contraste: o que NÃO é
+    hline(d, y, thick=1, color=(60, 65, 100))
+    y += 22
+
+    fn = F("bold", 48)
+    d.text((MARGIN, y), "Não é milagre.", font=fn, fill=GRAY_LT)
     y += 60
-    d.text((64, y), "Não salva o que", font=f_neg, fill=LIGHT_GRAY)
-    y += 60
-    d.text((64, y), "está quebrado.", font=f_neg, fill=LIGHT_GRAY)
-    y += 90
+    d.text((MARGIN, y), "Não salva o que está quebrado.", font=fn, fill=GRAY)
+    y += 76
 
-    # Body paragraph
-    f_body = font("regular", 34)
-    body = "Mas quando a base do negócio é sólida, marketing integrado transforma presença em resultado real e escalável."
-    lines = wrap_text(body, f_body, W - 128, d)
-    for line in lines:
-        d.text((64, y), line, font=f_body, fill=GRAY)
+    hline(d, y, thick=1, color=(60, 65, 100))
+    y += 26
+
+    # — Body
+    fb = F("regular", 33)
+    body = "Mas quando a base é sólida, marketing integrado transforma presença em resultado real e escalável."
+    for line in wrap(body, fb, W - MARGIN*2, d):
+        d.text((MARGIN, y), line, font=fb, fill=GRAY)
         y += 46
 
-    y += 20
-    f_cta = font("medium", 32)
-    d.text((64, y), "Arrasta para entender →", font=f_cta, fill=ACCENT)
+    y += 18
+    d.text((MARGIN, y), "Arrasta para entender →", font=F("medium", 32), fill=VIOLET_LT)
 
-    add_logo(img, LOGO_PATH)
-    img.save(f"{OUT_DIR}/slide_01.png")
+    logo(img)
+    img.save(f"{OUT}/slide_01.png")
     print("✓ slide_01")
 
 
 # ══════════════════════════════════════════════════════════════════════════════
-# SLIDE 02 — O Mito
+# SLIDE 02 — O MITO
 # ══════════════════════════════════════════════════════════════════════════════
 def slide_02():
-    img = make_background()
+    img = make_bg("default")
     d = ImageDraw.Draw(img)
-    add_counter(d, 2, 5)
+    counter(d, 2)
 
-    # Overline
-    f_over = font("bold", 24)
-    draw_tag(d, "ERRO MAIS CARO DO MERCADO", 64, 130, f_over, bg_color=(60, 0, 120))
+    y = 96
 
-    y = 230
-    add_accent_line(d, y)
-    y += 24
+    # Tag de contexto
+    _, y2 = tag(d, "ERRO MAIS CARO DO MERCADO", MARGIN, y, F("bold", 24), fill=(80, 0, 0))
+    y = y2 + 20
 
-    # X tag
-    f_xtag = font("black", 22)
-    draw_tag(d, "✗  O MITO", 64, y, f_xtag, bg_color=(180, 0, 60))
-    y += 68
+    # Tag de categoria
+    _, y2 = tag(d, "✗  O MITO", MARGIN, y, F("bold", 22), fill=RED_ACC)
+    y = y2 + 32
 
-    # Big quote
-    f_quote = font("black", 68)
-    quote_lines = [
-        '"O marketing vai',
-        "resolver o problema",
-        'do nosso produto."',
-    ]
+    hline(d, y)
+    y += 40
+
+    # Aspas decorativas gigantes no fundo
+    fq_deco = F("black", 320)
+    d_tmp = ImageDraw.Draw(img)
+    bb = d_tmp.textbbox((0,0), "❝", font=fq_deco)
+    # Renderiza como watermark semi-transparente
+    quote_layer = Image.new("RGBA", (W, H), (0,0,0,0))
+    dql = ImageDraw.Draw(quote_layer)
+    dql.text((MARGIN - 30, y - 80), '"', font=fq_deco, fill=(VIOLET[0], VIOLET[1], VIOLET[2], 18))
+    img.paste(quote_layer, mask=quote_layer.split()[3])
+
+    # Quote principal — tipografia dominante
+    fq = F("black", 72)
+    quote_lines = ['"O marketing vai', 'resolver o problema', 'do nosso produto."']
     for line in quote_lines:
-        d.text((64, y), line, font=f_quote, fill=WHITE)
-        y += 82
-
+        d.text((MARGIN, y), line, font=fq, fill=WHITE)
+        y += 86
     y += 10
-    add_accent_line(d, y)
-    y += 30
 
-    # Body
-    f_body = font("regular", 33)
+    hline(d, y)
+    y += 36
+
+    # Destaque visual: caixa com borda
+    box_y = y
+    d.rounded_rectangle([MARGIN, box_y, W-MARGIN, box_y + 180], radius=12,
+                         outline=RED_ACC, width=2, fill=(40, 5, 15))
+    fb = F("regular", 30)
     body = "Investir em campanhas antes de resolver o produto, a entrega ou a proposta de valor é o erro mais caro que uma empresa pode cometer."
-    lines = wrap_text(body, f_body, W - 128, d)
-    for line in lines:
-        d.text((64, y), line, font=f_body, fill=GRAY)
-        y += 46
+    blines = wrap(body, fb, W - MARGIN*2 - 40, d)
+    by = box_y + 22
+    for line in blines:
+        d.text((MARGIN + 20, by), line, font=fb, fill=OFF_WHITE)
+        by += 42
+    y = box_y + 200
 
-    y += 20
-    f_cta = font("medium", 32)
-    d.text((64, y), "Continua no próximo slide →", font=f_cta, fill=ACCENT)
+    y += 24
+    d.text((MARGIN, y), "Continua no próximo slide →", font=F("medium", 32), fill=VIOLET_LT)
 
-    add_logo(img, LOGO_PATH)
-    img.save(f"{OUT_DIR}/slide_02.png")
+    logo(img)
+    img.save(f"{OUT}/slide_02.png")
     print("✓ slide_02")
 
 
 # ══════════════════════════════════════════════════════════════════════════════
-# SLIDE 03 — A Verdade
+# SLIDE 03 — A VERDADE
 # ══════════════════════════════════════════════════════════════════════════════
 def slide_03():
-    img = make_background()
+    img = make_bg("split")
     d = ImageDraw.Draw(img)
-    add_counter(d, 3, 5)
+    counter(d, 3)
 
-    y = 120
+    y = 96
 
-    # Left diagram area: two rows Base Sólida / Base Fraca
-    f_label = font("bold", 30)
-    f_small = font("regular", 26)
-    col_x = 64
+    hline(d, y)
+    y += 28
 
-    # Divider
-    add_accent_line(d, y, x_start=64, x_end=W - 64)
-    y += 24
+    # — Diagrama visual: duas colunas  NEGÓCIO → MARKETING
+    col_labels_y = y
+    d.text((MARGIN, col_labels_y), "NEGÓCIO", font=F("bold", 22), fill=GRAY)
+    d.text((MARGIN+420, col_labels_y), "MARKETING INTEGRADO", font=F("bold", 22), fill=GRAY)
+    y += 44
 
-    # "NEGÓCIO" header
-    d.text((col_x, y), "NEGÓCIO", font=font("bold", 22), fill=GRAY)
-    d.text((col_x + 340, y), "MARKETING INTEGRADO", font=font("bold", 22), fill=GRAY)
-    y += 36
+    # Row 1: Base sólida
+    d.rounded_rectangle([MARGIN, y, MARGIN+340, y+58], radius=8,
+                         fill=(0, 55, 35), outline=(0, 200, 100), width=2)
+    d.text((MARGIN+14, y+13), "Base sólida", font=F("bold", 32), fill=GREEN)
 
-    # Row: Base sólida
-    d.rounded_rectangle([col_x, y, col_x + 290, y + 52], radius=8,
-                         fill=(20, 100, 60), outline=(0, 200, 100), width=2)
-    d.text((col_x + 14, y + 12), "Base sólida →", font=f_label, fill=(0, 230, 120))
-    arrow_x = col_x + 300
-    d.text((arrow_x, y + 12), "──────────→", font=font("regular", 28), fill=ACCENT)
-    y += 64
+    # Arrow
+    ax = MARGIN + 350
+    d.text((ax, y+14), "────→", font=F("regular", 30), fill=VIOLET)
+    # Result box
+    d.rounded_rectangle([ax+150, y, ax+330, y+58], radius=8,
+                         fill=(30, 0, 70), outline=VIOLET, width=2)
+    d.text((ax+162, y+13), "Escala", font=F("bold", 32), fill=VIOLET_LT)
+    y += 76
 
-    # Row: Base fraca
-    d.rounded_rectangle([col_x, y, col_x + 290, y + 52], radius=8,
-                         fill=(100, 10, 20), outline=(220, 40, 60), width=2)
-    d.text((col_x + 14, y + 12), "Base fraca →", font=f_label, fill=(240, 80, 90))
-    d.text((arrow_x, y + 12), "──────────→", font=font("regular", 28), fill=(180, 30, 50))
-    y += 80
+    # Row 2: Base fraca
+    d.rounded_rectangle([MARGIN, y, MARGIN+340, y+58], radius=8,
+                         fill=(55, 5, 15), outline=RED_ACC, width=2)
+    d.text((MARGIN+14, y+13), "Base fraca", font=F("bold", 32), fill=RED_ACC)
+    ax2 = MARGIN + 350
+    d.text((ax2, y+14), "────→", font=F("regular", 30), fill=(100, 30, 50))
+    d.rounded_rectangle([ax2+150, y, ax2+330, y+58], radius=8,
+                         fill=(50, 5, 15), outline=RED_ACC, width=2)
+    d.text((ax2+162, y+13), "Colapso", font=F("bold", 32), fill=RED_ACC)
+    y += 90
 
-    add_accent_line(d, y)
+    hline(d, y)
     y += 30
 
-    # ROI metric — big callout
-    f_big_num = font("black", 110)
-    f_big_label = font("bold", 30)
-    d.text((col_x, y), "x8", font=f_big_num, fill=ACCENT)
-    roi_y = y + 28
-    d.text((col_x + 190, roi_y), "ROI MÉDIO PMI", font=f_big_label, fill=WHITE)
-    d.text((col_x + 190, roi_y + 44), "quando bem aplicado", font=font("regular", 26), fill=GRAY)
-    y += 140
+    # — Métrica gigante centralizada
+    # "x8" dominante
+    fx8 = F("black", 200)
+    bb = d.textbbox((0,0), "x8", font=fx8)
+    x8_w = bb[2]-bb[0]
+    x_x8 = (W - x8_w) // 2
+    # Glow behind x8
+    glow = Image.new("RGBA", (W, H), (0,0,0,0))
+    dg = ImageDraw.Draw(glow)
+    for r in range(280, 0, -14):
+        a = int(40 * (1-r/280))
+        cx_g = W//2
+        cy_g = y + 110
+        dg.ellipse([cx_g-r, cy_g-r, cx_g+r, cy_g+r],
+                   fill=(VIOLET[0], VIOLET[1], VIOLET[2], a))
+    glow = glow.filter(ImageFilter.GaussianBlur(30))
+    img.paste(glow, mask=glow.split()[3])
+    d = ImageDraw.Draw(img)
 
-    add_accent_line(d, y)
-    y += 24
+    d.text((x_x8, y), "x8", font=fx8, fill=VIOLET)
+    y_after_x8 = y + bb[3] - bb[1] + 4
+    label_txt = "ROI MÉDIO PMI — quando bem aplicado"
+    fb_label = F("bold", 28)
+    bb2 = d.textbbox((0,0), label_txt, font=fb_label)
+    d.text(((W-(bb2[2]-bb2[0]))//2, y_after_x8), label_txt, font=fb_label, fill=GRAY_LT)
+    y = y_after_x8 + 50
 
-    # "A VERDADE" tag + headline
-    draw_tag(d, "✓  A VERDADE", 64, y, font("bold", 22), bg_color=(0, 130, 80))
-    y += 60
+    hline(d, y)
+    y += 26
 
-    f_truth = font("black", 52)
-    d.text((64, y), "Marketing amplifica", font=f_truth, fill=WHITE)
+    # — A Verdade
+    tag(d, "✓  A VERDADE", MARGIN, y, F("bold", 22), fill=(0, 120, 70))
     y += 62
-    d.text((64, y), "o que já existe –", font=f_truth, fill=WHITE)
-    y += 62
-    d.text((64, y), "o bom e o ruim.", font=f_truth, fill=ACCENT)
+
+    fv = F("black", 58)
+    d.text((MARGIN, y), "Marketing amplifica o que", font=fv, fill=WHITE)
+    y += 70
+    d.text((MARGIN, y), "já existe — o bom", font=fv, fill=WHITE)
+    y += 70
+    d.text((MARGIN, y), "e o ruim.", font=fv, fill=VIOLET_LT)
     y += 82
 
-    f_body = font("regular", 30)
-    body = "Com base sólida, estratégia integrada multiplica resultado. Com base fraca, ela acelera o colapso."
-    lines = wrap_text(body, f_body, W - 128, d)
-    for line in lines:
-        d.text((64, y), line, font=f_body, fill=GRAY)
-        y += 42
+    fb = F("regular", 30)
+    body = "A diferença está no diagnóstico antes da execução."
+    d.text((MARGIN, y), body, font=fb, fill=GRAY)
+    y += 52
 
-    y += 10
-    d.text((64, y), "Continua no próximo slide →", font=font("medium", 30), fill=ACCENT)
+    d.text((MARGIN, y), "Continua no próximo slide →", font=F("medium", 30), fill=VIOLET_LT)
 
-    add_logo(img, LOGO_PATH)
-    img.save(f"{OUT_DIR}/slide_03.png")
+    logo(img)
+    img.save(f"{OUT}/slide_03.png")
     print("✓ slide_03")
 
 
 # ══════════════════════════════════════════════════════════════════════════════
-# SLIDE 04 — Método PMI
+# SLIDE 04 — MÉTODO PMI
 # ══════════════════════════════════════════════════════════════════════════════
 def slide_04():
-    img = make_background()
+    img = make_bg("default")
     d = ImageDraw.Draw(img)
-    add_counter(d, 4, 5)
+    counter(d, 4)
 
-    y = 110
-    add_accent_line(d, y)
-    y += 24
+    y = 96
+    hline(d, y)
+    y += 28
 
-    # Tag
-    draw_tag(d, "⚡  MÉTODO PMI", 64, y, font("bold", 24), bg_color=ACCENT)
-    y += 68
+    tag(d, "⚡  MÉTODO PMI", MARGIN, y, F("bold", 26), fill=VIOLET)
+    y += 72
 
-    # Big headline
-    f_h = font("black", 72)
-    d.text((64, y), "Do diagnóstico ao", font=f_h, fill=WHITE)
-    y += 85
-    d.text((64, y), "crescimento em", font=f_h, fill=WHITE)
-    y += 85
-    d.text((64, y), "4 etapas claras.", font=f_h, fill=ACCENT)
-    y += 100
+    # Headline
+    fh = F("black", 88)
+    d.text((MARGIN, y), "Do diagnóstico", font=fh, fill=WHITE)
+    y += 102
+    d.text((MARGIN, y), "ao crescimento", font=fh, fill=WHITE)
+    y += 102
+    d.text((MARGIN, y), "em 4 etapas.", font=fh, fill=VIOLET)
+    y += 116
 
-    add_accent_line(d, y)
+    hline(d, y, thick=1, color=(50, 55, 90))
     y += 30
 
-    # 4 steps
+    # 4 steps — layout compacto mas arejado
     steps = [
-        ("01", "Diagnóstico", "Entender antes de agir. Sem pacote, sem pitch, sem atalho."),
-        ("02", "Estratégia",  "Plano sob medida integrando todos os canais com meta clara."),
-        ("03", "Execução",    "Estratégia em prática com dados em tempo real. Ajuste contínuo."),
-        ("04", "Crescimento", "Resultado previsível. Marca consolidada. Escala real."),
+        ("01", "Diagnóstico",  "Entender antes de agir. Sem pacote, sem pitch."),
+        ("02", "Estratégia",   "Plano sob medida integrando canais com meta clara."),
+        ("03", "Execução",     "Em prática com dados em tempo real. Ajuste contínuo."),
+        ("04", "Crescimento",  "Resultado previsível. Marca consolidada. Escala real."),
     ]
 
-    f_num  = font("black", 36)
-    f_step = font("bold", 34)
-    f_desc = font("regular", 27)
+    fn = F("black", 32)
+    ft = F("bold", 36)
+    fd = F("regular", 28)
+    step_h = 118
 
     for num, title, desc in steps:
-        # Number bubble
-        d.ellipse([64, y + 2, 64 + 46, y + 2 + 46], fill=ACCENT)
-        bbox = d.textbbox((0, 0), num, font=f_num)
-        nx = 64 + (46 - (bbox[2] - bbox[0])) // 2
-        ny = y + 2 + (46 - (bbox[3] - bbox[1])) // 2
-        d.text((nx, ny), num, font=f_num, fill=WHITE)
+        # Linha conectora (exceto último)
+        if num != "04":
+            d.rectangle([MARGIN + 22, y + step_h - 18, MARGIN + 26, y + step_h + 6],
+                         fill=(60, 65, 100))
 
-        tx = 64 + 64
-        d.text((tx, y), title, font=f_step, fill=WHITE)
-        y += 40
-        desc_lines = wrap_text(desc, f_desc, W - tx - 64, d)
-        for line in desc_lines:
-            d.text((tx, y), line, font=f_desc, fill=GRAY)
-            y += 36
-        y += 16
+        # Número círculo
+        cx, cy = MARGIN + 24, y + 22
+        d.ellipse([cx-22, cy-22, cx+22, cy+22], fill=VIOLET)
+        nbb = d.textbbox((0,0), num, font=fn)
+        d.text((cx - (nbb[2]-nbb[0])//2, cy - (nbb[3]-nbb[1])//2 - 2), num, font=fn, fill=WHITE)
 
-    y += 4
-    body = "Sem surpresas. Sem pacotes genéricos. Cada etapa com meta definida e resultado previsível."
-    f_body = font("regular", 28)
-    lines = wrap_text(body, f_body, W - 128, d)
-    for line in lines:
-        d.text((64, y), line, font=f_body, fill=GRAY)
-        y += 38
+        # Título + desc
+        tx = MARGIN + 64
+        d.text((tx, y), title, font=ft, fill=WHITE)
+        dy = y + 44
+        for line in wrap(desc, fd, W - tx - MARGIN, d):
+            d.text((tx, dy), line, font=fd, fill=GRAY)
+            dy += 36
+        y += step_h
 
-    y += 8
-    d.text((64, y), "Último slide →", font=font("medium", 30), fill=ACCENT)
+    y += 10
+    fb = F("regular", 28)
+    d.text((MARGIN, y), "Sem surpresas. Sem pacotes genéricos.", font=fb, fill=GRAY)
+    y += 42
+    d.text((MARGIN, y), "Último slide →", font=F("medium", 30), fill=VIOLET_LT)
 
-    add_logo(img, LOGO_PATH)
-    img.save(f"{OUT_DIR}/slide_04.png")
+    logo(img)
+    img.save(f"{OUT}/slide_04.png")
     print("✓ slide_04")
 
 
@@ -406,58 +478,65 @@ def slide_04():
 # SLIDE 05 — CTA
 # ══════════════════════════════════════════════════════════════════════════════
 def slide_05():
-    img = make_background()
+    img = make_bg("cta")
     d = ImageDraw.Draw(img)
-    add_counter(d, 5, 5)
+    counter(d, 5)
+
+    # Linha decorativa topo
+    hline(d, 96)
 
     y = 130
 
-    # "DIAGNÓSTICO" tag
-    draw_tag(d, "DIAGNÓSTICO", 64, y, font("bold", 26), bg_color=ACCENT)
-    y += 80
-
-    add_accent_line(d, y)
-    y += 28
-
-    # Free tag
-    f_free = font("bold", 28)
-    draw_tag(d, "CONSULTORIA 100% GRATUITA", 64, y, f_free, bg_color=(20, 100, 60))
+    # Badge gratuidade
+    tag(d, "DIAGNÓSTICO GRATUITO", MARGIN, y, F("bold", 26), fill=(0, 120, 70))
     y += 72
 
-    # Big headline
-    f_h = font("black", 82)
-    d.text((64, y), "Pronto para", font=f_h, fill=WHITE)
-    y += 95
-    d.text((64, y), "escalar o seu", font=f_h, fill=WHITE)
-    y += 95
-    d.text((64, y), "negócio", font=f_h, fill=WHITE)
-    y += 95
-    d.text((64, y), "de verdade?", font=f_h, fill=ACCENT)
-    y += 110
+    # Headline central — massiva
+    fh = F("black", 100)
+    lines_h = ["Pronto para", "escalar o seu", "negócio", "de verdade?"]
+    for i, line in enumerate(lines_h):
+        color = VIOLET if i == 3 else WHITE
+        d.text((MARGIN, y), line, font=fh, fill=color)
+        y += 115
 
-    add_accent_line(d, y)
-    y += 28
+    y += 10
+    hline(d, y)
+    y += 36
 
     # Body
-    f_body = font("regular", 32)
+    fb = F("regular", 33)
     body = "A PMI analisa seu cenário, identifica gargalos reais e mostra o caminho mais curto para o resultado. Sem compromisso. Sem pitch."
-    lines = wrap_text(body, f_body, W - 128, d)
-    for line in lines:
-        d.text((64, y), line, font=f_body, fill=GRAY)
-        y += 44
+    for line in wrap(body, fb, W - MARGIN*2, d):
+        d.text((MARGIN, y), line, font=fb, fill=GRAY_LT)
+        y += 46
 
-    y += 20
-    # CTA button style
-    draw_tag(d, "COMENTA ABAIXO", 64, y, font("black", 34), bg_color=ACCENT, pad_x=30, pad_y=14)
-    y += 80
+    y += 28
+
+    # CTA button — centralizado, destaque total
+    cta_txt = "COMENTA ABAIXO"
+    fc = F("black", 38)
+    bb = d.textbbox((0,0), cta_txt, font=fc)
+    btn_w = bb[2]-bb[0] + 80
+    btn_h = bb[3]-bb[1] + 28
+    btn_x = (W - btn_w) // 2
+    d.rounded_rectangle([btn_x, y, btn_x+btn_w, y+btn_h], radius=10, fill=VIOLET)
+    d.text((btn_x + 40, y + 14), cta_txt, font=fc, fill=WHITE)
+    y += btn_h + 30
 
     # Handle
-    d.text((64, y), "@perrymarketingintegrado", font=font("medium", 30), fill=LIGHT_GRAY)
+    handle_txt = "@perrymarketingintegrado"
+    fh2 = F("medium", 30)
+    bb2 = d.textbbox((0,0), handle_txt, font=fh2)
+    d.text(((W-(bb2[2]-bb2[0]))//2, y), handle_txt, font=fh2, fill=GRAY_LT)
 
-    add_logo(img, LOGO_PATH)
-    img.save(f"{OUT_DIR}/slide_05.png")
+    logo(img)
+    img.save(f"{OUT}/slide_05.png")
     print("✓ slide_05")
 
+
+# ── Run ───────────────────────────────────────────────────────────────────────
+OUT = "/home/user/WEB/carrossel-pmi/slides"
+os.makedirs(OUT, exist_ok=True)
 
 if __name__ == "__main__":
     slide_01()
@@ -465,4 +544,4 @@ if __name__ == "__main__":
     slide_03()
     slide_04()
     slide_05()
-    print("\nDone — slides saved to", OUT_DIR)
+    print(f"\nDone → {OUT}")
