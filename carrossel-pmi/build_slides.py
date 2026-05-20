@@ -56,68 +56,79 @@ def gradient_overlay(photo):
     return photo.convert("RGB")
 
 
-def draw_headline(d, lines, y, size, color=WHITE, leading=None):
-    """Desenha headline com auto-wrap se a linha não couber. Retorna y após a última linha."""
-    fnt = F("black", size)
-    if leading is None:
-        leading = int(size * 1.1)
-    max_w = W - MARGIN * 2
+def wrap_headline_lines(d, lines, fnt, max_w):
+    """Quebra cada linha do headline se ultrapassar max_w."""
+    out = []
     for line in lines:
-        # Quebra automática caso a linha seja larga demais
         words = line.split()
-        cur_line = ""
-        for word in words:
-            test = (cur_line + " " + word).strip()
-            bb = d.textbbox((0, 0), test, font=fnt)
-            if bb[2] - bb[0] <= max_w:
-                cur_line = test
+        cur = ""
+        for w in words:
+            test = (cur + " " + w).strip()
+            if d.textbbox((0, 0), test, font=fnt)[2] <= max_w:
+                cur = test
             else:
-                if cur_line:
-                    d.text((MARGIN, y), cur_line, font=fnt, fill=color)
-                    y += leading
-                cur_line = word
-        if cur_line:
-            d.text((MARGIN, y), cur_line, font=fnt, fill=color)
-            y += leading
-    return y
+                if cur:
+                    out.append(cur)
+                cur = w
+        if cur:
+            out.append(cur)
+    return out
 
 
-def draw_subtitle_parts(d, parts, y, size=34):
+def layout_subtitle_lines(d, parts, fnt_reg, fnt_bld, max_w):
     """
-    parts: lista de (texto, destaque).
-    Renderiza word-by-word com wrap, respeitando TEXT_SAFE_BOTTOM.
+    Distribui as palavras em linhas; cada linha é uma lista de
+    (word, font, color) já com larguras pré-calculadas.
+    Retorna: [ [(word, fnt, color, width), ...], ... ], line_height
     """
-    fnt_reg = F("regular", size)
-    fnt_bld = F("bold", size)
-    max_x   = W - MARGIN
-    line_h  = int(size * 1.48)
-
     tokens = []
     for text, highlight in parts:
         for word in text.split():
             tokens.append((word, highlight))
 
-    x, cur_y = MARGIN, y
+    space_w = d.textbbox((0, 0), " ", font=fnt_reg)[2]
+    lines = [[]]
+    cur_w = 0
 
     for word, highlight in tokens:
-        # Para se ultrapassar a área segura
-        if cur_y + line_h > TEXT_SAFE_BOTTOM:
-            break
         fnt   = fnt_bld if highlight else fnt_reg
         color = VIOLET_LT if highlight else GRAY
-        bb    = d.textbbox((0, 0), word + " ", font=fnt)
-        ww    = bb[2] - bb[0]
+        ww    = d.textbbox((0, 0), word, font=fnt)[2]
+        add_w = ww + (space_w if lines[-1] else 0)
 
-        if x + ww > max_x and x > MARGIN:
-            x = MARGIN
-            cur_y += line_h
-            if cur_y + line_h > TEXT_SAFE_BOTTOM:
-                break
+        if cur_w + add_w > max_w and lines[-1]:
+            lines.append([])
+            cur_w = ww
+            lines[-1].append((word, fnt, color, ww))
+        else:
+            lines[-1].append((word, fnt, color, ww))
+            cur_w += add_w
 
-        d.text((x, cur_y), word, font=fnt, fill=color)
-        x += ww
+    return lines, space_w
 
-    return cur_y + line_h
+
+def draw_centered_headline(d, lines, y, size, color=WHITE):
+    fnt = F("black", size)
+    leading = int(size * 1.08)
+    for line in lines:
+        bb = d.textbbox((0, 0), line, font=fnt)
+        tw = bb[2] - bb[0]
+        x = (W - tw) // 2
+        d.text((x, y), line, font=fnt, fill=color)
+        y += leading
+    return y
+
+
+def draw_centered_subtitle(d, lines, y, size, space_w):
+    line_h = int(size * 1.42)
+    for line in lines:
+        total_w = sum(ww for _, _, _, ww in line) + space_w * (len(line) - 1)
+        x = (W - total_w) // 2
+        for word, fnt, color, ww in line:
+            d.text((x, y), word, font=fnt, fill=color)
+            x += ww + space_w
+        y += line_h
+    return y
 
 
 def add_logo(img, h=LOGO_H, bottom=LOGO_PAD):
@@ -130,34 +141,74 @@ def add_logo(img, h=LOGO_H, bottom=LOGO_PAD):
     img.paste(lg, (x, y), lg)
 
 
-def make_slide(photo_path, headline_lines, headline_size=75,
-               subtitle_parts=None, out_path="", photo_centering=(0.5, 0.25)):
+def make_slide(photo_path, headline_lines, subtitle_parts,
+               out_path, headline_size=85, subtitle_size=34,
+               photo_centering=(0.5, 0.25)):
 
-    # 1. canvas preto
     canvas = Image.new("RGB", (W, H), BLACK)
 
-    # 2. foto com gradiente
+    # Foto + gradiente
     photo = crop_photo(photo_path, centering=photo_centering)
     photo = gradient_overlay(photo)
     canvas.paste(photo, (0, 0))
 
-    # 3. linha accent violet
     d = ImageDraw.Draw(canvas)
+
+    # Linha violet accent
     d.rectangle([0, LINE_Y, W, LINE_Y + LINE_H], fill=VIOLET)
 
-    # 4. headline
-    text_y = TEXT_Y + 30
-    text_y = draw_headline(d, headline_lines, text_y, headline_size)
+    # Auto-fit do headline: se com 85px ele estourar a largura, reduz progressivamente
+    max_w = W - MARGIN * 2
+    h_size = headline_size
+    while h_size > 50:
+        fnt = F("black", h_size)
+        wrapped = wrap_headline_lines(d, headline_lines, fnt, max_w)
+        # Se o número de linhas pós-wrap é igual ao input, ok
+        if len(wrapped) == len(headline_lines):
+            break
+        h_size -= 4
+    fnt_h = F("black", h_size)
+    wrapped_h = wrap_headline_lines(d, headline_lines, fnt_h, max_w)
+    h_leading = int(h_size * 1.08)
+    h_total = h_leading * len(wrapped_h)
 
-    # 5. subtítulo
-    text_y += 14
-    draw_subtitle_parts(d, subtitle_parts, text_y, size=36)
+    # Auto-fit do subtítulo: reduz se ultrapassar área
+    fnt_sub_reg = F("regular", subtitle_size)
+    fnt_sub_bld = F("bold", subtitle_size)
+    sub_lines, space_w = layout_subtitle_lines(d, subtitle_parts,
+                                                fnt_sub_reg, fnt_sub_bld, max_w)
+    s_leading = int(subtitle_size * 1.42)
+    s_total = s_leading * len(sub_lines)
 
-    # 6. logo PMI
+    # Espaço total disponível
+    area_top    = LINE_Y + LINE_H
+    area_bottom = TEXT_SAFE_BOTTOM
+    area_h      = area_bottom - area_top
+
+    gap = 28
+    block_h = h_total + gap + s_total
+
+    # Se não couber, reduz o subtítulo
+    while block_h > area_h - 20 and subtitle_size > 24:
+        subtitle_size -= 2
+        fnt_sub_reg = F("regular", subtitle_size)
+        fnt_sub_bld = F("bold", subtitle_size)
+        sub_lines, space_w = layout_subtitle_lines(d, subtitle_parts,
+                                                    fnt_sub_reg, fnt_sub_bld, max_w)
+        s_leading = int(subtitle_size * 1.42)
+        s_total = s_leading * len(sub_lines)
+        block_h = h_total + gap + s_total
+
+    # Centraliza verticalmente
+    start_y = area_top + (area_h - block_h) // 2
+
+    # Renderiza
+    y_after_h = draw_centered_headline(d, wrapped_h, start_y, h_size)
+    draw_centered_subtitle(d, sub_lines, y_after_h + gap, subtitle_size, space_w)
+
     add_logo(canvas)
-
     canvas.save(out_path)
-    print(f"✓ {os.path.basename(out_path)}")
+    print(f"✓ {os.path.basename(out_path)}  (headline {h_size}px, sub {subtitle_size}px)")
 
 
 # ── Slides ────────────────────────────────────────────────────────────────────
