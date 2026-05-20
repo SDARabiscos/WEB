@@ -6,13 +6,15 @@ import os
 
 # ── Canvas ────────────────────────────────────────────────────────────────────
 W, H        = 1080, 1350
-PHOTO_H     = 740          # foto ocupa 55% do canvas
-LINE_Y      = PHOTO_H      # linha accent exatamente após a foto
+PHOTO_H     = 675          # foto ocupa 50% do canvas
+LINE_Y      = PHOTO_H
 LINE_H      = 5
-TEXT_Y      = LINE_Y + LINE_H + 0   # texto começa direto após a linha
+TEXT_Y      = LINE_Y + LINE_H
 MARGIN      = 58
-LOGO_H      = 62
-LOGO_PAD    = 38           # espaço abaixo do último texto até o logo
+LOGO_H      = 43           # 30% menor
+LOGO_PAD    = 32
+# área segura para texto: de TEXT_Y+padding até acima do logo
+TEXT_SAFE_BOTTOM = H - LOGO_PAD - LOGO_H - 12
 
 # ── Cores PMI ────────────────────────────────────────────────────────────────
 VIOLET      = (134, 0, 255)
@@ -55,44 +57,62 @@ def gradient_overlay(photo):
 
 
 def draw_headline(d, lines, y, size, color=WHITE, leading=None):
-    """Desenha linhas de headline; retorna y após o último linha."""
+    """Desenha headline com auto-wrap se a linha não couber. Retorna y após a última linha."""
     fnt = F("black", size)
     if leading is None:
-        leading = int(size * 1.08)
+        leading = int(size * 1.1)
+    max_w = W - MARGIN * 2
     for line in lines:
-        d.text((MARGIN, y), line, font=fnt, fill=color)
-        y += leading
+        # Quebra automática caso a linha seja larga demais
+        words = line.split()
+        cur_line = ""
+        for word in words:
+            test = (cur_line + " " + word).strip()
+            bb = d.textbbox((0, 0), test, font=fnt)
+            if bb[2] - bb[0] <= max_w:
+                cur_line = test
+            else:
+                if cur_line:
+                    d.text((MARGIN, y), cur_line, font=fnt, fill=color)
+                    y += leading
+                cur_line = word
+        if cur_line:
+            d.text((MARGIN, y), cur_line, font=fnt, fill=color)
+            y += leading
     return y
 
 
-def draw_subtitle_parts(d, parts, y, size=36):
+def draw_subtitle_parts(d, parts, y, size=34):
     """
-    parts: lista de (texto, destaque)
-    destaque=True → cor violeta, destaque=False → cinza claro
-    Empacota as palavras respeitando a largura do canvas.
+    parts: lista de (texto, destaque).
+    Renderiza word-by-word com wrap, respeitando TEXT_SAFE_BOTTOM.
     """
     fnt_reg = F("regular", size)
     fnt_bld = F("bold", size)
-    max_w = W - MARGIN * 2
+    max_x   = W - MARGIN
+    line_h  = int(size * 1.48)
 
-    # monta lista de tokens (word, bold, color)
     tokens = []
     for text, highlight in parts:
         for word in text.split():
             tokens.append((word, highlight))
 
     x, cur_y = MARGIN, y
-    line_h = int(size * 1.45)
 
-    for i, (word, highlight) in enumerate(tokens):
+    for word, highlight in tokens:
+        # Para se ultrapassar a área segura
+        if cur_y + line_h > TEXT_SAFE_BOTTOM:
+            break
         fnt   = fnt_bld if highlight else fnt_reg
         color = VIOLET_LT if highlight else GRAY
         bb    = d.textbbox((0, 0), word + " ", font=fnt)
         ww    = bb[2] - bb[0]
 
-        if x + ww > W - MARGIN and x > MARGIN:
+        if x + ww > max_x and x > MARGIN:
             x = MARGIN
             cur_y += line_h
+            if cur_y + line_h > TEXT_SAFE_BOTTOM:
+                break
 
         d.text((x, cur_y), word, font=fnt, fill=color)
         x += ww
@@ -110,8 +130,8 @@ def add_logo(img, h=LOGO_H, bottom=LOGO_PAD):
     img.paste(lg, (x, y), lg)
 
 
-def make_slide(photo_path, headline_lines, headline_size,
-               subtitle_parts, out_path, photo_centering=(0.5, 0.25)):
+def make_slide(photo_path, headline_lines, headline_size=75,
+               subtitle_parts=None, out_path="", photo_centering=(0.5, 0.25)):
 
     # 1. canvas preto
     canvas = Image.new("RGB", (W, H), BLACK)
@@ -126,7 +146,7 @@ def make_slide(photo_path, headline_lines, headline_size,
     d.rectangle([0, LINE_Y, W, LINE_Y + LINE_H], fill=VIOLET)
 
     # 4. headline
-    text_y = TEXT_Y + 36
+    text_y = TEXT_Y + 30
     text_y = draw_headline(d, headline_lines, text_y, headline_size)
 
     # 5. subtítulo
@@ -150,7 +170,6 @@ PH  = "/home/user/WEB/carrossel-pmi/photos"
 make_slide(
     photo_path     = f"{PH}/photo_01.png",
     headline_lines = ["MARKETING É UM", "AMPLIFICADOR"],
-    headline_size  = 102,
     subtitle_parts = [
         ("Não é milagre. Não salva o que", False),
         ("está quebrado.", True),
@@ -165,7 +184,6 @@ make_slide(
 make_slide(
     photo_path     = f"{PH}/photo_02.png",
     headline_lines = ["O ERRO MAIS CARO", "DO MERCADO"],
-    headline_size  = 102,
     subtitle_parts = [
         ("Investir em campanhas antes de resolver o", False),
         ("produto", True),
@@ -179,7 +197,6 @@ make_slide(
 make_slide(
     photo_path     = f"{PH}/photo_03.png",
     headline_lines = ["ELE AMPLIFICA O", "QUE JÁ EXISTE"],
-    headline_size  = 102,
     subtitle_parts = [
         ("Base sólida + estratégia integrada =", False),
         ("8x mais resultado.", True),
@@ -193,7 +210,6 @@ make_slide(
 make_slide(
     photo_path     = f"{PH}/photo_04.png",
     headline_lines = ["4 ETAPAS QUE", "MUDAM O JOGO"],
-    headline_size  = 102,
     subtitle_parts = [
         ("Diagnóstico →", True),
         ("Estratégia →", False),
@@ -209,7 +225,6 @@ make_slide(
 make_slide(
     photo_path     = f"{PH}/photo_05.png",
     headline_lines = ["PRONTO PARA", "ESCALAR DE", "VERDADE?"],
-    headline_size  = 102,
     subtitle_parts = [
         ("A PMI faz um diagnóstico", False),
         ("100% gratuito", True),
