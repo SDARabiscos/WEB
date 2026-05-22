@@ -123,22 +123,32 @@ def smoky_purple(img, top_s=160, bot_s=255, top_r=320, bot_r=800, blur=60):
     return base.convert("RGB")
 
 def text_panel(canvas, y_top, y_bot):
-    """Painel escuro sólido com fade nas bordas — garante leitura em qualquer fundo."""
-    IW = canvas.size[0]
-    pad = 80   # quantos px o fade se estende acima de y_top
+    """Painel escuro com fade suave em cima e embaixo — leitura clara sem bloco pesado."""
+    IW, IH = canvas.size
+    fade_top = 100   # px de fade acima do texto
+    fade_bot = 160   # px de fade abaixo do texto
+    max_alpha = 175  # opacidade central — legível sem sufocar a imagem
 
     layer = Image.new("RGBA", canvas.size, (0,0,0,0))
     dl    = ImageDraw.Draw(layer)
 
-    # área central totalmente sólida
-    dl.rectangle([0, y_top, IW, y_bot], fill=(4, 0, 10, 210))
+    # núcleo sólido apenas na faixa do texto
+    core_top = y_top
+    core_bot = min(y_bot, IH)
+    dl.rectangle([0, core_top, IW, core_bot], fill=(4, 0, 10, max_alpha))
 
     # fade de entrada (acima)
-    for iy in range(pad):
-        a = int(210 * (iy / pad) ** 1.6)
-        dl.line([(0, y_top - pad + iy), (IW, y_top - pad + iy)], fill=(4, 0, 10, a))
+    for iy in range(fade_top):
+        a = int(max_alpha * (iy / fade_top) ** 1.8)
+        dl.line([(0, core_top - fade_top + iy), (IW, core_top - fade_top + iy)],
+                fill=(4, 0, 10, a))
 
-    layer = layer.filter(ImageFilter.GaussianBlur(18))
+    # fade de saída (abaixo) — desaparece suavemente
+    for iy in range(fade_bot):
+        a = int(max_alpha * (1 - iy / fade_bot) ** 1.4)
+        dl.line([(0, core_bot + iy), (IW, core_bot + iy)], fill=(4, 0, 10, a))
+
+    layer = layer.filter(ImageFilter.GaussianBlur(14))
     base  = canvas.convert("RGBA"); base.alpha_composite(layer)
     return base.convert("RGB")
 
@@ -153,9 +163,9 @@ def make_open_slide(bg_path, headlines, subtitle, out_path,
 
     h_sz, fnt_h = fit_font(d, headlines, "black", h_start)
     lead    = int(h_sz * 1.08)
-    fnt_s   = F("regular", 28)
+    fnt_s   = F("regular", 32)
     sub_ls  = wrap(d, subtitle, fnt_s)
-    sub_h   = len(sub_ls) * int(28*1.55)
+    sub_h   = len(sub_ls) * int(32*1.55)
     badge_h = 60 if badge else 0
     extra_h = 80 if extra_fn else 0
     block_h = badge_h + lead*len(headlines) + 20+5+18 + sub_h + extra_h
@@ -165,7 +175,7 @@ def make_open_slide(bg_path, headlines, subtitle, out_path,
     y_start = min(y_start, H - 140 - block_h)
     y = y_start
 
-    canvas = text_panel(canvas, y - 60, H)
+    canvas = text_panel(canvas, y - 60, y_start + block_h + 40)
     d = ImageDraw.Draw(canvas)
 
     # ── Badge de pilar ─────────────────────────────────────────────
@@ -192,7 +202,7 @@ def make_open_slide(bg_path, headlines, subtitle, out_path,
         y += lead
 
     y += 20; y = sep_line(d, y) + 18
-    y  = draw_sub(canvas, d, subtitle, y, fnt_sz=28, color=W_SOFT)
+    y  = draw_sub(canvas, d, subtitle, y, fnt_sz=32, color=WHITE)
     if extra_fn: extra_fn(canvas, d, y)
     canvas.save(out_path); print(f"✓ {os.path.basename(out_path)}")
 
@@ -276,7 +286,7 @@ def make_clean_slide(headlines, subtitle, out_path, h_start=100,
         y += lead
 
     y += 20; y = sep_line(d, y) + 18
-    y  = draw_sub(canvas, d, subtitle, y, fnt_sz=28, color=W_SOFT)
+    y  = draw_sub(canvas, d, subtitle, y, fnt_sz=32, color=WHITE)
     if extra_fn: extra_fn(canvas, d, y)
     canvas.save(out_path); print(f"✓ {os.path.basename(out_path)}")
 
