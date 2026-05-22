@@ -7,11 +7,21 @@ import os
 W, H    = 1080, 1080
 MARGIN  = 60          # margem lateral
 MAX_W   = W - MARGIN*2
+
+# Paleta Carrossel 1 — Violeta/Rosa
 VIOLET  = (134, 0, 255)
 VLT     = (160, 60, 255)
 PINK    = (236, 72, 153)
+
+# Paleta Carrossel 2 — Âmbar/Dourado/Laranja
+GOLD    = (255, 185, 0)
+AMBER   = (255, 120, 0)
+CRIMSON = (200, 30, 30)   # tachado "VIRAL"
+CYAN2   = (0, 210, 190)   # separador C2
+
 WHITE   = (255, 255, 255)
 GRAY    = (165, 168, 185)
+WARM_GRAY = (195, 180, 155)  # subtítulo C2
 RED     = (220, 38, 38)
 
 R = "/usr/share/fonts/truetype/roboto/unhinted/RobotoTTF"
@@ -114,12 +124,44 @@ def darken_zone(canvas, y_top):
     base = canvas.convert("RGBA"); base.alpha_composite(tz)
     return base.convert("RGB")
 
-def sep_line(d, y, w=56):
+def sep_line(d, y, w=56, c1=None, c2=None):
+    if c1 is None: c1 = VLT
+    if c2 is None: c2 = PINK
     x = (W-w)//2
     for xi in range(w):
-        c = lerp(VLT, PINK, xi/max(1,w-1))
+        c = lerp(c1, c2, xi/max(1,w-1))
         d.line([(x+xi,y),(x+xi,y+5)], fill=c)
     return y+5
+
+# ── Overlay com tint quente (para C2) ─────────────────────────────
+def smoky_overlay_warm(img, top_s=140, bot_s=255, top_r=260, bot_r=660, blur=58):
+    """Mesmo smoky_overlay mas tint levemente âmbar escuro no fundo."""
+    ov = Image.new("RGBA", img.size, (0,0,0,0))
+    dv = ImageDraw.Draw(ov)
+    IW, IH = img.size
+    for y in range(top_r):
+        a = int(top_s * (1 - y/top_r)**1.8)
+        dv.line([(0,y),(IW,y)], fill=(10,5,0,a))
+    for y in range(IH-1, IH-bot_r-1, -1):
+        dist = IH - 1 - y
+        a = int(bot_s * (1 - dist / bot_r) ** 0.72)
+        dv.line([(0,y),(IW,y)], fill=(15,8,0,a))   # tint âmbar escuro
+    ov = ov.filter(ImageFilter.GaussianBlur(blur))
+    base = img.convert("RGBA"); base.alpha_composite(ov)
+    return base.convert("RGB")
+
+# ── Grad text C2 — dourado para laranja ───────────────────────────
+def grad_text_c2(canvas, d, text, font, x, y):
+    return grad_text(canvas, d, text, font, x, y, c1=GOLD, c2=AMBER)
+
+# ── Logo com barra âmbar (para C2) ────────────────────────────────
+def paste_logo_c2(canvas, lh=54, x=52, y=42):
+    logo = Image.open(LOGO).convert("RGBA")
+    lw = int(logo.width * lh / logo.height)
+    logo = logo.resize((lw, lh), Image.LANCZOS)
+    canvas.paste(logo, (x, y), logo)
+    d = ImageDraw.Draw(canvas)
+    d.rectangle([x, y+lh+8, x+lw, y+lh+12], fill=GOLD)
 
 # ── Blocos de texto centrado ───────────────────────────────────────
 def draw_sub(canvas, d, text, y, fnt_sz=27, color=GRAY):
@@ -180,6 +222,50 @@ def make_slide(bg_path, headlines, subtitle, out_path,
     y += 20
     y  = sep_line(d, y) + 18
     y  = draw_sub(canvas, d, subtitle, y)
+
+    if extra_fn:
+        extra_fn(canvas, d, y)
+
+    canvas.save(out_path)
+    print(f"✓ {os.path.basename(out_path)}")
+
+
+# ── Slide genérico C2 (paleta âmbar) ──────────────────────────────
+def make_slide_c2(bg_path, headlines, subtitle, out_path,
+                  centering=(0.5,0.5), h_start=100,
+                  top_s=140, bot_s=255, top_r=260, bot_r=660, blur=58,
+                  extra_fn=None):
+    canvas = smoky_overlay_warm(load_bg(bg_path, centering),
+                                top_s, bot_s, top_r, bot_r, blur)
+    paste_logo_c2(canvas)
+    d = ImageDraw.Draw(canvas)
+
+    h_sz, fnt_h = fit_font(d, headlines, "black", h_start)
+    lead = int(h_sz * 1.08)
+
+    fnt_s  = F("regular", 27)
+    sub_ls = wrap(d, subtitle, fnt_s)
+    sub_h  = len(sub_ls) * int(27*1.5)
+    extra_h = 80 if extra_fn else 0
+    block_h = lead*len(headlines) + 20 + 5 + 18 + sub_h + extra_h
+    y = max(H - 100 - block_h, 460)
+
+    canvas = darken_zone(canvas, y)
+    d = ImageDraw.Draw(canvas)
+
+    for i, line in enumerate(headlines):
+        lw = tw(d, line, fnt_h)
+        x  = (W - lw) // 2
+        if i == len(headlines)-1:
+            canvas = grad_text_c2(canvas, d, line, fnt_h, x, y)
+            d = ImageDraw.Draw(canvas)
+        else:
+            d.text((x, y), line, font=fnt_h, fill=WHITE)
+        y += lead
+
+    y += 20
+    y  = sep_line(d, y, c1=GOLD, c2=AMBER) + 18
+    y  = draw_sub(canvas, d, subtitle, y, color=WARM_GRAY)
 
     if extra_fn:
         extra_fn(canvas, d, y)
@@ -294,14 +380,14 @@ def c1_slide05():
 
 
 # ══════════════════════════════════════════════════════════════════
-# CARROSSEL 2 — "VIRAL ESTÁ MORTO"
+# CARROSSEL 2 — "VIRAL ESTÁ MORTO" (paleta âmbar/dourado)
 # ══════════════════════════════════════════════════════════════════
 
 def c2_slide01():
-    # Especial: "VIRAL" com tachado + segunda linha gradiente
-    canvas = smoky_overlay(load_bg(f"{BG}/bg_viral_slide01.png"),
-                           140, 252, 260, 640, 58)
-    paste_logo(canvas)
+    # Especial: "VIRAL" tachado crimson + "ESTÁ MORTO." gradiente dourado
+    canvas = smoky_overlay_warm(load_bg(f"{BG}/bg2_viral_slide01.png"),
+                                130, 255, 255, 660, 60)
+    paste_logo_c2(canvas)
     d = ImageDraw.Draw(canvas)
 
     headlines = ["VIRAL", "ESTÁ MORTO."]
@@ -316,27 +402,27 @@ def c2_slide01():
     canvas = darken_zone(canvas, y)
     d = ImageDraw.Draw(canvas)
 
-    # "VIRAL" branco + tachado vermelho
+    # "VIRAL" branco + tachado crimson
     lw1 = tw(d,"VIRAL",fnt_h); lh1 = th(d,"VIRAL",fnt_h)
     x1  = (W-lw1)//2
     d.text((x1, y), "VIRAL", font=fnt_h, fill=WHITE)
     mid = y + lh1//2
-    d.line([(x1-6, mid),(x1+lw1+6, mid)], fill=RED, width=max(8, h_sz//14))
+    d.line([(x1-6, mid),(x1+lw1+6, mid)], fill=CRIMSON, width=max(8, h_sz//14))
     y += lead
 
-    # "ESTÁ MORTO." gradiente
+    # "ESTÁ MORTO." gradiente dourado
     lw2 = tw(d,"ESTÁ MORTO.",fnt_h)
-    canvas = grad_text(canvas, d, "ESTÁ MORTO.", fnt_h, (W-lw2)//2, y)
+    canvas = grad_text_c2(canvas, d, "ESTÁ MORTO.", fnt_h, (W-lw2)//2, y)
     d = ImageDraw.Draw(canvas)
     y += lead
 
-    y += 20; y = sep_line(d, y) + 18
-    draw_sub(canvas, d, "E quem ainda corre atrás disso está perdendo tempo, dinheiro e posicionamento.", y)
+    y += 20; y = sep_line(d, y, c1=GOLD, c2=AMBER) + 18
+    draw_sub(canvas, d, "E quem ainda corre atrás disso está perdendo tempo, dinheiro e posicionamento.", y, color=WARM_GRAY)
     canvas.save(f"{OUT}/c2_slide01.png"); print("✓ c2_slide01")
 
 def c2_slide02():
-    make_slide(
-        f"{BG}/bg_viral_slide02.png",
+    make_slide_c2(
+        f"{BG}/bg2_viral_slide02.png",
         ["O ALGORITMO PAROU", "DE PREMIAR BARULHO"],
         "Em 2026 o Instagram virou curador de relevância. Conteúdo apelativo e sem substância perdeu alcance.",
         f"{OUT}/c2_slide02.png",
@@ -344,8 +430,8 @@ def c2_slide02():
     )
 
 def c2_slide03():
-    make_slide(
-        f"{BG}/bg_viral_slide03.png",
+    make_slide_c2(
+        f"{BG}/bg2_viral_slide03.png",
         ["1 MILHÃO DE VIEWS DE QUEM", "NÃO COMPRA NÃO PAGA BOLETO."],
         "Alcance sem retenção é vaidade. Quem retém audiência qualificada vende. Quem viraliza pra nada, some.",
         f"{OUT}/c2_slide03.png",
@@ -353,8 +439,8 @@ def c2_slide03():
     )
 
 def c2_slide04():
-    make_slide(
-        f"{BG}/bg_viral_slide04.png",
+    make_slide_c2(
+        f"{BG}/bg2_viral_slide04.png",
         ["O QUE REALMENTE", "FUNCIONA AGORA"],
         "Conteúdo que resolve. Que ensina. Que posiciona. Consistência bate viral eventual toda semana.",
         f"{OUT}/c2_slide04.png",
@@ -364,7 +450,7 @@ def c2_slide04():
 def c2_slide05():
     def extra(canvas, d, y):
         fnt_b  = F("bold", 28)
-        labels = [("SIM", VIOLET), ("NÃO", PINK)]
+        labels = [("SIM", GOLD), ("NÃO", AMBER)]
         btns   = [(lbl, col, tw(d,lbl,fnt_b)+52, th(d,lbl,fnt_b)+22)
                   for lbl, col in labels]
         total  = sum(b[2] for b in btns) + 20
@@ -375,10 +461,10 @@ def c2_slide05():
             d.text((bx+(bw-tw(d,lbl,fnt_b))//2, y2+(bh-th(d,lbl,fnt_b))//2),
                    lbl, font=fnt_b, fill=WHITE)
             bx += bw+20
-        draw_sub(canvas, d, "Curioso pra saber a proporção.", y2+btns[0][3]+14)
+        draw_sub(canvas, d, "Curioso pra saber a proporção.", y2+btns[0][3]+14, color=WARM_GRAY)
 
-    make_slide(
-        f"{BG}/bg_viral_slide05.png",
+    make_slide_c2(
+        f"{BG}/bg2_viral_slide05.png",
         ["PARA DE PERSEGUIR VIRAL.", "CONSTRÓI AUTORIDADE."],
         "",
         f"{OUT}/c2_slide05.png",
