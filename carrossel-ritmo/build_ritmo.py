@@ -74,17 +74,16 @@ def grad_text(canvas, d, text, font, x, y, c1=PURPLE, c2=PUR_LT):
     canvas = canvas.convert("RGBA"); canvas.alpha_composite(tint)
     return canvas.convert("RGB")
 
-# ── @ritmodamarca no topo ─────────────────────────────────────────
-def paste_handle(canvas, x=52, y=44):
+# ── @ritmodamarca na base centralizado ───────────────────────────
+def paste_handle(canvas, y_offset=40):
     d   = ImageDraw.Draw(canvas)
     fnt = F("bold", 22)
-    # "@" em roxo, "ritmodamarca" em branco
-    aw = tw(d, "@", fnt)
+    total_w = tw(d, "@ritmodamarca", fnt)
+    x   = (W - total_w) // 2
+    y   = H - y_offset - fnt.size
+    aw  = tw(d, "@", fnt)
     d.text((x, y), "@", font=fnt, fill=PURPLE)
-    d.text((x+aw, y), "ritmodamarca", font=fnt, fill=WHITE)
-    # barra roxa embaixo
-    total = tw(d, "@ritmodamarca", fnt)
-    d.rectangle([x, y+fnt.size+8, x+total, y+fnt.size+12], fill=PURPLE)
+    d.text((x + aw, y), "ritmodamarca", font=fnt, fill=WHITE)
 
 # ── Separador roxo gradiente ──────────────────────────────────────
 def sep_line(d, y, w=56):
