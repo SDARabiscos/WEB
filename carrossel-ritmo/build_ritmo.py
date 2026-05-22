@@ -122,27 +122,24 @@ def smoky_purple(img, top_s=160, bot_s=255, top_r=320, bot_r=800, blur=60):
     base = img.convert("RGBA"); base.alpha_composite(ov)
     return base.convert("RGB")
 
-def darken_zone(canvas, y_top):
-    """Dois passes: gradiente suave + camada sólida escura na zona de texto."""
-    IH, IW = canvas.size[1], canvas.size[0]
-    t = max(y_top - 200, 0)
+def text_panel(canvas, y_top, y_bot):
+    """Painel escuro sólido com fade nas bordas — garante leitura em qualquer fundo."""
+    IW = canvas.size[0]
+    pad = 80   # quantos px o fade se estende acima de y_top
 
-    # Passe 1: gradiente suave de cima para baixo
-    tz = Image.new("RGBA", canvas.size, (0,0,0,0))
-    dz = ImageDraw.Draw(tz)
-    for iy in range(t, IH):
-        a = int(235 * ((iy-t)/max(1,IH-t))**0.45)
-        dz.line([(0,iy),(IW,iy)], fill=(4,0,10,a))
-    tz = tz.filter(ImageFilter.GaussianBlur(40))
-    base = canvas.convert("RGBA"); base.alpha_composite(tz)
-    canvas = base.convert("RGB")
+    layer = Image.new("RGBA", canvas.size, (0,0,0,0))
+    dl    = ImageDraw.Draw(layer)
 
-    # Passe 2: retângulo sólido com bordas suavizadas na zona do texto
-    pad = Image.new("RGBA", canvas.size, (0,0,0,0))
-    dp  = ImageDraw.Draw(pad)
-    dp.rectangle([0, y_top - 20, IW, IH], fill=(4, 0, 10, 200))
-    pad = pad.filter(ImageFilter.GaussianBlur(24))
-    base = canvas.convert("RGBA"); base.alpha_composite(pad)
+    # área central totalmente sólida
+    dl.rectangle([0, y_top, IW, y_bot], fill=(4, 0, 10, 210))
+
+    # fade de entrada (acima)
+    for iy in range(pad):
+        a = int(210 * (iy / pad) ** 1.6)
+        dl.line([(0, y_top - pad + iy), (IW, y_top - pad + iy)], fill=(4, 0, 10, a))
+
+    layer = layer.filter(ImageFilter.GaussianBlur(18))
+    base  = canvas.convert("RGBA"); base.alpha_composite(layer)
     return base.convert("RGB")
 
 def make_open_slide(bg_path, headlines, subtitle, out_path,
@@ -155,16 +152,20 @@ def make_open_slide(bg_path, headlines, subtitle, out_path,
     d = ImageDraw.Draw(canvas)
 
     h_sz, fnt_h = fit_font(d, headlines, "black", h_start)
-    lead   = int(h_sz * 1.08)
-    fnt_s  = F("regular", 26)
-    sub_ls = wrap(d, subtitle, fnt_s)
-    sub_h  = len(sub_ls) * int(26*1.55)
+    lead    = int(h_sz * 1.08)
+    fnt_s   = F("regular", 28)
+    sub_ls  = wrap(d, subtitle, fnt_s)
+    sub_h   = len(sub_ls) * int(28*1.55)
     badge_h = 60 if badge else 0
     extra_h = 80 if extra_fn else 0
     block_h = badge_h + lead*len(headlines) + 20+5+18 + sub_h + extra_h
-    y = max(H - 120 - block_h, 560)
 
-    canvas = darken_zone(canvas, y)
+    # texto começa no terço inferior da imagem, nunca muito baixo
+    y_start = max(int(H * 0.48) - block_h // 2, 360)
+    y_start = min(y_start, H - 140 - block_h)
+    y = y_start
+
+    canvas = text_panel(canvas, y - 60, H)
     d = ImageDraw.Draw(canvas)
 
     # ── Badge de pilar ─────────────────────────────────────────────
