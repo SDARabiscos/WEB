@@ -243,7 +243,7 @@ def peca_01():
         y+=int(30*1.5)
     y+=10
 
-    y = text_c(d,"Relatórios que o cliente entende, conteúdo no horário certo e inbox sem mensagem perdida — sem planilha, sem post-it.",
+    y = text_c(d,"Relatórios que o cliente entende, conteúdo no horário certo e inbox sem mensagem perdida. Sem planilha, sem post-it.",
                F("regular",26),W,y,GRAY_TEXT,max_w=W-MG*2,leading=1.52)
     y+=18
 
@@ -263,7 +263,7 @@ def peca_01():
         d.text((ix+38,iy+ROW//2-11),item,font=f_item,fill=TEXT_DARK)
     y+=3*ROW+24
 
-    btn_grad_c(d,W,y,"Ver onde sua agência perde tempo  →",F("bold",24))
+    btn_grad_c(d,W,y,"Ver onde sua agência perde tempo",F("bold",24))
 
     img.save(f"{OUT}/peca_01.png"); print("✓ peca_01")
 
@@ -323,13 +323,13 @@ def peca_02():
 
     paras=["Agendar post. Responder DM. Gerar relatório. Criar legenda.",
            "Tudo isso todo dia. Para todo cliente.",
-           "O PMI reúne tudo em um único lugar — o que tomava horas passa a tomar minutos."]
+           "O PMI reúne tudo em um único lugar. O que tomava horas passa a tomar minutos."]
     for p in paras:
         y=text_c(d,p,F("regular",28),W,y,GRAY_BODY,max_w=W-MG*2,leading=1.5)
         y+=10
     y+=24
 
-    btn_c(d,W,y,"Comece agora — teste sem risco  →",F("bold",25),color=PURPLE)
+    btn_c(d,W,y,"Comece agora · teste sem risco",F("bold",25),color=PURPLE)
     img.save(f"{OUT}/peca_02.png"); print("✓ peca_02")
 
 
@@ -365,21 +365,21 @@ def peca_03():
     y+=20
 
     # Avatares
-    N=8; av_r=24; av_g=8; total=N*(av_r*2+av_g)-av_g; ax0=(W-total)//2
-    av_cy=y+av_r; initials=list("ABCDEFGH")
+    N=8; av_r=28; av_g=10; total=N*(av_r*2)+( N-1)*av_g; ax0=(W-total)//2
+    av_cy=y+av_r+8; f_av=F("black",22); initials=list("ABCDEFGH")
     for i in range(N):
         ax=ax0+i*(av_r*2+av_g)+av_r; c=lerp(PURPLE_LT,PINK,i/(N-1))
         d.ellipse([ax-av_r-2,av_cy-av_r-2,ax+av_r+2,av_cy+av_r+2],fill=(10,5,20))
         d.ellipse([ax-av_r,av_cy-av_r,ax+av_r,av_cy+av_r],fill=c)
-        iw=tw(d,initials[i],F("bold",17)); ih=th(d,initials[i],F("bold",17))
-        d.text((ax-iw//2,av_cy-ih//2-2),initials[i],font=F("bold",17),fill=WHITE)
-    y=av_cy+av_r+26
+        iw=tw(d,initials[i],f_av); ih=th(d,initials[i],f_av)
+        d.text((ax-iw//2, av_cy-ih//2),initials[i],font=f_av,fill=WHITE)
+    y=av_cy+av_r+30
 
     y=text_c(d,"Gestores que usam o PMI criam a legenda de uma semana em menos de 5 minutos, automatizam respostas e entregam relatórios com a marca da agência.",
              F("regular",26),W,y,GRAY_BODY,max_w=W-MG*2,leading=1.5)
     y+=26
 
-    y=btn_grad_c(d,W,y,"Veja como funciona e comece hoje  →",F("bold",24))
+    y=btn_grad_c(d,W,y,"Veja como funciona e comece hoje",F("bold",24))
     y+=26
     logo_c(d,W,y,size=34,on_dark=True)
     img.save(f"{OUT}/peca_03.png"); print("✓ peca_03")
@@ -424,10 +424,12 @@ def peca_04():
         img=img.convert("RGBA"); img.alpha_composite(lay); img=img.convert("RGB")
         d=ImageDraw.Draw(img)
         d.ellipse([nx-node_r,ny-node_r,nx+node_r,ny+node_r],fill=(20,9,42),outline=(78,38,148),width=2)
-        f_nd=F("medium",18)
+        f_nd=F("medium",14)
+        n_lines=len(lns); line_h=18
+        start_off=-((n_lines-1)*line_h)//2-7
         for li,lt in enumerate(lns):
             ltw=tw(d,lt,f_nd)
-            d.text((nx-ltw//2,ny-10+li*22),lt,font=f_nd,fill=GRAY_BODY)
+            d.text((nx-ltw//2, ny+start_off+li*line_h),lt,font=f_nd,fill=WHITE)
 
     # Hub com glow + gradiente
     for r in range(hub_r+55,hub_r-1,-3):
@@ -447,10 +449,10 @@ def peca_04():
     d.text((hub_cx-smw//2,hub_cy+12),"Social",font=F("medium",14),fill=WHITE)
 
     y_b=hub_cy+spoke+node_r+36
-    y_b=text_c(d,"O plano Agency do PMI centraliza tudo — múltiplos clientes, relatórios white-label, IA ilimitada e criativos para Meta Ads.",
+    y_b=text_c(d,"O plano Agency do PMI centraliza tudo: múltiplos clientes, relatórios white-label, IA ilimitada e criativos para Meta Ads.",
                F("regular",26),W,y_b,GRAY_BODY,max_w=W-MG*2,leading=1.5)
     y_b+=24
-    y_b=btn_c(d,W,y_b,"Monte sua operação com a gente  →",F("bold",23),color=PURPLE)
+    y_b=btn_c(d,W,y_b,"Monte sua operação com a gente",F("bold",23),color=PURPLE)
     y_b+=26
     logo_c(d,W,y_b,size=32,on_dark=True)
     img.save(f"{OUT}/peca_04.png"); print("✓ peca_04")
@@ -507,7 +509,7 @@ def peca_05():
     y+=24
 
     # Métricas (3 colunas centralizadas)
-    stats=[("700+","Profissionais"),("5h+","Economizadas/sem."),("99%","Taxa de entrega")]
+    stats=[("700+","Profissionais"),("5h+","Economizadas"),("99%","Taxa de entrega")]
     col_w=(W-MG*2)//3
     f_val=F("black",52); f_lbl=F("regular",21)
     val_h=th(d,stats[0][0],f_val)
