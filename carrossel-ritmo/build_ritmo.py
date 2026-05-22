@@ -107,7 +107,7 @@ def draw_sub(canvas, d, text, y, fnt_sz=26, color=GRAY_M):
 # ══════════════════════════════════════════════════════════════════
 # SLIDE DE ABERTURA — background IA + smoky overlay roxo
 # ══════════════════════════════════════════════════════════════════
-def smoky_purple(img, top_s=130, bot_s=255, top_r=260, bot_r=680, blur=60):
+def smoky_purple(img, top_s=160, bot_s=255, top_r=320, bot_r=800, blur=60):
     ov = Image.new("RGBA", img.size, (0,0,0,0))
     dv = ImageDraw.Draw(ov)
     IW, IH = img.size
@@ -116,22 +116,33 @@ def smoky_purple(img, top_s=130, bot_s=255, top_r=260, bot_r=680, blur=60):
         dv.line([(0,y),(IW,y)], fill=(5,0,10,a))
     for y in range(IH-1, IH-bot_r-1, -1):
         dist = IH - 1 - y
-        a = int(bot_s * (1 - dist/bot_r)**0.72)
+        a = int(bot_s * (1 - dist/bot_r)**0.55)
         dv.line([(0,y),(IW,y)], fill=(5,0,12,a))
     ov = ov.filter(ImageFilter.GaussianBlur(blur))
     base = img.convert("RGBA"); base.alpha_composite(ov)
     return base.convert("RGB")
 
 def darken_zone(canvas, y_top):
+    """Dois passes: gradiente suave + camada sólida escura na zona de texto."""
+    IH, IW = canvas.size[1], canvas.size[0]
+    t = max(y_top - 200, 0)
+
+    # Passe 1: gradiente suave de cima para baixo
     tz = Image.new("RGBA", canvas.size, (0,0,0,0))
     dz = ImageDraw.Draw(tz)
-    t  = max(y_top - 80, 0)
-    IH = canvas.size[1]
     for iy in range(t, IH):
-        a = int(215 * ((iy-t)/max(1,IH-t))**0.55)
-        dz.line([(0,iy),(canvas.size[0],iy)], fill=(5,0,12,a))
-    tz = tz.filter(ImageFilter.GaussianBlur(36))
+        a = int(235 * ((iy-t)/max(1,IH-t))**0.45)
+        dz.line([(0,iy),(IW,iy)], fill=(4,0,10,a))
+    tz = tz.filter(ImageFilter.GaussianBlur(40))
     base = canvas.convert("RGBA"); base.alpha_composite(tz)
+    canvas = base.convert("RGB")
+
+    # Passe 2: retângulo sólido com bordas suavizadas na zona do texto
+    pad = Image.new("RGBA", canvas.size, (0,0,0,0))
+    dp  = ImageDraw.Draw(pad)
+    dp.rectangle([0, y_top - 20, IW, IH], fill=(4, 0, 10, 200))
+    pad = pad.filter(ImageFilter.GaussianBlur(24))
+    base = canvas.convert("RGBA"); base.alpha_composite(pad)
     return base.convert("RGB")
 
 def make_open_slide(bg_path, headlines, subtitle, out_path,
@@ -180,7 +191,7 @@ def make_open_slide(bg_path, headlines, subtitle, out_path,
         y += lead
 
     y += 20; y = sep_line(d, y) + 18
-    y  = draw_sub(canvas, d, subtitle, y)
+    y  = draw_sub(canvas, d, subtitle, y, fnt_sz=28, color=W_SOFT)
     if extra_fn: extra_fn(canvas, d, y)
     canvas.save(out_path); print(f"✓ {os.path.basename(out_path)}")
 
@@ -264,7 +275,7 @@ def make_clean_slide(headlines, subtitle, out_path, h_start=100,
         y += lead
 
     y += 20; y = sep_line(d, y) + 18
-    y  = draw_sub(canvas, d, subtitle, y)
+    y  = draw_sub(canvas, d, subtitle, y, fnt_sz=28, color=W_SOFT)
     if extra_fn: extra_fn(canvas, d, y)
     canvas.save(out_path); print(f"✓ {os.path.basename(out_path)}")
 
