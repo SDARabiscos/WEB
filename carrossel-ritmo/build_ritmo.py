@@ -4,7 +4,7 @@
 from PIL import Image, ImageDraw, ImageFont, ImageOps, ImageFilter
 import os, math
 
-W, H   = 1080, 1080
+W, H   = 1080, 1350
 MARGIN = 64
 MAX_W  = W - MARGIN * 2
 
@@ -135,7 +135,8 @@ def darken_zone(canvas, y_top):
     return base.convert("RGB")
 
 def make_open_slide(bg_path, headlines, subtitle, out_path,
-                    centering=(0.5,0.5), h_start=100, extra_fn=None):
+                    centering=(0.5,0.5), h_start=100, extra_fn=None,
+                    badge=None):
     img    = Image.open(bg_path).convert("RGB")
     canvas = ImageOps.fit(img, (W,H), Image.LANCZOS, centering=centering)
     canvas = smoky_purple(canvas)
@@ -143,16 +144,31 @@ def make_open_slide(bg_path, headlines, subtitle, out_path,
     d = ImageDraw.Draw(canvas)
 
     h_sz, fnt_h = fit_font(d, headlines, "black", h_start)
-    lead = int(h_sz * 1.08)
+    lead   = int(h_sz * 1.08)
     fnt_s  = F("regular", 26)
     sub_ls = wrap(d, subtitle, fnt_s)
-    sub_h  = len(sub_ls)*int(26*1.55)
+    sub_h  = len(sub_ls) * int(26*1.55)
+    badge_h = 60 if badge else 0
     extra_h = 80 if extra_fn else 0
-    block_h = lead*len(headlines) + 20+5+18 + sub_h + extra_h
-    y = max(H - 100 - block_h, 460)
+    block_h = badge_h + lead*len(headlines) + 20+5+18 + sub_h + extra_h
+    y = max(H - 120 - block_h, 560)
 
     canvas = darken_zone(canvas, y)
     d = ImageDraw.Draw(canvas)
+
+    # ── Badge de pilar ─────────────────────────────────────────────
+    if badge:
+        pill_w = tw(d, f"{badge['num']}  {badge['label']}", F("medium",13)) + 40
+        pill_h = 34
+        px     = (W - pill_w) // 2
+        d.rounded_rectangle([px, y, px+pill_w, y+pill_h], radius=17, fill=(*PUR_DK,))
+        d.rounded_rectangle([px, y, px+pill_w, y+pill_h], radius=17, outline=PURPLE, width=1)
+        inner_x = px + 16
+        d.text((inner_x, y+10), badge["num"], font=F("black",13), fill=PUR_LT)
+        sep_x = inner_x + tw(d, badge["num"], F("black",13)) + 8
+        d.line([(sep_x, y+8),(sep_x, y+pill_h-8)], fill=BG3, width=1)
+        d.text((sep_x+8, y+10), badge["label"], font=F("medium",13), fill=GRAY_M)
+        y += pill_h + 18
 
     for i, line in enumerate(headlines):
         lw = tw(d, line, fnt_h); x = (W-lw)//2
@@ -279,46 +295,45 @@ os.makedirs(OUT, exist_ok=True)
 # CARROSSEL 1 — "SUA MARCA TEM RITMO OU TEM PRESSA?"
 # ══════════════════════════════════════════════════════════════════
 
-def c1_s01():  # abertura — IA bg
+def c1_s01():
     make_open_slide(
-        f"{BG}/bg_c1_slide01.png",
+        f"{BG}/bg_c1_s01.png",
         ["SUA MARCA TEM", "RITMO OU", "TEM PRESSA?"],
         "A resposta muda tudo sobre como você cresce.",
         f"{OUT}/c1_slide01.png",
         h_start=108,
     )
 
-def c1_s02():  # clean
-    make_clean_slide(
+def c1_s02():
+    make_open_slide(
+        f"{BG}/bg_c1_s02.png",
         ["PRESSA É ANSIEDADE", "DISFARÇADA DE ESTRATÉGIA."],
         "Postar todo dia sem direção não é consistência. É ruído com calendário.",
         f"{OUT}/c1_slide02.png", h_start=84,
     )
 
-def c1_s03():  # clean
-    make_clean_slide(
+def c1_s03():
+    make_open_slide(
+        f"{BG}/bg_c1_s03.png",
         ["RITMO NÃO É", "VELOCIDADE."],
         "É cadência. O ciclo certo de criar, distribuir e converter. Sem queimar a audiência.",
         f"{OUT}/c1_slide03.png", h_start=100,
     )
 
-def c1_s04():  # clean
-    make_clean_slide(
+def c1_s04():
+    make_open_slide(
+        f"{BG}/bg_c1_s04.png",
         ["MARCAS QUE ESCALAM", "CONSTROEM ANTES DE ACELERAR."],
         "DNA claro. Posicionamento afiado. Sistema que repete resultado.",
         f"{OUT}/c1_slide04.png", h_start=84,
     )
 
-def c1_s05():  # clean + botões
-    def extra(canvas, d, y):
-        btn_row(canvas, d, y,
-                [("CONSTRUINDO", PUR_MD), ("CORRENDO", PURPLE)],
-                "Comenta aqui. Qual é o ritmo da sua marca agora?")
-    make_clean_slide(
+def c1_s05():
+    make_open_slide(
+        f"{BG}/bg_c1_s05.png",
         ["QUAL É O", "RITMO DA SUA MARCA?"],
-        "",
+        "Comenta aqui. Conta como está o ritmo do seu negócio agora.",
         f"{OUT}/c1_slide05.png", h_start=100,
-        extra_fn=extra,
     )
 
 
@@ -326,49 +341,48 @@ def c1_s05():  # clean + botões
 # CARROSSEL 2 — "O COMPASSO QUE TRANSFORMA MARKETING EM PREVISIBILIDADE"
 # ══════════════════════════════════════════════════════════════════
 
-def c2_s01():  # abertura — IA bg
+def c2_s01():
     make_open_slide(
-        f"{BG}/bg_c2_slide01.png",
+        f"{BG}/bg_c2_s01.png",
         ["O COMPASSO", "QUE TRANSFORMA", "MARKETING EM", "PREVISIBILIDADE."],
         "3 pilares. 1 sistema. Resultado que se repete.",
         f"{OUT}/c2_slide01.png",
         h_start=96,
     )
 
-def c2_s02():  # clean — pilar 01
-    make_clean_slide(
+def c2_s02():
+    make_open_slide(
+        f"{BG}/bg_c2_s02.png",
         ["DNA &", "POSICIONAMENTO."],
         "Sem clareza de quem você é e para quem fala, qualquer estratégia é desperdício.",
         f"{OUT}/c2_slide02.png", h_start=108,
         badge={"num": "01", "label": "PILAR"},
     )
 
-def c2_s03():  # clean — pilar 02
-    make_clean_slide(
+def c2_s03():
+    make_open_slide(
+        f"{BG}/bg_c2_s03.png",
         ["TRÁFEGO", "& TRAÇÃO."],
         "Meta e Google só funcionam quando criativo e público estão alinhados ao posicionamento.",
         f"{OUT}/c2_slide03.png", h_start=112,
         badge={"num": "02", "label": "PILAR"},
     )
 
-def c2_s04():  # clean — pilar 03
-    make_clean_slide(
+def c2_s04():
+    make_open_slide(
+        f"{BG}/bg_c2_s04.png",
         ["ECOSSISTEMA", "DE CONVERSÃO."],
         "CRM, automação e funil não são luxo. São o que transforma clique em cliente recorrente.",
         f"{OUT}/c2_slide04.png", h_start=108,
         badge={"num": "03", "label": "PILAR"},
     )
 
-def c2_s05():  # clean + botões
-    def extra(canvas, d, y):
-        btn_row(canvas, d, y,
-                [("01", PUR_DK), ("02", PUR_MD), ("03", PURPLE)],
-                "Qual pilar é seu gargalo? Comenta o número.")
-    make_clean_slide(
+def c2_s05():
+    make_open_slide(
+        f"{BG}/bg_c2_s05.png",
         ["QUAL PILAR", "É SEU GARGALO?"],
-        "",
+        "Comenta o número: 01, 02 ou 03. A gente te diz o próximo passo.",
         f"{OUT}/c2_slide05.png", h_start=104,
-        extra_fn=extra,
     )
 
 
