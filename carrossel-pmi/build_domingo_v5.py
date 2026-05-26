@@ -141,7 +141,7 @@ def build(data, path):
 
     # handle
     hf = F("medium", 26)
-    hnd = "@pmiconsultoria"
+    hnd = "@perrymarketingintegrado"
     hbb = d.textbbox((0, 0), hnd, font=hf)
     d.text((M, HANDLE_Y - hbb[1]), hnd, font=hf, fill=(170, 160, 190))
 
