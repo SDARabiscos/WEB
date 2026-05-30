@@ -10,9 +10,11 @@ W, H   = 1080, 1350
 C_BG   = (7, 6, 11)
 C_WHT  = (255, 255, 255)
 C_SUB  = (210, 200, 225)
+C_VIB  = (110, 0, 212)    # #6e00d4
+C_MED  = (168, 85, 247)   # #a855f7
 
 FD   = '/home/user/WEB/carrossel-pmi/fonts'
-LOGO = '/home/user/WEB/carrossel-pmi/logo_ritmodamarca.png'
+LOGO = '/home/user/WEB/carrossel-pmi/logo_pmi_transparent.png'
 BG   = '/home/user/WEB/carrossel-pmi/sabado_bg'
 OUT  = '/home/user/WEB/carrossel-pmi/sabado'
 os.makedirs(OUT, exist_ok=True)
@@ -142,10 +144,9 @@ def build(bg_file, hl_lines, sub_text, out_name,
     print(f'  ✓ {out_name}')
 
 
-# ── Cores de acento ──────────────────────────────────────────────────────────
-PURPLE = (168, 85, 247)    # marca
-TEAL   = (20, 220, 190)    # TikTok vibe
-RED    = (239, 68, 68)     # urgência / vaidade
+# ── Cores de acento — paleta da marca ────────────────────────────────────────
+PURPLE = (168, 85, 247)   # #a855f7 roxo médio
+VIBRANT = (110, 0, 212)   # #6e00d4 roxo vibrante
 
 # ════════════════════════════════════════════════════════════════════════════
 # POST A — TikTok Shop (5 slides)
@@ -153,29 +154,29 @@ RED    = (239, 68, 68)     # urgência / vaidade
 print('=== POST A — TikTok Shop ===')
 
 build('pa_s1_creator.jpg',
-      ['ENQUANTO VOCÊ DEBATE', 'SE DEVE ENTRAR', 'NO TIKTOK SHOP,'],
-      'seu concorrente já está vendendo ao vivo.',
-      'pa_s1.png', TEAL, 90, accent_idx={2})
+      ['SEU CONCORRENTE', 'JA ESTA VENDENDO', 'AO VIVO.'],
+      'Voce ainda esta debatendo se deve entrar no TikTok Shop.',
+      'pa_s1.png', PURPLE, 96, accent_idx={1, 2})
 
 build('pa_s2_shopping.jpg',
-      ['EM MENOS DE 1 ANO', 'O TIKTOK SHOP VIROU', 'O 3º MAIOR', 'MARKETPLACE DO BRASIL.'],
-      'Atrás só de Mercado Livre e Shopee.',
-      'pa_s2.png', TEAL, 90, accent_idx={2, 3})
+      ['EM MENOS DE 1 ANO', 'O TIKTOK SHOP SE TORNOU', 'O 3 MAIOR', 'MARKETPLACE DO BRASIL.'],
+      'Atras so de Mercado Livre e Shopee. Nao e tendencia. E mercado.',
+      'pa_s2.png', PURPLE, 84, accent_idx={2, 3})
 
 build('pa_s3_money.jpg',
-      ['O FATURAMENTO POR', 'LIVES CRESCEU', '96 VEZES', 'EM UM ANO.'],
-      'Um negócio foi de R$ 4 mil para R$ 3,2 milhões vendendo ao vivo.',
-      'pa_s3.png', TEAL, 94, accent_idx={2})
+      ['UM NEGOCIO', 'FOI DE R$ 4 MIL', 'A R$ 3,2 MILHOES', 'VENDENDO AO VIVO.'],
+      'O faturamento por lives cresceu 96 vezes em um ano no Brasil.',
+      'pa_s3.png', PURPLE, 90, accent_idx={2, 3})
 
 build('pa_s4_cityphone.jpg',
-      ['VER. CONFIAR.', 'COMPRAR.', 'SEM SAIR DO APP.'],
-      'O consumidor não quer clicar em link nem esperar página carregar.',
-      'pa_s4.png', TEAL, 104, accent_idx={1})
+      ['O CONSUMIDOR', 'QUER VER,', 'CONFIAR E COMPRAR', 'EM 30 SEGUNDOS.'],
+      'Sem clicar em link. Sem esperar carregar pagina. Tudo dentro do app.',
+      'pa_s4.png', PURPLE, 90, accent_idx={2})
 
 build('pa_s5_glow.jpg',
-      ['A PERGUNTA NÃO É', '"DEVO ENTRAR?"', 'É: QUANTO VOCÊ', 'JÁ PERDEU?'],
-      'Segue @ritmodamarca e descobre como posicionar seu negócio agora.',
-      'pa_s5.png', TEAL, 90, accent_idx={1, 3})
+      ['A QUESTAO', 'NAO E SE VOCE', 'DEVE ENTRAR.'],
+      'E quanto voce ja perdeu esperando a hora certa. Siga @perrymarketingintegrado.',
+      'pa_s5.png', PURPLE, 96, accent_idx={2})
 
 # ════════════════════════════════════════════════════════════════════════════
 # POST B — ROI de Vaidade (4 slides)
@@ -183,23 +184,23 @@ build('pa_s5_glow.jpg',
 print('\n=== POST B — ROI de Vaidade ===')
 
 build('pb_s1_data.jpg',
-      ['SEGUIR TODAS AS', 'TENDÊNCIAS CAIU', 'DE 54% PARA 16%', 'EM UM ANO.'],
-      'O mercado finalmente acordou. Acabou a era do engajamento bonito sem resultado.',
-      'pb_s1.png', RED, 88, accent_idx={2, 3})
+      ['QUEM AINDA POSTA', 'SÓ PARA CURTIDA', 'ESTA ATRASADO', '7 ANOS.'],
+      'Seguir todas as tendencias caiu de 54 para 16 porcento em um ano. O mercado cresceu.',
+      'pb_s1.png', VIBRANT, 88, accent_idx={2, 3})
 
 build('pb_s2_likes.jpg',
-      ['CURTIDA NÃO PAGA', 'BOLETO.', 'ALCANCE NÃO É', 'FATURAMENTO.'],
-      'Quem ainda otimiza post para like em 2026 opera com mentalidade de 2019.',
-      'pb_s2.png', RED, 92, accent_idx={1, 3})
+      ['CURTIDA NAO', 'PAGA BOLETO.', 'ALCANCE NAO E', 'FATURAMENTO.'],
+      'Engajamento sem conversao e so barulho. O mercado cobrou resultado e ganhou.',
+      'pb_s2.png', VIBRANT, 90, accent_idx={0, 2})
 
 build('pb_s3_dramatic.jpg',
-      ['A PERGUNTA CERTA', 'É UMA SÓ:'],
-      'Isso aqui gera cliente — ou só gera aplauso?',
-      'pb_s3.png', RED, 110, accent_idx={1})
+      ['ANTES DE POSTAR,', 'RESPONDA:', 'ISSO GERA CLIENTE', 'OU SO APLAUSO?'],
+      'Se a resposta demorar mais de 5 segundos, voce tem um problema de posicionamento.',
+      'pb_s3.png', VIBRANT, 88, accent_idx={2, 3})
 
 build('pb_s4_night.jpg',
-      ['NA PMI A GENTE', 'SEMPRE DEFENDEU:', 'RESULTADO ACIMA', 'DE TREND.'],
-      'Não é sobre ser bonito no feed. É sobre construir um negócio que vende de verdade.',
-      'pb_s4.png', RED, 90, accent_idx={2, 3})
+      ['NAO E SOBRE', 'SER BONITO', 'NO FEED.'],
+      'E sobre construir um negocio que vende todo dia. A PMI sempre defendeu isso.',
+      'pb_s4.png', VIBRANT, 104, accent_idx={1, 2})
 
 print(f'\nDone → {OUT}')
