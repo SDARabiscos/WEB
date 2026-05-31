@@ -11,7 +11,7 @@ server.tool(
   { placa: z.string().describe('Placa sem traco: ABC1234 (antiga) ou ABC1D23 (Mercosul)') },
   async ({ placa }) => {
     try {
-      const d = await consultarPlaca(placa);
+      const { veiculo: d, ipva, estados } = await consultarPlaca(placa);
       const sep = '-'.repeat(40);
       const txt = [
         `CONSULTA VEICULAR --- ${d.placa}`,
@@ -19,7 +19,7 @@ server.tool(
         `Marca:        ${d.marca}`,
         `Modelo:       ${d.modelo}`,
         `Generico:     ${d.generico}`,
-        `Ano:          ${d.ano}`,
+        `Ano:          ${d.ano}${d.anoModelo ? ' / Modelo ' + d.anoModelo : ''}`,
         `Cor:          ${d.cor}`,
         `Combustivel:  ${d.combustivel}`,
         `Potencia:     ${d.potencia}`,
@@ -32,6 +32,12 @@ server.tool(
         `Codigo:       ${d.codigoFipe}`,
         `Modelo FIPE:  ${d.modeloFipe}`,
         `Valor:        ${d.valorFipe}`,
+        sep,
+        'IPVA',
+        `Valor Venal:  ${ipva.valorVenal}`,
+        `Aliquota:     ${ipva.aliquota}`,
+        `Valor IPVA:   ${ipva.valorIpva}`,
+        `Estados:      ${estados.length} estados disponíveis`,
         sep,
         `Fonte: ${d.fonte}`,
       ].join('\n');

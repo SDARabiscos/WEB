@@ -4,6 +4,7 @@ export interface DadosVeiculo {
   modelo: string;
   generico: string;
   ano: string;
+  anoModelo: string;
   cor: string;
   combustivel: string;
   potencia: string;
@@ -14,5 +15,20 @@ export interface DadosVeiculo {
   codigoFipe: string;
   modeloFipe: string;
   valorFipe: string;
+  placaAntiga: string;
   fonte: string;
+}
+
+export interface DadosIpva {
+  valorVenal: string;
+  aliquota: string;
+  valorIpva: string;
+  historico: { ano: string; valorVenal: string; valorIpva: string }[];
+}
+
+export interface EstadoIpva {
+  estado: string;
+  valorVenal: string;
+  taxa: string;
+  valorIpva: string;
 }
