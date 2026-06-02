@@ -1,0 +1,2209 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Manual da Marca — Azevedo Motors</title>
+<style>
+  :root {
+    --preto: #0D0D0D;
+    --branco: #FFFFFF;
+    --cobre-escuro: #7B3B10;
+    --cobre-medio: #A0521C;
+    --cobre-claro: #C87941;
+    --cobre-grad: linear-gradient(180deg, #7B3B10 0%, #C87941 100%);
+    --cobre-grad-h: linear-gradient(90deg, #7B3B10 0%, #C87941 100%);
+    --cinza-claro: #F5F5F3;
+    --cinza-medio: #E0DDD8;
+    --cinza-escuro: #2A2A2A;
+    --fonte-titulo: 'Georgia', 'Times New Roman', serif;
+    --fonte-corpo: 'Helvetica Neue', 'Arial', sans-serif;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: var(--fonte-corpo);
+    background: var(--branco);
+    color: var(--preto);
+    line-height: 1.6;
+  }
+
+  /* ── NAVEGAÇÃO LATERAL ── */
+  nav {
+    position: fixed;
+    top: 0; left: 0;
+    width: 260px;
+    height: 100vh;
+    background: var(--preto);
+    z-index: 100;
+    display: flex;
+    flex-direction: column;
+    padding: 40px 0;
+    overflow-y: auto;
+  }
+
+  .nav-logo {
+    padding: 0 28px 32px;
+    border-bottom: 1px solid #222;
+  }
+
+  .nav-logo .brand-v {
+    font-size: 13px;
+    letter-spacing: 4px;
+    color: var(--cobre-claro);
+    display: block;
+    margin-bottom: 4px;
+  }
+
+  .nav-logo .brand-name {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--branco);
+    letter-spacing: 3px;
+    text-transform: uppercase;
+  }
+
+  .nav-label {
+    font-size: 9px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: #555;
+    padding: 24px 28px 8px;
+  }
+
+  nav a {
+    display: block;
+    padding: 10px 28px;
+    color: #888;
+    text-decoration: none;
+    font-size: 12px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    transition: color .2s, padding-left .2s;
+    border-left: 2px solid transparent;
+  }
+
+  nav a:hover, nav a.active {
+    color: var(--cobre-claro);
+    border-left-color: var(--cobre-claro);
+    padding-left: 34px;
+  }
+
+  /* ── CONTEÚDO PRINCIPAL ── */
+  main {
+    margin-left: 260px;
+  }
+
+  /* ── CAPA ── */
+  .capa {
+    height: 100vh;
+    background: var(--preto);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .capa::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at 60% 50%, #3a1a0840 0%, transparent 70%);
+  }
+
+  .capa-tag {
+    font-size: 10px;
+    letter-spacing: 6px;
+    text-transform: uppercase;
+    color: var(--cobre-medio);
+    margin-bottom: 32px;
+  }
+
+  .capa-titulo {
+    font-size: clamp(48px, 6vw, 88px);
+    font-weight: 800;
+    color: var(--branco);
+    letter-spacing: 12px;
+    text-transform: uppercase;
+    text-align: center;
+  }
+
+  .capa-titulo .v-grad {
+    background: var(--cobre-grad);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .capa-sub {
+    margin-top: 12px;
+    font-size: 13px;
+    letter-spacing: 8px;
+    color: var(--cobre-claro);
+    text-transform: uppercase;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .capa-sub::before, .capa-sub::after {
+    content: '';
+    width: 40px;
+    height: 1px;
+    background: var(--cobre-grad-h);
+  }
+
+  .capa-desc {
+    margin-top: 60px;
+    font-size: 13px;
+    letter-spacing: 2px;
+    color: #555;
+    text-transform: uppercase;
+  }
+
+  .capa-versao {
+    position: absolute;
+    bottom: 40px;
+    right: 60px;
+    font-size: 11px;
+    color: #333;
+    letter-spacing: 2px;
+  }
+
+  /* ── SEÇÕES ── */
+  .secao {
+    padding: 100px 80px;
+    border-bottom: 1px solid var(--cinza-medio);
+  }
+
+  .secao:nth-child(even) {
+    background: var(--cinza-claro);
+  }
+
+  .secao-num {
+    font-size: 10px;
+    letter-spacing: 4px;
+    color: var(--cobre-medio);
+    text-transform: uppercase;
+    margin-bottom: 8px;
+    display: block;
+  }
+
+  .secao-titulo {
+    font-size: clamp(28px, 3vw, 48px);
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 4px;
+    color: var(--preto);
+    margin-bottom: 16px;
+    line-height: 1.1;
+  }
+
+  .secao-titulo .accent {
+    background: var(--cobre-grad);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .secao-desc {
+    font-size: 15px;
+    color: #666;
+    max-width: 640px;
+    margin-bottom: 60px;
+    line-height: 1.8;
+  }
+
+  .divider {
+    width: 48px;
+    height: 2px;
+    background: var(--cobre-grad-h);
+    margin: 20px 0 40px;
+  }
+
+  /* ── GRID 2 COLUNAS ── */
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; }
+  .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+  .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
+
+  /* ── CARD ── */
+  .card {
+    background: var(--branco);
+    border: 1px solid var(--cinza-medio);
+    padding: 32px;
+    position: relative;
+  }
+
+  .card-dark {
+    background: var(--preto);
+    border-color: #222;
+    color: var(--branco);
+  }
+
+  .card-titulo {
+    font-size: 11px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--cobre-medio);
+    margin-bottom: 12px;
+  }
+
+  .card-valor {
+    font-size: 22px;
+    font-weight: 700;
+    letter-spacing: 1px;
+  }
+
+  .card-desc {
+    font-size: 13px;
+    color: #888;
+    margin-top: 8px;
+    line-height: 1.7;
+  }
+
+  /* ── PALETA DE CORES ── */
+  .cor-bloco {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .cor-amostra {
+    height: 120px;
+    width: 100%;
+  }
+
+  .cor-info {
+    padding: 20px;
+    background: var(--branco);
+    border: 1px solid var(--cinza-medio);
+    border-top: none;
+  }
+
+  .cor-nome {
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+
+  .cor-hex {
+    font-size: 12px;
+    color: #888;
+    font-family: monospace;
+    letter-spacing: 1px;
+  }
+
+  .cor-uso {
+    font-size: 11px;
+    color: #aaa;
+    margin-top: 8px;
+    line-height: 1.5;
+  }
+
+  /* ── TIPOGRAFIA ── */
+  .tipo-exemplo {
+    padding: 40px;
+    background: var(--branco);
+    border: 1px solid var(--cinza-medio);
+    margin-bottom: 20px;
+  }
+
+  .tipo-meta {
+    font-size: 11px;
+    letter-spacing: 3px;
+    color: var(--cobre-medio);
+    text-transform: uppercase;
+    margin-bottom: 16px;
+  }
+
+  .tipo-h1 { font-size: 56px; font-weight: 800; letter-spacing: 6px; text-transform: uppercase; line-height: 1; }
+  .tipo-h2 { font-size: 36px; font-weight: 700; letter-spacing: 4px; text-transform: uppercase; }
+  .tipo-h3 { font-size: 24px; font-weight: 600; letter-spacing: 3px; text-transform: uppercase; }
+  .tipo-body { font-size: 16px; color: #444; line-height: 1.8; max-width: 560px; }
+  .tipo-caption { font-size: 11px; letter-spacing: 3px; text-transform: uppercase; color: #888; }
+
+  /* ── LOGO DISPLAY ── */
+  .logo-box {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 60px;
+    border: 1px solid var(--cinza-medio);
+    position: relative;
+  }
+
+  .logo-box-dark {
+    background: var(--preto);
+    border-color: #222;
+  }
+
+  .logo-svg {
+    width: 240px;
+  }
+
+  .logo-tag {
+    position: absolute;
+    bottom: 16px;
+    right: 20px;
+    font-size: 10px;
+    letter-spacing: 2px;
+    color: #aaa;
+    text-transform: uppercase;
+  }
+
+  /* ── LOGO SVG INLINE ── */
+  .logo-texto {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .logo-texto-principal {
+    font-size: 38px;
+    font-weight: 800;
+    letter-spacing: 10px;
+    text-transform: uppercase;
+    color: var(--preto);
+    display: flex;
+    align-items: center;
+  }
+
+  .logo-texto-principal .v-copper {
+    background: linear-gradient(180deg, #7B3B10 0%, #C87941 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .logo-texto-sub {
+    font-size: 12px;
+    letter-spacing: 8px;
+    text-transform: uppercase;
+    color: var(--preto);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .logo-linha {
+    width: 32px;
+    height: 1px;
+    background: linear-gradient(90deg, #7B3B10, #C87941);
+  }
+
+  /* versão branca do logo */
+  .logo-texto-branco .logo-texto-principal { color: var(--branco); }
+  .logo-texto-branco .logo-texto-sub { color: var(--branco); }
+
+  /* ── REGRAS USO INCORRETO ── */
+  .uso-errado {
+    border: 2px dashed #e55;
+    padding: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 16px;
+    position: relative;
+  }
+
+  .uso-errado::after {
+    content: '✕ NÃO FAÇA ISSO';
+    position: absolute;
+    top: -12px;
+    left: 16px;
+    background: #e55;
+    color: white;
+    font-size: 10px;
+    letter-spacing: 2px;
+    padding: 2px 8px;
+  }
+
+  .uso-correto {
+    border: 2px solid #5a5;
+    padding: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 16px;
+    position: relative;
+  }
+
+  .uso-correto::after {
+    content: '✓ CORRETO';
+    position: absolute;
+    top: -12px;
+    left: 16px;
+    background: #5a5;
+    color: white;
+    font-size: 10px;
+    letter-spacing: 2px;
+    padding: 2px 8px;
+  }
+
+  /* ── INSTAGRAM ── */
+  .insta-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 4px;
+    margin-bottom: 32px;
+  }
+
+  .insta-post {
+    aspect-ratio: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .insta-post-label {
+    position: absolute;
+    bottom: 12px;
+    left: 12px;
+    right: 12px;
+    font-size: 9px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.8);
+  }
+
+  .ip1 { background: var(--preto); color: var(--cobre-claro); }
+  .ip2 { background: linear-gradient(135deg, #1a1a1a 0%, #3a2010 100%); }
+  .ip3 { background: #f0ece6; color: var(--preto); }
+  .ip4 { background: linear-gradient(180deg, #7B3B10 0%, #C87941 100%); }
+  .ip5 { background: var(--preto); }
+  .ip6 { background: #e8e2da; color: var(--preto); }
+  .ip7 { background: linear-gradient(135deg, #C87941 0%, #7B3B10 100%); }
+  .ip8 { background: #1a1a1a; }
+  .ip9 { background: #f5f2ed; color: var(--preto); }
+
+  .stories-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+  }
+
+  .stories-frame {
+    aspect-ratio: 9/16;
+    border: 1px solid var(--cinza-medio);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .sf1 { background: var(--preto); }
+  .sf2 { background: linear-gradient(180deg, #0d0d0d 0%, #3a1a08 100%); }
+  .sf3 { background: var(--cinza-claro); }
+  .sf4 { background: linear-gradient(135deg, #7B3B10 0%, #C87941 100%); }
+
+  /* ── DIMENSÕES MÍDIA ── */
+  .midia-card {
+    background: var(--branco);
+    border: 1px solid var(--cinza-medio);
+    padding: 24px;
+  }
+
+  .midia-preview {
+    background: var(--cinza-medio);
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #888;
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+  }
+
+  .midia-nome {
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+
+  .midia-dim {
+    font-size: 18px;
+    font-weight: 800;
+    color: var(--preto);
+    margin-bottom: 4px;
+  }
+
+  .midia-formato {
+    font-size: 11px;
+    color: #888;
+    letter-spacing: 1px;
+  }
+
+  /* ── TOM DE VOZ ── */
+  .tom-card {
+    padding: 32px;
+    border-left: 3px solid var(--cobre-medio);
+    background: var(--branco);
+    border-top: 1px solid var(--cinza-medio);
+    border-right: 1px solid var(--cinza-medio);
+    border-bottom: 1px solid var(--cinza-medio);
+  }
+
+  .tom-titulo {
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+
+  .tom-desc { font-size: 14px; color: #555; line-height: 1.8; }
+
+  .exemplo-certo { color: #2d8a2d; font-style: italic; }
+  .exemplo-errado { color: #c03030; font-style: italic; text-decoration: line-through; }
+
+  /* ── ANÚNCIOS ── */
+  .anuncio-box {
+    border: 1px solid var(--cinza-medio);
+    overflow: hidden;
+  }
+
+  .anuncio-header {
+    background: var(--preto);
+    color: var(--branco);
+    padding: 20px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .anuncio-tag {
+    font-size: 9px;
+    letter-spacing: 3px;
+    color: var(--cobre-claro);
+    text-transform: uppercase;
+  }
+
+  .anuncio-corpo {
+    padding: 24px;
+  }
+
+  .anuncio-titulo { font-size: 16px; font-weight: 700; margin-bottom: 8px; }
+  .anuncio-texto { font-size: 13px; color: #555; line-height: 1.7; }
+  .anuncio-cta {
+    display: inline-block;
+    margin-top: 16px;
+    background: linear-gradient(90deg, #7B3B10, #C87941);
+    color: white;
+    font-size: 10px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    padding: 10px 24px;
+    text-decoration: none;
+  }
+
+  /* ── TABELA ── */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+
+  th {
+    background: var(--preto);
+    color: var(--cobre-claro);
+    padding: 14px 20px;
+    text-align: left;
+    font-size: 10px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    font-weight: 600;
+  }
+
+  td {
+    padding: 14px 20px;
+    border-bottom: 1px solid var(--cinza-medio);
+    color: #444;
+    vertical-align: top;
+  }
+
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: var(--cinza-claro); }
+
+  /* ── BADGES ── */
+  .badge {
+    display: inline-block;
+    font-size: 9px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    padding: 4px 10px;
+    border: 1px solid;
+  }
+
+  .badge-cobre { border-color: var(--cobre-medio); color: var(--cobre-medio); }
+  .badge-preto { border-color: var(--preto); color: var(--preto); background: transparent; }
+  .badge-fill { background: var(--preto); color: var(--cobre-claro); border-color: var(--preto); }
+
+  /* ── VALORES ── */
+  .valor-card {
+    text-align: center;
+    padding: 48px 32px;
+    border: 1px solid var(--cinza-medio);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .valor-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 50%;
+    transform: translateX(-50%);
+    width: 40px;
+    height: 3px;
+    background: var(--cobre-grad-h);
+  }
+
+  .valor-icone {
+    font-size: 28px;
+    margin-bottom: 16px;
+    display: block;
+  }
+
+  .valor-nome {
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+
+  .valor-desc { font-size: 13px; color: #666; line-height: 1.7; }
+
+  /* ── FOOTER ── */
+  .pagina-footer {
+    background: var(--preto);
+    padding: 80px;
+    text-align: center;
+    color: #444;
+  }
+
+  .pagina-footer .marca {
+    font-size: 22px;
+    font-weight: 800;
+    letter-spacing: 8px;
+    text-transform: uppercase;
+    color: var(--branco);
+    margin-bottom: 8px;
+  }
+
+  .pagina-footer .sub {
+    font-size: 10px;
+    letter-spacing: 6px;
+    color: var(--cobre-claro);
+    text-transform: uppercase;
+    margin-bottom: 40px;
+  }
+
+  .pagina-footer p {
+    font-size: 12px;
+    letter-spacing: 1px;
+    color: #555;
+  }
+
+  /* ── SCROLLBAR ── */
+  ::-webkit-scrollbar { width: 4px; }
+  ::-webkit-scrollbar-track { background: #111; }
+  ::-webkit-scrollbar-thumb { background: var(--cobre-escuro); }
+
+  /* ── RESPONSIVO ── */
+  @media (max-width: 1100px) {
+    nav { width: 0; overflow: hidden; }
+    main { margin-left: 0; }
+    .secao { padding: 60px 32px; }
+    .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr 1fr; }
+    .stories-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+
+  @media (max-width: 640px) {
+    .grid-2, .grid-3, .grid-4, .insta-grid { grid-template-columns: 1fr; }
+    .stories-grid { grid-template-columns: repeat(2, 1fr); }
+    .secao { padding: 48px 20px; }
+    .capa-titulo { font-size: 36px; letter-spacing: 6px; }
+  }
+
+  /* ── UTILITÁRIOS ── */
+  .mt-8 { margin-top: 8px; }
+  .mt-16 { margin-top: 16px; }
+  .mt-32 { margin-top: 32px; }
+  .mt-48 { margin-top: 48px; }
+  .mb-8 { margin-bottom: 8px; }
+  .mb-16 { margin-bottom: 16px; }
+  .mb-32 { margin-bottom: 32px; }
+  .gap-note {
+    font-size: 12px;
+    color: #999;
+    letter-spacing: 1px;
+    padding: 12px 16px;
+    background: #f9f8f6;
+    border-left: 3px solid var(--cobre-claro);
+    margin-top: 16px;
+  }
+
+  /* ── PROGRESS BARS ── */
+  .prog-label { display: flex; justify-content: space-between; font-size: 12px; color: #666; margin-bottom: 6px; letter-spacing: 1px; }
+  .prog-bar { height: 4px; background: var(--cinza-medio); margin-bottom: 16px; }
+  .prog-fill { height: 4px; background: var(--cobre-grad-h); }
+
+  /* ── ICON BULLET ── */
+  .check-list { list-style: none; }
+  .check-list li {
+    padding: 6px 0;
+    font-size: 14px;
+    color: #444;
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+  }
+  .check-list li::before {
+    content: '—';
+    color: var(--cobre-medio);
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+</style>
+</head>
+<body>
+
+<!-- ══════════════════ NAVEGAÇÃO ══════════════════ -->
+<nav>
+  <div class="nav-logo">
+    <span class="brand-v">▼</span>
+    <span class="brand-name">Azevedo Motors</span>
+  </div>
+
+  <span class="nav-label">Manual da Marca</span>
+  <a href="#intro">Introdução</a>
+  <a href="#missao">Missão &amp; Valores</a>
+  <a href="#logo">Logotipo</a>
+  <a href="#cores">Paleta de Cores</a>
+  <a href="#tipografia">Tipografia</a>
+  <a href="#voz">Tom de Voz</a>
+
+  <span class="nav-label">Digital</span>
+  <a href="#instagram">Instagram</a>
+  <a href="#stories">Stories &amp; Reels</a>
+  <a href="#midias">Especificações de Mídia</a>
+
+  <span class="nav-label">Publicidade</span>
+  <a href="#anuncios">Anúncios</a>
+  <a href="#veiculacao">Veiculação</a>
+  <a href="#hashtags">Hashtags &amp; Bio</a>
+
+  <span class="nav-label">Aplicações</span>
+  <a href="#papelaria">Papelaria</a>
+  <a href="#proibicoes">Proibições</a>
+</nav>
+
+<!-- ══════════════════ MAIN ══════════════════ -->
+<main>
+
+  <!-- ── CAPA ── -->
+  <section class="capa">
+    <span class="capa-tag">Manual da Marca — Versão 1.0</span>
+    <h1 class="capa-titulo">
+      AZE<span class="v-grad">V</span>EDO
+    </h1>
+    <div class="capa-sub">MOTORS</div>
+    <p class="capa-desc">Brand Guidelines · Instagram · Mídias · Veiculação</p>
+    <div class="capa-versao">2025 · Confidencial</div>
+  </section>
+
+  <!-- ── 1. INTRODUÇÃO ── -->
+  <section class="secao" id="intro">
+    <span class="secao-num">01 — Introdução</span>
+    <h2 class="secao-titulo">A <span class="accent">Marca</span></h2>
+    <div class="divider"></div>
+    <p class="secao-desc">
+      Este documento define os padrões visuais, verbais e estratégicos da Azevedo Motors.
+      Toda peça de comunicação — física ou digital — deve seguir estas diretrizes para garantir
+      consistência, autoridade e elegância em todos os pontos de contato com o cliente.
+    </p>
+
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-titulo">Posicionamento</div>
+        <div class="card-valor">Premium · Confiança · Sofisticação</div>
+        <div class="card-desc">
+          A Azevedo Motors posiciona-se como referência em veículos de alta qualidade,
+          combinando tradição familiar com modernidade e excelência no atendimento.
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-titulo">Público-alvo</div>
+        <div class="card-valor">25–55 anos · Classe A/B</div>
+        <div class="card-desc">
+          Homens e mulheres que valorizam qualidade, design e uma experiência de compra
+          diferenciada. Buscam status, segurança e atendimento personalizado.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── 2. MISSÃO ── -->
+  <section class="secao" id="missao">
+    <span class="secao-num">02 — Identidade</span>
+    <h2 class="secao-titulo">Missão, <span class="accent">Visão</span> &amp; Valores</h2>
+    <div class="divider"></div>
+
+    <div class="grid-2 mb-32">
+      <div class="card card-dark">
+        <div class="card-titulo">Missão</div>
+        <div class="card-desc" style="color:#ccc; font-size:15px; line-height:1.9;">
+          Oferecer a melhor experiência na aquisição de veículos premium, com atendimento
+          consultivo, transparência e paixão por automóveis.
+        </div>
+      </div>
+      <div class="card card-dark">
+        <div class="card-titulo">Visão</div>
+        <div class="card-desc" style="color:#ccc; font-size:15px; line-height:1.9;">
+          Ser a concessionária multimarca mais respeitada da região, reconhecida pela excelência,
+          pelo portfólio exclusivo e por relacionamentos de longo prazo.
+        </div>
+      </div>
+    </div>
+
+    <div class="grid-3">
+      <div class="valor-card">
+        <span class="valor-icone">◆</span>
+        <div class="valor-nome">Excelência</div>
+        <div class="valor-desc">Cada detalhe importa. Do showroom ao pós-venda, entregamos mais do que o esperado.</div>
+      </div>
+      <div class="valor-card">
+        <span class="valor-icone">◈</span>
+        <div class="valor-nome">Confiança</div>
+        <div class="valor-desc">Relações construídas com transparência, honestidade e respeito ao cliente.</div>
+      </div>
+      <div class="valor-card">
+        <span class="valor-icone">◇</span>
+        <div class="valor-nome">Paixão</div>
+        <div class="valor-desc">Amamos o que fazemos. Essa energia se reflete em cada negociação e entrega.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── 3. LOGOTIPO ── -->
+  <section class="secao" id="logo">
+    <span class="secao-num">03 — Identidade Visual</span>
+    <h2 class="secao-titulo">Logo<span class="accent">tipo</span></h2>
+    <div class="divider"></div>
+    <p class="secao-desc">
+      A identidade visual da Azevedo Motors baseia-se no contraste sofisticado entre o preto profundo
+      e o gradiente cobre — materiais que remetem à mecânica de precisão e ao luxo atemporal.
+      O "V" em destaque representa a inicial do sobrenome e a forma icônica do motor V.
+    </p>
+
+    <!-- Versão principal -->
+    <h3 style="font-size:11px; letter-spacing:3px; text-transform:uppercase; color:#999; margin-bottom:16px;">Versão Principal — Fundo Branco</h3>
+    <div class="grid-2 mb-32">
+      <div class="logo-box">
+        <div class="logo-texto">
+          <div class="logo-texto-principal">
+            AZE<span class="v-copper">V</span>EDO
+          </div>
+          <div class="logo-texto-sub">
+            <span class="logo-linha"></span>
+            MOTORS
+            <span class="logo-linha"></span>
+          </div>
+        </div>
+        <span class="logo-tag">Versão Horizontal</span>
+      </div>
+      <div class="logo-box logo-box-dark">
+        <div class="logo-texto logo-texto-branco">
+          <div class="logo-texto-principal">
+            AZE<span class="v-copper">V</span>EDO
+          </div>
+          <div class="logo-texto-sub">
+            <span class="logo-linha"></span>
+            MOTORS
+            <span class="logo-linha"></span>
+          </div>
+        </div>
+        <span class="logo-tag">Versão Negativa</span>
+      </div>
+    </div>
+
+    <!-- Ícone V -->
+    <h3 style="font-size:11px; letter-spacing:3px; text-transform:uppercase; color:#999; margin-bottom:16px;">Ícone / Símbolo</h3>
+    <div class="grid-4 mb-32">
+      <div class="logo-box" style="padding:40px;">
+        <svg width="80" height="80" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="vg1" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#7B3B10"/>
+              <stop offset="100%" stop-color="#C87941"/>
+            </linearGradient>
+          </defs>
+          <path d="M10 8 L40 72 L70 8" stroke="url(#vg1)" stroke-width="8" fill="none" stroke-linejoin="round" stroke-linecap="round"/>
+        </svg>
+        <span class="logo-tag">Fundo Branco</span>
+      </div>
+      <div class="logo-box logo-box-dark" style="padding:40px;">
+        <svg width="80" height="80" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="vg2" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#7B3B10"/>
+              <stop offset="100%" stop-color="#C87941"/>
+            </linearGradient>
+          </defs>
+          <path d="M10 8 L40 72 L70 8" stroke="url(#vg2)" stroke-width="8" fill="none" stroke-linejoin="round" stroke-linecap="round"/>
+        </svg>
+        <span class="logo-tag">Fundo Preto</span>
+      </div>
+      <div class="logo-box" style="background:#C87941; padding:40px;">
+        <svg width="80" height="80" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M10 8 L40 72 L70 8" stroke="#0D0D0D" stroke-width="8" fill="none" stroke-linejoin="round" stroke-linecap="round"/>
+        </svg>
+        <span class="logo-tag" style="color:#0d0d0d;">Fundo Cobre</span>
+      </div>
+      <div class="logo-box" style="background:var(--cinza-claro); padding:40px;">
+        <svg width="80" height="80" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="vg3" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#7B3B10"/>
+              <stop offset="100%" stop-color="#C87941"/>
+            </linearGradient>
+          </defs>
+          <path d="M10 8 L40 72 L70 8" stroke="url(#vg3)" stroke-width="8" fill="none" stroke-linejoin="round" stroke-linecap="round"/>
+        </svg>
+        <span class="logo-tag">Fundo Off-White</span>
+      </div>
+    </div>
+
+    <!-- Área de proteção -->
+    <h3 style="font-size:11px; letter-spacing:3px; text-transform:uppercase; color:#999; margin-bottom:16px; margin-top:48px;">Área de Proteção</h3>
+    <div class="card">
+      <div style="display:flex; align-items:center; justify-content:center; padding:40px; position:relative;">
+        <div style="border:2px dashed var(--cobre-claro); padding:32px 48px; display:inline-block;">
+          <div class="logo-texto">
+            <div class="logo-texto-principal" style="font-size:28px; letter-spacing:8px;">
+              AZE<span class="v-copper">V</span>EDO
+            </div>
+            <div class="logo-texto-sub" style="font-size:10px; letter-spacing:6px;">
+              <span class="logo-linha"></span> MOTORS <span class="logo-linha"></span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="gap-note">
+        A área de proteção mínima ao redor do logotipo equivale à altura da letra "M" de MOTORS.
+        Nenhum elemento — texto, imagem ou borda — deve invadir essa zona.
+      </div>
+    </div>
+
+    <!-- Tamanhos mínimos -->
+    <h3 style="font-size:11px; letter-spacing:3px; text-transform:uppercase; color:#999; margin-bottom:16px; margin-top:48px;">Tamanhos Mínimos</h3>
+    <table>
+      <tr>
+        <th>Aplicação</th>
+        <th>Tamanho Mínimo</th>
+        <th>Versão Recomendada</th>
+      </tr>
+      <tr>
+        <td>Impresso (offset/digital)</td>
+        <td>30mm de largura</td>
+        <td>Horizontal completa</td>
+      </tr>
+      <tr>
+        <td>Digital / Web</td>
+        <td>120px de largura</td>
+        <td>Horizontal ou ícone V</td>
+      </tr>
+      <tr>
+        <td>Favicon / App Icon</td>
+        <td>32×32px</td>
+        <td>Apenas ícone V</td>
+      </tr>
+      <tr>
+        <td>Bordado / Gravação</td>
+        <td>40mm</td>
+        <td>Ícone V + AZEVEDO</td>
+      </tr>
+      <tr>
+        <td>Outdoor / Banner</td>
+        <td>Sem mínimo</td>
+        <td>Horizontal completa</td>
+      </tr>
+    </table>
+  </section>
+
+  <!-- ── 4. CORES ── -->
+  <section class="secao" id="cores">
+    <span class="secao-num">04 — Identidade Visual</span>
+    <h2 class="secao-titulo">Paleta de <span class="accent">Cores</span></h2>
+    <div class="divider"></div>
+    <p class="secao-desc">
+      A paleta foi construída sobre o contraste máximo entre o preto absoluto e tons quentes de cobre.
+      O cobre é a assinatura cromática da marca — nunca deve ser substituído por dourado, laranja ou marrom genérico.
+    </p>
+
+    <!-- Cores primárias -->
+    <h3 style="font-size:11px; letter-spacing:3px; text-transform:uppercase; color:#999; margin-bottom:20px;">Cores Primárias</h3>
+    <div class="grid-4 mb-32">
+      <div class="cor-bloco">
+        <div class="cor-amostra" style="background:#0D0D0D;"></div>
+        <div class="cor-info">
+          <div class="cor-nome">Preto Profundo</div>
+          <div class="cor-hex">HEX #0D0D0D</div>
+          <div class="cor-hex">RGB 13, 13, 13</div>
+          <div class="cor-hex">CMYK 0, 0, 0, 95</div>
+          <div class="cor-uso">Base de todo o sistema. Fundo principal, texto em fundos claros.</div>
+        </div>
+      </div>
+      <div class="cor-bloco">
+        <div class="cor-amostra" style="background: linear-gradient(180deg, #7B3B10 0%, #C87941 100%);"></div>
+        <div class="cor-info">
+          <div class="cor-nome">Gradiente Cobre</div>
+          <div class="cor-hex">#7B3B10 → #C87941</div>
+          <div class="cor-hex">Ícone V e destaques</div>
+          <div class="cor-uso">Exclusivo para o ícone V, linhas decorativas e CTAs principais.</div>
+        </div>
+      </div>
+      <div class="cor-bloco">
+        <div class="cor-amostra" style="background:#FFFFFF; border-bottom:none;"></div>
+        <div class="cor-info" style="border-top: 1px solid var(--cinza-medio);">
+          <div class="cor-nome">Branco Puro</div>
+          <div class="cor-hex">HEX #FFFFFF</div>
+          <div class="cor-hex">RGB 255, 255, 255</div>
+          <div class="cor-hex">CMYK 0, 0, 0, 0</div>
+          <div class="cor-uso">Fundos de layout, texto sobre preto, espaço negativo.</div>
+        </div>
+      </div>
+      <div class="cor-bloco">
+        <div class="cor-amostra" style="background:#F5F2ED;"></div>
+        <div class="cor-info">
+          <div class="cor-nome">Off-White Creme</div>
+          <div class="cor-hex">HEX #F5F2ED</div>
+          <div class="cor-hex">RGB 245, 242, 237</div>
+          <div class="cor-hex">CMYK 0, 1, 3, 4</div>
+          <div class="cor-uso">Alternativa ao branco. Dá leveza sem perder sofisticação.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Cores secundárias -->
+    <h3 style="font-size:11px; letter-spacing:3px; text-transform:uppercase; color:#999; margin-bottom:20px;">Tons de Cobre</h3>
+    <div class="grid-4 mb-32">
+      <div class="cor-bloco">
+        <div class="cor-amostra" style="background:#7B3B10;"></div>
+        <div class="cor-info">
+          <div class="cor-nome">Cobre Escuro</div>
+          <div class="cor-hex">HEX #7B3B10</div>
+          <div class="cor-uso">Topo do gradiente V. Texto de destaque em fundos claros.</div>
+        </div>
+      </div>
+      <div class="cor-bloco">
+        <div class="cor-amostra" style="background:#A0521C;"></div>
+        <div class="cor-info">
+          <div class="cor-nome">Cobre Médio</div>
+          <div class="cor-hex">HEX #A0521C</div>
+          <div class="cor-uso">Labels, bordas de destaque, ícones secundários.</div>
+        </div>
+      </div>
+      <div class="cor-bloco">
+        <div class="cor-amostra" style="background:#C87941;"></div>
+        <div class="cor-info">
+          <div class="cor-nome">Cobre Claro</div>
+          <div class="cor-hex">HEX #C87941</div>
+          <div class="cor-uso">Base do gradiente V. CTAs, hovers, linhas decorativas.</div>
+        </div>
+      </div>
+      <div class="cor-bloco">
+        <div class="cor-amostra" style="background:#E8C99A;"></div>
+        <div class="cor-info">
+          <div class="cor-nome">Cobre Nude</div>
+          <div class="cor-hex">HEX #E8C99A</div>
+          <div class="cor-uso">Backgrounds sutis, hover states em dark mode.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Neutros -->
+    <h3 style="font-size:11px; letter-spacing:3px; text-transform:uppercase; color:#999; margin-bottom:20px;">Escala de Neutros</h3>
+    <div class="grid-4">
+      <div class="cor-bloco">
+        <div class="cor-amostra" style="background:#2A2A2A;"></div>
+        <div class="cor-info"><div class="cor-nome">Cinza Fundo</div><div class="cor-hex">#2A2A2A</div></div>
+      </div>
+      <div class="cor-bloco">
+        <div class="cor-amostra" style="background:#555555;"></div>
+        <div class="cor-info"><div class="cor-nome">Cinza Texto</div><div class="cor-hex">#555555</div></div>
+      </div>
+      <div class="cor-bloco">
+        <div class="cor-amostra" style="background:#E0DDD8;"></div>
+        <div class="cor-info"><div class="cor-nome">Cinza Borda</div><div class="cor-hex">#E0DDD8</div></div>
+      </div>
+      <div class="cor-bloco">
+        <div class="cor-amostra" style="background:#F5F5F3;"></div>
+        <div class="cor-info"><div class="cor-nome">Cinza Fundo Light</div><div class="cor-hex">#F5F5F3</div></div>
+      </div>
+    </div>
+
+    <!-- Nota sobre uso -->
+    <div class="gap-note mt-32">
+      <strong>IMPORTANTE:</strong> O gradiente cobre é a assinatura visual da marca. Nunca substitua por dourado (#FFD700),
+      laranja (#FF6600) ou qualquer tom genérico. Use os valores exatos especificados acima para garantir consistência em todas as mídias.
+    </div>
+  </section>
+
+  <!-- ── 5. TIPOGRAFIA ── -->
+  <section class="secao" id="tipografia">
+    <span class="secao-num">05 — Identidade Visual</span>
+    <h2 class="secao-titulo">Tipo<span class="accent">grafia</span></h2>
+    <div class="divider"></div>
+    <p class="secao-desc">
+      O sistema tipográfico usa uma hierarquia clara: Futura (ou alternativa geométrica) para
+      títulos e identificações, e Inter para textos corridos. A combinação cria tensão sofisticada
+      entre rigidez geométrica e leiturabilidade contemporânea.
+    </p>
+
+    <div class="tipo-exemplo">
+      <div class="tipo-meta">Fonte Principal — Títulos / Logo / Headlines</div>
+      <div class="tipo-h1">AZEVEDO MOTORS</div>
+      <div style="margin-top:16px; font-size:12px; color:#aaa; letter-spacing:2px;">
+        Futura PT Heavy / Montserrat ExtraBold / Bebas Neue (alternativa gratuita)
+      </div>
+    </div>
+
+    <div class="tipo-exemplo">
+      <div class="tipo-meta">Fonte Secundária — Corpo / Descrições / UI</div>
+      <div class="tipo-body">
+        Excelência em cada detalhe. Na Azevedo Motors, cada veículo é selecionado com critério,
+        cada cliente é atendido com exclusividade, e cada entrega é celebrada como uma conquista.
+      </div>
+      <div style="margin-top:16px; font-size:12px; color:#aaa; letter-spacing:2px;">
+        Inter Regular · Inter Medium · Inter SemiBold
+      </div>
+    </div>
+
+    <h3 style="font-size:11px; letter-spacing:3px; text-transform:uppercase; color:#999; margin:40px 0 20px;">Hierarquia Completa</h3>
+    <table>
+      <tr>
+        <th>Estilo</th>
+        <th>Fonte</th>
+        <th>Tamanho</th>
+        <th>Peso</th>
+        <th>Tracking</th>
+        <th>Uso</th>
+      </tr>
+      <tr>
+        <td><strong>Display</strong></td>
+        <td>Montserrat / Futura</td>
+        <td>72–120px</td>
+        <td>ExtraBold 800</td>
+        <td>+8 a +12px</td>
+        <td>Capas, outdoors, posts hero</td>
+      </tr>
+      <tr>
+        <td><strong>H1</strong></td>
+        <td>Montserrat / Futura</td>
+        <td>48–64px</td>
+        <td>Bold 700</td>
+        <td>+4 a +6px</td>
+        <td>Título principal de página</td>
+      </tr>
+      <tr>
+        <td><strong>H2</strong></td>
+        <td>Montserrat / Futura</td>
+        <td>32–40px</td>
+        <td>Bold 700</td>
+        <td>+3px</td>
+        <td>Subtítulos de seção</td>
+      </tr>
+      <tr>
+        <td><strong>H3</strong></td>
+        <td>Montserrat</td>
+        <td>20–24px</td>
+        <td>SemiBold 600</td>
+        <td>+2px</td>
+        <td>Cards, labels de destaque</td>
+      </tr>
+      <tr>
+        <td><strong>Body</strong></td>
+        <td>Inter</td>
+        <td>14–16px</td>
+        <td>Regular 400</td>
+        <td>0</td>
+        <td>Textos descritivos, legendas longas</td>
+      </tr>
+      <tr>
+        <td><strong>Caption</strong></td>
+        <td>Inter</td>
+        <td>11–12px</td>
+        <td>Medium 500</td>
+        <td>+2px</td>
+        <td>Metadados, categorias, tags</td>
+      </tr>
+      <tr>
+        <td><strong>Label</strong></td>
+        <td>Montserrat</td>
+        <td>9–11px</td>
+        <td>SemiBold 600</td>
+        <td>+3px</td>
+        <td>Badges, botões, CAPS only</td>
+      </tr>
+    </table>
+
+    <div class="gap-note mt-16">
+      <strong>Google Fonts gratuitas:</strong> Montserrat (substitui Futura PT) + Inter (corpo).
+      Ambas disponíveis em fonts.google.com — importe sempre as variantes 400, 500, 600, 700 e 800.
+    </div>
+  </section>
+
+  <!-- ── 6. TOM DE VOZ ── -->
+  <section class="secao" id="voz">
+    <span class="secao-num">06 — Comunicação</span>
+    <h2 class="secao-titulo">Tom de <span class="accent">Voz</span></h2>
+    <div class="divider"></div>
+    <p class="secao-desc">
+      A Azevedo Motors fala como um especialista apaixonado, não como um vendedor. Nossa linguagem
+      é sofisticada sem ser hermética, próxima sem ser informal. Transmitimos autoridade com calor humano.
+    </p>
+
+    <div class="grid-2 mb-32">
+      <div class="tom-card">
+        <div class="tom-titulo">Sofisticado, não Arrogante</div>
+        <div class="tom-desc">
+          Usamos vocabulário elevado mas nunca inacessível. Falamos de qualidade com dados e argumentos sólidos.<br><br>
+          <span class="exemplo-certo">✓ "Cada detalhe foi pensado para quem entende de automóveis."</span><br>
+          <span class="exemplo-errado">✗ "Só quem tem gosto paga assim."</span>
+        </div>
+      </div>
+      <div class="tom-card">
+        <div class="tom-titulo">Próximo, não Informal</div>
+        <div class="tom-desc">
+          Tratamos o cliente como parceiro. Usamos "você", mas mantemos formalidade elegante.<br><br>
+          <span class="exemplo-certo">✓ "Encontramos o veículo ideal para o seu estilo de vida."</span><br>
+          <span class="exemplo-errado">✗ "Ei! Olha que oferta incrível pra você!"</span>
+        </div>
+      </div>
+      <div class="tom-card">
+        <div class="tom-titulo">Confiante, não Agressivo</div>
+        <div class="tom-desc">
+          Não pressionamos. Nossa oferta fala por si. Urgência quando real, nunca fabricada.<br><br>
+          <span class="exemplo-certo">✓ "Unidade limitada. Agende sua visita."</span><br>
+          <span class="exemplo-errado">✗ "ÚLTIMA CHANCE!!! CORRE PRA NÃO PERDER!!!"</span>
+        </div>
+      </div>
+      <div class="tom-card">
+        <div class="tom-titulo">Especialista, não Técnico</div>
+        <div class="tom-desc">
+          Traduzimos especificações em benefícios reais para o cotidiano do cliente.<br><br>
+          <span class="exemplo-certo">✓ "Motor V6 turbo: ultrapassagens seguras em qualquer situação."</span><br>
+          <span class="exemplo-errado">✗ "Torque de 450Nm a 1800rpm com injeção direta."</span>
+        </div>
+      </div>
+    </div>
+
+    <h3 style="font-size:11px; letter-spacing:3px; text-transform:uppercase; color:#999; margin-bottom:20px;">Palavras da Marca</h3>
+    <div class="grid-3">
+      <div class="card">
+        <div class="card-titulo">Usamos</div>
+        <ul class="check-list mt-8">
+          <li>Exclusivo / Premium</li>
+          <li>Sofisticado / Refinado</li>
+          <li>Experiência / Sensação</li>
+          <li>Curadoria / Selecionado</li>
+          <li>Confiança / Transparência</li>
+          <li>Performance / Precisão</li>
+        </ul>
+      </div>
+      <div class="card">
+        <div class="card-titulo">Evitamos</div>
+        <ul class="check-list mt-8">
+          <li>Barato / Promoção imperdível</li>
+          <li>Mega / Super / Ultra (excessivo)</li>
+          <li>Gente, Pessoal, Galera</li>
+          <li>Clica no link da bio!</li>
+          <li>Tá esperando o quê?</li>
+          <li>Corra! Última chance!</li>
+        </ul>
+      </div>
+      <div class="card">
+        <div class="card-titulo">CTAs Recomendados</div>
+        <ul class="check-list mt-8">
+          <li>Agende sua visita</li>
+          <li>Conheça este veículo</li>
+          <li>Entre em contato</li>
+          <li>Saiba mais</li>
+          <li>Explore nosso portfólio</li>
+          <li>Fale com um especialista</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── 7. INSTAGRAM ── -->
+  <section class="secao" id="instagram">
+    <span class="secao-num">07 — Social Media</span>
+    <h2 class="secao-titulo">Insta<span class="accent">gram</span></h2>
+    <div class="divider"></div>
+    <p class="secao-desc">
+      O feed do Instagram é a vitrine digital da marca. Deve transmitir elegância, consistência
+      e desejo. Cada post é cuidadosamente curado para manter a identidade visual premium.
+    </p>
+
+    <!-- Grid Preview -->
+    <h3 style="font-size:11px; letter-spacing:3px; text-transform:uppercase; color:#999; margin-bottom:16px;">Grade do Feed — Padrão Visual</h3>
+    <div class="insta-grid mb-32" style="max-width:540px;">
+      <div class="insta-post ip1">
+        <svg width="40" height="40" viewBox="0 0 80 80" fill="none"><defs><linearGradient id="vfeed" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#7B3B10"/><stop offset="100%" stop-color="#C87941"/></linearGradient></defs><path d="M10 8 L40 72 L70 8" stroke="url(#vfeed)" stroke-width="8" fill="none" stroke-linejoin="round" stroke-linecap="round"/></svg>
+        <div class="insta-post-label">Post Institucional</div>
+      </div>
+      <div class="insta-post ip2">
+        <div style="text-align:center; color:#C87941;">
+          <div style="font-size:10px; letter-spacing:3px; color:#aaa;">DESTAQUE</div>
+          <div style="font-size:15px; font-weight:800; letter-spacing:4px; margin-top:6px; color:white;">BMW M3</div>
+        </div>
+        <div class="insta-post-label" style="color:rgba(255,255,255,0.6);">Foto do Veículo</div>
+      </div>
+      <div class="insta-post ip3">
+        <div style="text-align:center;">
+          <div style="font-size:9px; letter-spacing:3px; color:#A0521C;">AZEVEDO MOTORS</div>
+          <div style="font-size:22px; font-weight:800; letter-spacing:2px; margin-top:4px;">"Dirigir<br>é arte."</div>
+        </div>
+        <div class="insta-post-label">Quote / Citação</div>
+      </div>
+      <div class="insta-post ip4">
+        <div style="text-align:center; color:white;">
+          <div style="font-size:20px; font-weight:800; letter-spacing:4px;">NOVO</div>
+          <div style="font-size:9px; letter-spacing:3px; margin-top:4px; opacity:0.8;">NO PORTFÓLIO</div>
+        </div>
+        <div class="insta-post-label" style="color:rgba(255,255,255,0.8);">Anúncio Produto</div>
+      </div>
+      <div class="insta-post ip5">
+        <div style="text-align:center;">
+          <div style="font-size:9px; letter-spacing:3px; color:#C87941;">BASTIDORES</div>
+          <div style="font-size:12px; color:#888; margin-top:6px;">Detalhes / BTS</div>
+        </div>
+        <div class="insta-post-label">Behind The Scenes</div>
+      </div>
+      <div class="insta-post ip6">
+        <div style="text-align:center;">
+          <div style="font-size:9px; letter-spacing:3px; color:#A0521C;">CLIENTE</div>
+          <div style="font-size:12px; color:#555; margin-top:6px;">Depoimento</div>
+        </div>
+        <div class="insta-post-label">Social Proof</div>
+      </div>
+      <div class="insta-post ip7">
+        <div style="text-align:center; color:white;">
+          <div style="font-size:10px; letter-spacing:3px;">ESPECIFICAÇÕES</div>
+          <div style="font-size:14px; font-weight:800; margin-top:6px;">0–100 km/h<br>em 4.2s</div>
+        </div>
+        <div class="insta-post-label" style="color:rgba(255,255,255,0.8);">Dados Técnicos</div>
+      </div>
+      <div class="insta-post ip8">
+        <div style="text-align:center;">
+          <svg width="36" height="36" viewBox="0 0 80 80" fill="none"><defs><linearGradient id="vfeed2" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#7B3B10"/><stop offset="100%" stop-color="#C87941"/></linearGradient></defs><path d="M10 8 L40 72 L70 8" stroke="url(#vfeed2)" stroke-width="8" fill="none" stroke-linejoin="round" stroke-linecap="round"/></svg>
+        </div>
+        <div class="insta-post-label">Branding Puro</div>
+      </div>
+      <div class="insta-post ip9">
+        <div style="text-align:center;">
+          <div style="font-size:9px; letter-spacing:3px; color:#A0521C;">MERCADO</div>
+          <div style="font-size:12px; color:#555; margin-top:6px;">Conteúdo Info</div>
+        </div>
+        <div class="insta-post-label">Conteúdo Educativo</div>
+      </div>
+    </div>
+
+    <!-- Regras do feed -->
+    <h3 style="font-size:11px; letter-spacing:3px; text-transform:uppercase; color:#999; margin-bottom:20px;">Regras do Feed</h3>
+    <div class="grid-2 mb-32">
+      <div class="card">
+        <div class="card-titulo">Composição Visual</div>
+        <ul class="check-list mt-8">
+          <li>Sempre use fundo preto, branco ou off-white</li>
+          <li>Nunca misture fundos coloridos aleatórios</li>
+          <li>Cobre só para acentos — nunca fundo total</li>
+          <li>Tipografia: Montserrat para títulos no post</li>
+          <li>Mínimo 40% de espaço negativo</li>
+          <li>Fotos de veículos: fundo clean, ângulo lateral ou 3/4</li>
+        </ul>
+      </div>
+      <div class="card">
+        <div class="card-titulo">Legenda (Caption)</div>
+        <ul class="check-list mt-8">
+          <li>Primeira linha: frase de impacto (sem emoji no início)</li>
+          <li>Corpo: 2–4 linhas descritivas, tom sofisticado</li>
+          <li>Máximo 5 emojis por legenda (use com moderação)</li>
+          <li>CTA sempre na última linha</li>
+          <li>Hashtags: bloco separado no final (máximo 20)</li>
+          <li>Marcar localização quando relevante</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Frequência de posts -->
+    <h3 style="font-size:11px; letter-spacing:3px; text-transform:uppercase; color:#999; margin-bottom:20px;">Frequência de Publicação</h3>
+    <table>
+      <tr>
+        <th>Tipo de Conteúdo</th>
+        <th>Frequência</th>
+        <th>Melhor Horário</th>
+        <th>Formato</th>
+      </tr>
+      <tr>
+        <td>Veículo em Destaque</td>
+        <td>3× por semana</td>
+        <td>Seg / Qua / Sex — 12h ou 18h</td>
+        <td>Carrossel 1080×1080</td>
+      </tr>
+      <tr>
+        <td>Branding / Institucional</td>
+        <td>1× por semana</td>
+        <td>Domingo 10h</td>
+        <td>Imagem estática 1080×1080</td>
+      </tr>
+      <tr>
+        <td>Depoimento / Social Proof</td>
+        <td>1× por semana</td>
+        <td>Terça 9h</td>
+        <td>Imagem ou Carrossel</td>
+      </tr>
+      <tr>
+        <td>Conteúdo Educativo</td>
+        <td>1× por semana</td>
+        <td>Quinta 11h</td>
+        <td>Carrossel 1080×1080</td>
+      </tr>
+      <tr>
+        <td>Promoção / Oferta</td>
+        <td>Quando aplicável</td>
+        <td>Seg 8h ou Sex 17h</td>
+        <td>Imagem + Stories</td>
+      </tr>
+    </table>
+  </section>
+
+  <!-- ── 8. STORIES & REELS ── -->
+  <section class="secao" id="stories">
+    <span class="secao-num">08 — Social Media</span>
+    <h2 class="secao-titulo">Stories &amp; <span class="accent">Reels</span></h2>
+    <div class="divider"></div>
+    <p class="secao-desc">
+      Stories e Reels têm linguagem mais dinâmica, mas mantêm a identidade da marca.
+      São o canal de maior alcance orgânico — devem ser consistentes e atrativos.
+    </p>
+
+    <h3 style="font-size:11px; letter-spacing:3px; text-transform:uppercase; color:#999; margin-bottom:20px;">Templates de Stories</h3>
+    <div class="stories-grid mb-32">
+      <div class="stories-frame sf1">
+        <div style="text-align:center; padding:20px;">
+          <div style="font-size:8px; letter-spacing:3px; color:#C87941; margin-bottom:8px;">AZEVEDO MOTORS</div>
+          <div style="font-size:16px; font-weight:800; color:white; letter-spacing:2px; line-height:1.2;">NOVO NO<br>PORTFÓLIO</div>
+          <div style="width:24px; height:2px; background:linear-gradient(90deg,#7B3B10,#C87941); margin:12px auto;"></div>
+          <div style="font-size:8px; color:#888; letter-spacing:2px;">ARRASTE PARA CIMA</div>
+        </div>
+        <span style="position:absolute; bottom:12px; font-size:8px; letter-spacing:2px; color:#444; text-transform:uppercase;">Anúncio</span>
+      </div>
+      <div class="stories-frame sf2">
+        <div style="text-align:center; padding:20px;">
+          <div style="font-size:8px; letter-spacing:3px; color:#C87941; margin-bottom:16px;">VOCÊ SABIA?</div>
+          <div style="font-size:13px; color:white; line-height:1.7; opacity:0.9;">
+            Veículos bem<br>conservados valorizam<br>até 30% mais na revenda.
+          </div>
+          <div style="width:24px; height:2px; background:linear-gradient(90deg,#7B3B10,#C87941); margin:16px auto;"></div>
+          <div style="font-size:8px; color:#888; letter-spacing:2px;">SALVE ESSA DICA</div>
+        </div>
+        <span style="position:absolute; bottom:12px; font-size:8px; letter-spacing:2px; color:#444; text-transform:uppercase;">Educativo</span>
+      </div>
+      <div class="stories-frame sf3">
+        <div style="text-align:center; padding:20px;">
+          <div style="font-size:8px; letter-spacing:3px; color:#A0521C; margin-bottom:12px;">DEPOIMENTO</div>
+          <div style="font-size:12px; color:#333; line-height:1.7; font-style:italic;">
+            "Melhor experiência<br>de compra que já tive.<br>Voltarei com certeza."
+          </div>
+          <div style="font-size:9px; color:#888; margin-top:12px; letter-spacing:1px;">— Carlos M., cliente</div>
+        </div>
+        <span style="position:absolute; bottom:12px; font-size:8px; letter-spacing:2px; color:#999; text-transform:uppercase;">Social Proof</span>
+      </div>
+      <div class="stories-frame sf4">
+        <div style="text-align:center; padding:20px;">
+          <div style="font-size:8px; letter-spacing:3px; color:rgba(255,255,255,0.7); margin-bottom:8px;">OFERTA</div>
+          <div style="font-size:20px; font-weight:800; color:white; letter-spacing:4px; line-height:1;">R$ 89.900</div>
+          <div style="font-size:10px; color:rgba(255,255,255,0.8); margin-top:4px; letter-spacing:2px;">HONDA CIVIC 2022</div>
+          <div style="background:rgba(0,0,0,0.3); color:white; font-size:8px; letter-spacing:2px; padding:8px 16px; margin-top:16px; text-transform:uppercase;">Ver detalhes</div>
+        </div>
+        <span style="position:absolute; bottom:12px; font-size:8px; letter-spacing:2px; color:rgba(255,255,255,0.5); text-transform:uppercase;">Oferta</span>
+      </div>
+    </div>
+
+    <h3 style="font-size:11px; letter-spacing:3px; text-transform:uppercase; color:#999; margin-bottom:20px;">Diretrizes para Reels</h3>
+    <div class="grid-3">
+      <div class="card">
+        <div class="card-titulo">Estrutura do Reel</div>
+        <ul class="check-list mt-8">
+          <li>0–3s: Hook visual forte (close do veículo)</li>
+          <li>3–10s: Destaque principal (interior / motor)</li>
+          <li>10–25s: Desenvolvimento (features, ângulos)</li>
+          <li>25–30s: CTA com logo e contato</li>
+        </ul>
+      </div>
+      <div class="card">
+        <div class="card-titulo">Produção</div>
+        <ul class="check-list mt-8">
+          <li>Filmagem em 4K ou Full HD mínimo</li>
+          <li>Iluminação natural ou estúdio (evite noite)</li>
+          <li>Movimento suave (gimbal recomendado)</li>
+          <li>Trilha: jazz, eletrônico suave, lo-fi premium</li>
+          <li>Legenda sempre ativa</li>
+        </ul>
+      </div>
+      <div class="card">
+        <div class="card-titulo">Texto na Tela</div>
+        <ul class="check-list mt-8">
+          <li>Fonte: Montserrat Bold</li>
+          <li>Cor: Branco ou Cobre Claro #C87941</li>
+          <li>Posição: 1/4 inferior ou superior</li>
+          <li>Máximo 6 palavras por frame de texto</li>
+          <li>Sempre com sombra sutil para legibilidade</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── 9. ESPECIFICAÇÕES DE MÍDIA ── -->
+  <section class="secao" id="midias">
+    <span class="secao-num">09 — Técnico</span>
+    <h2 class="secao-titulo">Espe<span class="accent">cificações</span> de Mídia</h2>
+    <div class="divider"></div>
+    <p class="secao-desc">
+      Dimensões, formatos e resoluções corretos garantem que a marca apareça com qualidade
+      máxima em todos os canais — sem distorções, cortes ou perda de qualidade.
+    </p>
+
+    <h3 style="font-size:11px; letter-spacing:3px; text-transform:uppercase; color:#999; margin-bottom:20px;">Instagram</h3>
+    <div class="grid-4 mb-32">
+      <div class="midia-card">
+        <div class="midia-preview" style="height:100px;">1:1</div>
+        <div class="midia-nome">Post Quadrado</div>
+        <div class="midia-dim">1080×1080px</div>
+        <div class="midia-formato">JPG/PNG · 72dpi · máx. 30MB</div>
+      </div>
+      <div class="midia-card">
+        <div class="midia-preview" style="height:130px; aspect-ratio:4/5;">4:5</div>
+        <div class="midia-nome">Post Retrato</div>
+        <div class="midia-dim">1080×1350px</div>
+        <div class="midia-formato">JPG/PNG · 72dpi · máx. 30MB</div>
+      </div>
+      <div class="midia-card">
+        <div class="midia-preview" style="height:60px;">16:9</div>
+        <div class="midia-nome">Post Paisagem</div>
+        <div class="midia-dim">1080×566px</div>
+        <div class="midia-formato">JPG/PNG · 72dpi · máx. 30MB</div>
+      </div>
+      <div class="midia-card">
+        <div class="midia-preview" style="height:100px;">9:16</div>
+        <div class="midia-nome">Stories / Reels</div>
+        <div class="midia-dim">1080×1920px</div>
+        <div class="midia-formato">MP4/MOV · máx. 15s Stories · 90s Reels</div>
+      </div>
+    </div>
+
+    <h3 style="font-size:11px; letter-spacing:3px; text-transform:uppercase; color:#999; margin-bottom:20px;">Facebook / Meta Ads</h3>
+    <div class="grid-4 mb-32">
+      <div class="midia-card">
+        <div class="midia-preview" style="height:100px;">1:1</div>
+        <div class="midia-nome">Feed Image</div>
+        <div class="midia-dim">1200×1200px</div>
+        <div class="midia-formato">JPG/PNG · máx. 30MB</div>
+      </div>
+      <div class="midia-card">
+        <div class="midia-preview" style="height:63px;">1.91:1</div>
+        <div class="midia-nome">Link Preview</div>
+        <div class="midia-dim">1200×628px</div>
+        <div class="midia-formato">JPG/PNG · máx. 30MB</div>
+      </div>
+      <div class="midia-card">
+        <div class="midia-preview" style="height:130px;">9:16</div>
+        <div class="midia-nome">Stories</div>
+        <div class="midia-dim">1080×1920px</div>
+        <div class="midia-formato">MP4 · máx. 15s</div>
+      </div>
+      <div class="midia-card">
+        <div class="midia-preview" style="height:63px;">16:9</div>
+        <div class="midia-nome">Video Feed</div>
+        <div class="midia-dim">1280×720px</div>
+        <div class="midia-formato">MP4 · H.264 · máx. 4GB</div>
+      </div>
+    </div>
+
+    <h3 style="font-size:11px; letter-spacing:3px; text-transform:uppercase; color:#999; margin-bottom:20px;">Google Ads</h3>
+    <div class="grid-4 mb-32">
+      <div class="midia-card">
+        <div class="midia-preview" style="height:50px;">728×90</div>
+        <div class="midia-nome">Leaderboard</div>
+        <div class="midia-dim">728×90px</div>
+        <div class="midia-formato">JPG/PNG/GIF · máx. 150KB</div>
+      </div>
+      <div class="midia-card">
+        <div class="midia-preview" style="height:100px; max-width:150px;">300×250</div>
+        <div class="midia-nome">Medium Rectangle</div>
+        <div class="midia-dim">300×250px</div>
+        <div class="midia-formato">JPG/PNG/GIF · máx. 150KB</div>
+      </div>
+      <div class="midia-card">
+        <div class="midia-preview" style="height:120px; max-width:80px;">160×600</div>
+        <div class="midia-nome">Wide Skyscraper</div>
+        <div class="midia-dim">160×600px</div>
+        <div class="midia-formato">JPG/PNG/GIF · máx. 150KB</div>
+      </div>
+      <div class="midia-card">
+        <div class="midia-preview" style="height:100px;">1200×628</div>
+        <div class="midia-nome">Responsive Ad</div>
+        <div class="midia-dim">1200×628px</div>
+        <div class="midia-formato">JPG/PNG · máx. 5MB</div>
+      </div>
+    </div>
+
+    <h3 style="font-size:11px; letter-spacing:3px; text-transform:uppercase; color:#999; margin-bottom:20px;">WhatsApp &amp; Outros</h3>
+    <table>
+      <tr>
+        <th>Canal</th>
+        <th>Dimensão</th>
+        <th>Formato</th>
+        <th>Observação</th>
+      </tr>
+      <tr>
+        <td>WhatsApp Status</td>
+        <td>1080×1920px</td>
+        <td>JPG / MP4</td>
+        <td>Texto na zona segura central</td>
+      </tr>
+      <tr>
+        <td>WhatsApp Catálogo</td>
+        <td>800×800px</td>
+        <td>JPG</td>
+        <td>Fundo branco, veículo centralizado</td>
+      </tr>
+      <tr>
+        <td>Email Marketing Header</td>
+        <td>600×200px</td>
+        <td>JPG / PNG</td>
+        <td>72dpi, máx. 200KB</td>
+      </tr>
+      <tr>
+        <td>YouTube Thumbnail</td>
+        <td>1280×720px</td>
+        <td>JPG</td>
+        <td>Texto legível até 40% do tamanho</td>
+      </tr>
+      <tr>
+        <td>Google Meu Negócio</td>
+        <td>750×750px mínimo</td>
+        <td>JPG / PNG</td>
+        <td>Foto real do showroom ou veículo</td>
+      </tr>
+    </table>
+  </section>
+
+  <!-- ── 10. ANÚNCIOS ── -->
+  <section class="secao" id="anuncios">
+    <span class="secao-num">10 — Publicidade</span>
+    <h2 class="secao-titulo">Templates de <span class="accent">Anúncios</span></h2>
+    <div class="divider"></div>
+    <p class="secao-desc">
+      Anúncios pagos devem seguir o mesmo sistema visual da marca. Hierarquia clara,
+      CTA visível e identidade reconhecível em menos de 2 segundos.
+    </p>
+
+    <div class="grid-2 mb-32">
+      <!-- Anúncio Veículo -->
+      <div class="anuncio-box">
+        <div class="anuncio-header">
+          <div>
+            <div class="anuncio-tag">Anúncio · Feed Instagram</div>
+            <div style="font-size:14px; font-weight:700; color:white; margin-top:4px;">Destaque de Veículo</div>
+          </div>
+          <svg width="24" height="24" viewBox="0 0 80 80" fill="none"><defs><linearGradient id="vad" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#7B3B10"/><stop offset="100%" stop-color="#C87941"/></linearGradient></defs><path d="M10 8 L40 72 L70 8" stroke="url(#vad)" stroke-width="8" fill="none" stroke-linejoin="round" stroke-linecap="round"/></svg>
+        </div>
+        <div style="background:#111; height:200px; display:flex; align-items:center; justify-content:center; flex-direction:column; gap:8px;">
+          <div style="font-size:10px; letter-spacing:3px; color:#C87941;">AZEVEDO MOTORS</div>
+          <div style="font-size:28px; font-weight:800; color:white; letter-spacing:4px;">BMW 320i</div>
+          <div style="font-size:12px; color:#888; letter-spacing:2px;">2023 · 8.000 km · Automático</div>
+          <div style="font-size:22px; font-weight:800; color:#C87941; margin-top:8px;">R$ 189.900</div>
+        </div>
+        <div class="anuncio-corpo">
+          <div class="anuncio-titulo">O sedã que combina tecnologia e emoção</div>
+          <div class="anuncio-texto">
+            Motor 2.0 TwinPower Turbo, painel digital BMW Live Cockpit e assistente de condução completo.
+            Um veículo para quem não abre mão de performance no dia a dia.
+          </div>
+          <a class="anuncio-cta">Agendar Visita →</a>
+        </div>
+      </div>
+
+      <!-- Anúncio Institucional -->
+      <div class="anuncio-box">
+        <div class="anuncio-header">
+          <div>
+            <div class="anuncio-tag">Anúncio · Stories</div>
+            <div style="font-size:14px; font-weight:700; color:white; margin-top:4px;">Institucional / Branding</div>
+          </div>
+          <svg width="24" height="24" viewBox="0 0 80 80" fill="none"><defs><linearGradient id="vad2" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#7B3B10"/><stop offset="100%" stop-color="#C87941"/></linearGradient></defs><path d="M10 8 L40 72 L70 8" stroke="url(#vad2)" stroke-width="8" fill="none" stroke-linejoin="round" stroke-linecap="round"/></svg>
+        </div>
+        <div style="background:linear-gradient(135deg, #0d0d0d 0%, #2a1208 100%); height:200px; display:flex; align-items:center; justify-content:center; flex-direction:column; gap:12px; padding:32px; text-align:center;">
+          <div style="font-size:10px; letter-spacing:4px; color:#C87941;">DESDE 2010</div>
+          <div style="font-size:20px; font-weight:800; color:white; line-height:1.3;">Excelência em<br>cada detalhe.</div>
+          <div style="width:32px; height:2px; background:linear-gradient(90deg,#7B3B10,#C87941);"></div>
+        </div>
+        <div class="anuncio-corpo">
+          <div class="anuncio-titulo">Referência regional em veículos premium</div>
+          <div class="anuncio-texto">
+            Mais de 1.000 clientes satisfeitos. Equipe especializada, portfólio exclusivo
+            e condições de financiamento personalizadas para o seu perfil.
+          </div>
+          <a class="anuncio-cta">Conhecer a Azevedo →</a>
+        </div>
+      </div>
+    </div>
+
+    <h3 style="font-size:11px; letter-spacing:3px; text-transform:uppercase; color:#999; margin-bottom:20px;">Copywriting para Anúncios</h3>
+    <table>
+      <tr>
+        <th>Elemento</th>
+        <th>Máx. Caracteres</th>
+        <th>Diretriz</th>
+        <th>Exemplo</th>
+      </tr>
+      <tr>
+        <td>Título Principal</td>
+        <td>40 (Meta) / 30 (Google)</td>
+        <td>Benefício direto, sem jargão</td>
+        <td>"BMW premium com entrada facilitada"</td>
+      </tr>
+      <tr>
+        <td>Título Secundário</td>
+        <td>40 (Meta)</td>
+        <td>Prova social ou urgência real</td>
+        <td>"Apenas 2 unidades disponíveis"</td>
+      </tr>
+      <tr>
+        <td>Descrição</td>
+        <td>125 (Meta) / 90 (Google)</td>
+        <td>Detalhe técnico + CTA</td>
+        <td>"Motor 2.0 turbo, 2022, 12 mil km. Agende seu test drive."</td>
+      </tr>
+      <tr>
+        <td>CTA Button</td>
+        <td>Predefinido</td>
+        <td>Usar: "Saiba mais" ou "Enviar mensagem"</td>
+        <td>Evitar "Compre agora"</td>
+      </tr>
+    </table>
+  </section>
+
+  <!-- ── 11. VEICULAÇÃO ── -->
+  <section class="secao" id="veiculacao">
+    <span class="secao-num">11 — Estratégia</span>
+    <h2 class="secao-titulo">Estratégia de <span class="accent">Veiculação</span></h2>
+    <div class="divider"></div>
+    <p class="secao-desc">
+      A estratégia de mídia da Azevedo Motors combina presença orgânica de qualidade com
+      tráfego pago segmentado, garantindo cobertura em todo o funil de compra.
+    </p>
+
+    <!-- Funil -->
+    <h3 style="font-size:11px; letter-spacing:3px; text-transform:uppercase; color:#999; margin-bottom:20px;">Funil de Comunicação</h3>
+    <div class="grid-3 mb-32">
+      <div class="card" style="border-top:3px solid #C87941;">
+        <div class="card-titulo">Topo do Funil — Awareness</div>
+        <div class="card-valor" style="font-size:16px; margin-bottom:12px;">Alcance &amp; Reconhecimento</div>
+        <ul class="check-list">
+          <li>Reels orgânicos de veículos</li>
+          <li>Posts de branding / valores</li>
+          <li>Anúncios de vídeo (Reach)</li>
+          <li>Google Display (remarketing frio)</li>
+        </ul>
+        <div class="card-desc mt-16">
+          KPI: Impressões, Alcance, Visualizações de Vídeo (CPV &lt; R$0,10)
+        </div>
+      </div>
+      <div class="card" style="border-top:3px solid #A0521C;">
+        <div class="card-titulo">Meio do Funil — Consideração</div>
+        <div class="card-valor" style="font-size:16px; margin-bottom:12px;">Engajamento &amp; Intenção</div>
+        <ul class="check-list">
+          <li>Carrosséis com especificações</li>
+          <li>Conteúdo educativo (comparativos)</li>
+          <li>Anúncios de tráfego para site</li>
+          <li>Remarketing de engajados</li>
+        </ul>
+        <div class="card-desc mt-16">
+          KPI: Cliques, CTR &gt;1.5%, Custo/Clique &lt; R$1,50
+        </div>
+      </div>
+      <div class="card" style="border-top:3px solid #7B3B10;">
+        <div class="card-titulo">Fundo do Funil — Conversão</div>
+        <div class="card-valor" style="font-size:16px; margin-bottom:12px;">Leads &amp; Vendas</div>
+        <ul class="check-list">
+          <li>Lead Ads (formulário direto)</li>
+          <li>WhatsApp Ads (mensagem direta)</li>
+          <li>Google Search (palavra de marca)</li>
+          <li>Remarketing de visitantes</li>
+        </ul>
+        <div class="card-desc mt-16">
+          KPI: Leads, CPL &lt; R$25, Taxa de conversão &gt;3%
+        </div>
+      </div>
+    </div>
+
+    <!-- Distribuição orçamento -->
+    <h3 style="font-size:11px; letter-spacing:3px; text-transform:uppercase; color:#999; margin-bottom:24px;">Distribuição de Verba Recomendada</h3>
+    <div class="card mb-32">
+      <div style="padding:8px 0;">
+        <div class="prog-label"><span>Meta Ads (Instagram + Facebook)</span><span>45%</span></div>
+        <div class="prog-bar"><div class="prog-fill" style="width:45%;"></div></div>
+
+        <div class="prog-label"><span>Google Ads (Search + Display)</span><span>30%</span></div>
+        <div class="prog-bar"><div class="prog-fill" style="width:30%;"></div></div>
+
+        <div class="prog-label"><span>Produção de Conteúdo (Foto/Vídeo)</span><span>15%</span></div>
+        <div class="prog-bar"><div class="prog-fill" style="width:15%;"></div></div>
+
+        <div class="prog-label"><span>Outros (WhatsApp, OLX Premium, iCarros)</span><span>10%</span></div>
+        <div class="prog-bar"><div class="prog-fill" style="width:10%;"></div></div>
+      </div>
+    </div>
+
+    <!-- Segmentação -->
+    <h3 style="font-size:11px; letter-spacing:3px; text-transform:uppercase; color:#999; margin-bottom:20px;">Segmentação para Meta Ads</h3>
+    <table>
+      <tr>
+        <th>Parâmetro</th>
+        <th>Configuração Recomendada</th>
+      </tr>
+      <tr>
+        <td>Faixa Etária</td>
+        <td>25–55 anos</td>
+      </tr>
+      <tr>
+        <td>Gênero</td>
+        <td>Todos (veículos premium atraem ambos)</td>
+      </tr>
+      <tr>
+        <td>Localização</td>
+        <td>Raio de 60–100km da loja + cidade-alvo</td>
+      </tr>
+      <tr>
+        <td>Interesses</td>
+        <td>Automóveis de luxo, BMW, Mercedes, Audi, Test drive, Carros novos</td>
+      </tr>
+      <tr>
+        <td>Comportamento</td>
+        <td>Compradores de veículos (Meta: "Auto purchasers"), Alta renda</td>
+      </tr>
+      <tr>
+        <td>Público Personalizado</td>
+        <td>Lista de clientes (CRM), Visitantes do site, Engajados no perfil</td>
+      </tr>
+      <tr>
+        <td>Lookalike</td>
+        <td>1–3% de similares ao público de compradores confirmados</td>
+      </tr>
+    </table>
+  </section>
+
+  <!-- ── 12. HASHTAGS ── -->
+  <section class="secao" id="hashtags">
+    <span class="secao-num">12 — Social Media</span>
+    <h2 class="secao-titulo">Hashtags &amp; <span class="accent">Bio</span></h2>
+    <div class="divider"></div>
+
+    <div class="grid-2 mb-32">
+      <div>
+        <h3 style="font-size:11px; letter-spacing:3px; text-transform:uppercase; color:#999; margin-bottom:20px;">Bio do Instagram</h3>
+        <div class="card">
+          <div style="font-family: monospace; font-size:14px; line-height:2; color:#333; background:#f9f8f6; padding:20px; border-left:3px solid var(--cobre-medio);">
+            <strong>AZEVEDO MOTORS</strong> 🔸<br>
+            Veículos premium com curadoria exclusiva<br>
+            ✦ Multimarca · [Cidade] · Est. 2010<br>
+            📱 Atendimento via WhatsApp<br>
+            👇 Portfólio completo
+          </div>
+          <div class="gap-note mt-16">
+            Use o link da bio para o WhatsApp ou página de catálogo. Atualize o link conforme a campanha ativa.
+          </div>
+        </div>
+      </div>
+      <div>
+        <h3 style="font-size:11px; letter-spacing:3px; text-transform:uppercase; color:#999; margin-bottom:20px;">Handle e Identidade</h3>
+        <div class="card">
+          <div class="card-titulo">Username Recomendado</div>
+          <div style="font-size:20px; font-weight:700; margin:8px 0;">@azevedomovirsoficial</div>
+          <div class="card-titulo mt-16">Alternativas</div>
+          <div style="font-size:15px; color:#555;">@azevedo.motors · @azevedomtrs</div>
+          <div class="card-titulo mt-16">Nome de Exibição</div>
+          <div style="font-size:15px; color:#555;">Azevedo Motors | Veículos Premium</div>
+          <div class="card-titulo mt-16">Categoria</div>
+          <div style="font-size:15px; color:#555;">Concessionária de Veículos</div>
+        </div>
+      </div>
+    </div>
+
+    <h3 style="font-size:11px; letter-spacing:3px; text-transform:uppercase; color:#999; margin-bottom:20px;">Banco de Hashtags</h3>
+    <div class="grid-3">
+      <div class="card">
+        <div class="card-titulo">Marca (sempre usar)</div>
+        <div style="font-size:13px; color:#555; line-height:2.2; font-family:monospace;">
+          #AzevedoMotors<br>
+          #AzevedoMotorsOficial<br>
+          #VeiculosPremium
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-titulo">Segmento (rotacionar)</div>
+        <div style="font-size:12px; color:#555; line-height:2; font-family:monospace;">
+          #CarrosDeLuxo #VeiculosSeminovos<br>
+          #MultimarcaPremium #CarroImportado<br>
+          #SeminovosDeLuxo #AutomovelDeLuxo<br>
+          #CarroNovo #VeiculoDeQualidade
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-titulo">Por Marca (conforme post)</div>
+        <div style="font-size:12px; color:#555; line-height:2; font-family:monospace;">
+          #BMW #Mercedes #Audi #Volvo<br>
+          #Toyota #Honda #HyundaiPremium<br>
+          #JeepBrasil #FordBrasil<br>
+          #CarFans #CarLovers #CarBrasil
+        </div>
+      </div>
+    </div>
+
+    <div class="gap-note mt-16">
+      <strong>Estratégia:</strong> Use 3 hashtags de marca + 5–8 de segmento + 3–5 da marca específica do veículo.
+      Total recomendado: 12–18 hashtags por post. Mais de 20 pode parecer spam.
+    </div>
+  </section>
+
+  <!-- ── 13. PAPELARIA ── -->
+  <section class="secao" id="papelaria">
+    <span class="secao-num">13 — Aplicações</span>
+    <h2 class="secao-titulo">Papelaria &amp; <span class="accent">Materiais</span></h2>
+    <div class="divider"></div>
+    <p class="secao-desc">
+      A identidade da Azevedo Motors deve ser consistente offline. Cada ponto de contato físico
+      reforça a percepção premium da marca.
+    </p>
+
+    <div class="grid-3 mb-32">
+      <div class="card card-dark">
+        <div class="card-titulo">Cartão de Visita</div>
+        <div style="background:#1a1a1a; border:1px solid #333; border-radius:2px; padding:20px; margin:16px 0; height:100px; display:flex; flex-direction:column; justify-content:center;">
+          <div style="font-size:9px; letter-spacing:3px; color:#C87941;">AZEVEDO MOTORS</div>
+          <div style="font-size:12px; font-weight:700; color:white; margin-top:4px; letter-spacing:1px;">Nome do Consultor</div>
+          <div style="font-size:9px; color:#666; margin-top:2px; letter-spacing:1px;">Consultor de Vendas</div>
+        </div>
+        <ul class="check-list" style="color:#888;">
+          <li style="color:#888;">Papel: Couché 300g + Hot stamping cobre</li>
+          <li style="color:#888;">Tamanho: 90×50mm</li>
+          <li style="color:#888;">Frente preta, verso off-white</li>
+        </ul>
+      </div>
+      <div class="card card-dark">
+        <div class="card-titulo">Envelope &amp; Papel Timbrado</div>
+        <div style="background:#f5f2ed; border-radius:2px; padding:20px; margin:16px 0; height:100px; display:flex; align-items:flex-start; justify-content:flex-start;">
+          <div>
+            <div style="font-size:8px; letter-spacing:3px; color:#A0521C;">AZEVEDO MOTORS</div>
+            <div style="width:32px; height:1px; background:linear-gradient(90deg,#7B3B10,#C87941); margin:4px 0;"></div>
+          </div>
+        </div>
+        <ul class="check-list" style="color:#888;">
+          <li style="color:#888;">Papel: Vergê 120g off-white</li>
+          <li style="color:#888;">Logo no canto superior esquerdo</li>
+          <li style="color:#888;">Linha cobre de rodapé (1pt)</li>
+        </ul>
+      </div>
+      <div class="card card-dark">
+        <div class="card-titulo">Pasta &amp; Proposta Comercial</div>
+        <div style="background:#0d0d0d; border:1px solid #333; border-radius:2px; padding:20px; margin:16px 0; height:100px; display:flex; align-items:center; justify-content:center;">
+          <div style="text-align:center;">
+            <svg width="32" height="32" viewBox="0 0 80 80" fill="none"><defs><linearGradient id="vp" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#7B3B10"/><stop offset="100%" stop-color="#C87941"/></linearGradient></defs><path d="M10 8 L40 72 L70 8" stroke="url(#vp)" stroke-width="8" fill="none" stroke-linejoin="round" stroke-linecap="round"/></svg>
+          </div>
+        </div>
+        <ul class="check-list" style="color:#888;">
+          <li style="color:#888;">Capa: preta com relevo seco</li>
+          <li style="color:#888;">Símbolo V: hot stamping cobre</li>
+          <li style="color:#888;">Papel interno: couché fosco 170g</li>
+        </ul>
+      </div>
+    </div>
+
+    <h3 style="font-size:11px; letter-spacing:3px; text-transform:uppercase; color:#999; margin-bottom:20px;">Uniformes &amp; Showroom</h3>
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-titulo">Fardamento</div>
+        <ul class="check-list mt-8">
+          <li>Camisa polo ou social: preto ou branco</li>
+          <li>Bordado: logo AZEVEDO MOTORS no peito esquerdo</li>
+          <li>Calça social: preta ou grafite</li>
+          <li>Crachá: preto com letras douradas/cobre</li>
+          <li>Proibido usar logotipo em cores diferentes</li>
+        </ul>
+      </div>
+      <div class="card">
+        <div class="card-titulo">Showroom &amp; Sinalização</div>
+        <ul class="check-list mt-8">
+          <li>Fachada: letras caixa-alta iluminadas — aço cobre</li>
+          <li>Fundo de fachada: preto ou cinza antracite</li>
+          <li>Sinalização interna: padrão monocromático preto/cobre</li>
+          <li>Banner roll-up: fundo preto, vertical, logo centralizado</li>
+          <li>Totem: aço escovado com vinil preto e cobre</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── 14. PROIBIÇÕES ── -->
+  <section class="secao" id="proibicoes">
+    <span class="secao-num">14 — Proteção da Marca</span>
+    <h2 class="secao-titulo">O que <span class="accent">Não Fazer</span></h2>
+    <div class="divider"></div>
+    <p class="secao-desc">
+      Estas proibições são tão importantes quanto as diretrizes positivas.
+      Qualquer uso incorreto dilui a percepção premium da Azevedo Motors.
+    </p>
+
+    <div class="grid-2 mb-32">
+      <div class="uso-errado">
+        <div class="logo-texto" style="filter:hue-rotate(180deg);">
+          <div class="logo-texto-principal" style="color:#0066ff;">
+            AZE<span style="color:#ff0000;">V</span>EDO
+          </div>
+        </div>
+        <div style="font-size:12px; color:#888; text-align:center; margin-top:8px;">Não altere as cores do logotipo</div>
+      </div>
+      <div class="uso-correto">
+        <div class="logo-texto">
+          <div class="logo-texto-principal">
+            AZE<span class="v-copper">V</span>EDO
+          </div>
+          <div class="logo-texto-sub">
+            <span class="logo-linha"></span>MOTORS<span class="logo-linha"></span>
+          </div>
+        </div>
+        <div style="font-size:12px; color:#888; text-align:center; margin-top:8px;">Use sempre as cores oficiais</div>
+      </div>
+    </div>
+
+    <h3 style="font-size:11px; letter-spacing:3px; text-transform:uppercase; color:#999; margin-bottom:20px;">Lista de Proibições</h3>
+    <table>
+      <tr>
+        <th>Elemento</th>
+        <th>Proibição</th>
+        <th>Motivo</th>
+      </tr>
+      <tr>
+        <td>Logotipo</td>
+        <td>Não distorcer, rotacionar, aplicar efeitos ou separar elementos</td>
+        <td>Quebra a geometria e a legibilidade da marca</td>
+      </tr>
+      <tr>
+        <td>Cores</td>
+        <td>Não substituir o gradiente cobre por dourado, laranja ou amarelo</td>
+        <td>Altera o posicionamento premium e causa inconsistência</td>
+      </tr>
+      <tr>
+        <td>Tipografia</td>
+        <td>Não usar Comic Sans, Impact ou fontes serifadas genéricas</td>
+        <td>Incompatíveis com o posicionamento sofisticado</td>
+      </tr>
+      <tr>
+        <td>Fundos</td>
+        <td>Não aplicar logo sobre fundos coloridos não aprovados</td>
+        <td>Reduz legibilidade e contraste</td>
+      </tr>
+      <tr>
+        <td>Comunicação</td>
+        <td>Não usar linguagem agressiva, caps lock, excessos de emojis</td>
+        <td>Contradiz o tom sofisticado da marca</td>
+      </tr>
+      <tr>
+        <td>Imagens</td>
+        <td>Não usar fotos de baixa resolução, filtros excessivos ou imagens de banco genéricas</td>
+        <td>Reduz a percepção de qualidade</td>
+      </tr>
+      <tr>
+        <td>Parcerias</td>
+        <td>Não associar a marca a contextos incompatíveis com o posicionamento premium</td>
+        <td>Dilui o valor de marca construído</td>
+      </tr>
+    </table>
+
+    <!-- Nota final -->
+    <div style="margin-top:60px; padding:40px; background:var(--preto); text-align:center;">
+      <div style="font-size:10px; letter-spacing:4px; color:var(--cobre-medio); margin-bottom:12px; text-transform:uppercase;">Proteção da Marca</div>
+      <div style="font-size:18px; font-weight:700; color:var(--branco); letter-spacing:2px; margin-bottom:12px;">
+        Em caso de dúvida, consulte este manual.
+      </div>
+      <div style="font-size:13px; color:#555; line-height:1.8;">
+        Toda peça de comunicação produzida por agências parceiras deve ser aprovada pela Azevedo Motors
+        antes de veiculação. Este manual deve ser compartilhado com todos os fornecedores de mídia e design.
+      </div>
+    </div>
+  </section>
+
+  <!-- ── FOOTER ── -->
+  <footer class="pagina-footer">
+    <div class="marca">AZEVEDO MOTORS</div>
+    <div class="sub">Manual da Marca · Versão 1.0 · 2025</div>
+    <p>Este documento é confidencial e de uso exclusivo da equipe Azevedo Motors e parceiros autorizados.</p>
+    <p style="margin-top:8px;">Dúvidas sobre aplicação da marca: contato direto com a equipe de marketing.</p>
+
+    <div style="display:flex; justify-content:center; margin-top:40px;">
+      <svg width="40" height="40" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="vfoot" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#7B3B10"/>
+            <stop offset="100%" stop-color="#C87941"/>
+          </linearGradient>
+        </defs>
+        <path d="M10 8 L40 72 L70 8" stroke="url(#vfoot)" stroke-width="8" fill="none" stroke-linejoin="round" stroke-linecap="round"/>
+      </svg>
+    </div>
+  </footer>
+
+</main>
+
+<script>
+  // Navegação ativa ao rolar
+  const sections = document.querySelectorAll('section[id]');
+  const navLinks = document.querySelectorAll('nav a');
+
+  window.addEventListener('scroll', () => {
+    let current = '';
+    sections.forEach(s => {
+      if (window.scrollY >= s.offsetTop - 100) current = s.id;
+    });
+    navLinks.forEach(a => {
+      a.classList.remove('active');
+      if (a.getAttribute('href') === '#' + current) a.classList.add('active');
+    });
+  });
+</script>
+</body>
+</html>
